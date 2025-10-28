@@ -1,0 +1,164 @@
+/* Meal Contents Chart Styles */
+
+.meal-contents-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  align-items: center;
+}
+
+.meal-contents-legends-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.meal-chart {
+  overflow: visible;
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure y-axis text is fully visible and not clipped */
+.meal-chart .y-axis text {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.meal-chart-wrapper {
+  overflow: visible;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+
+.meal-chart-wrapper.expanded {
+  overflow: visible;
+  max-width: 100%;
+}
+
+.meal-cell {
+  transition: opacity 0.2s ease;
+}
+
+.meal-cell:hover {
+  opacity: 0.8;
+}
+
+/* Ensure emojis render properly and don't overflow */
+.meal-cell text {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: visible;
+}
+
+.meal-cell circle {
+  overflow: visible;
+}
+
+.meal-legend text {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Grid lines */
+/* Grid line styles moved to ChartStyles.css to avoid duplication */
+
+/* Axis styling */
+.x-axis text,
+.y-axis text {
+  font-family: 'Arial', sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure y-axis text is not clipped */
+.y-axis text {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Loading and error states - now handled by unified Placeholder component */
+
+
+
+/* Food category specific styling */
+.food-category-protein {
+  fill: #8B4513;
+}
+
+.food-category-carbohydrates {
+  fill: #F4A460;
+}
+
+.food-category-vegetables {
+  fill: #32CD32;
+}
+
+.food-category-fruit {
+  fill: #FF69B4;
+}
+
+.food-category-alcohol {
+  fill: #9370DB;
+}
+
+.food-category-sugar {
+  fill: #FF6347;
+}
+
+/* Sugar level indicators */
+.sugar-level-none {
+  fill: #F5F5F5;
+}
+
+.sugar-level-low {
+  fill: #FFE4E1;
+}
+
+.sugar-level-medium {
+  fill: #FFC0CB;
+}
+
+.sugar-level-high {
+  fill: #FF69B4;
+}
+
+.sugar-level-very-high {
+  fill: #DC143C;
+}
+
+/* Hover effects for interactive elements */
+.meal-cell rect:hover {
+  stroke-width: 2;
+  stroke: #333;
+}
+
+/* Text styling for better readability */
+.meal-chart text {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Meal Contents Chart Summary Styles - Now using standard chart-summary class */
+.meal-contents-chart-container .chart-summary {
+  max-width: 500px; /* Reduced width for meal contents charts */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.meal-contents-chart-container.expanded .chart-summary,
+.visualization-wrapper.expanded .meal-contents-chart-container .chart-summary {
+  max-width: none; /* Remove max-width constraint in expanded view */
+  width: 100%;
+}

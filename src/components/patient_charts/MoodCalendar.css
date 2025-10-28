@@ -1,0 +1,133 @@
+/* Mood Calendar Patient Charts Specific Styles */
+.mood-calendar-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-lg);
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+}
+
+.mood-calendar-legend-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center legend horizontally */
+  gap: 16px;
+}
+
+/* Expanded view - ensure legend is centered */
+.visualization-wrapper.expanded .mood-calendar-legend-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mood-calendar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+}
+
+/* Expanded view - allow calendar to scale properly */
+.visualization-wrapper.expanded .mood-calendar-wrapper {
+  width: 100%;
+  max-width: none;
+  padding: 1rem; /* Reduce padding in expanded mode */
+  gap: var(--chart-spacing-sm); /* Reduce gap between title and calendar */
+}
+
+/* Optimize legend in expanded mode */
+.visualization-wrapper.expanded .mood-calendar-legend-wrapper .legend-container {
+  max-width: 600px; /* Allow legend to expand for better mood item distribution */
+  width: 100%;
+  padding: var(--chart-spacing-md); /* Reduce padding for more compact appearance */
+}
+
+.visualization-wrapper.expanded .mood-calendar-legend-wrapper .legend-items {
+  justify-content: space-evenly; /* Better distribution of 3 mood items */
+  gap: var(--chart-spacing-xs); /* Minimal gap between items */
+}
+
+/* Reduce overall container spacing in expanded mode */
+.visualization-wrapper.expanded .mood-calendar-container {
+  gap: var(--chart-spacing-md); /* Reduce gap from lg to md */
+  padding: var(--chart-spacing-sm); /* Add minimal padding to container */
+}
+
+/* Optimize mood calendar wrapper spacing */
+.visualization-wrapper.expanded .mood-calendar-wrapper {
+  gap: var(--chart-spacing-xs); /* Reduce gap between elements */
+}
+
+/* Ensure calendar cells are properly sized in expanded mode */
+.visualization-wrapper.expanded .mood-calendar-svg .day-cell-bg {
+  stroke-width: 1; /* Maintain consistent border width */
+}
+
+/* Optimize mood icon positioning in expanded mode */
+.visualization-wrapper.expanded .mood-calendar-svg .mood-icon {
+  font-size: var(--chart-font-size-xl); /* Ensure consistent emoji size */
+}
+
+/* Note: Legend styles moved to centralized ChartStyles.css */
+/* SVG Container */
+.mood-calendar-svg-container { 
+  width: 100%; 
+  max-width: 400px; 
+}
+
+/* Expanded view - allow SVG to scale larger */
+.visualization-wrapper.expanded .mood-calendar-svg-container {
+  max-width: 800px; /* Increase from 400px to 800px for better expanded view */
+  width: 100%;
+}
+
+.mood-calendar-svg { 
+  width: 100%; 
+  height: auto; 
+}
+
+/* Optimize calendar title spacing in expanded mode */
+.visualization-wrapper.expanded .mood-calendar-svg-container .chart-title {
+  margin-bottom: var(--chart-spacing-sm); /* Reduce margin below title */
+  font-size: var(--chart-font-size-xl); /* Ensure consistent title size */
+}
+
+.visualization-wrapper.expanded .mood-calendar-svg-container .chart-subtitle {
+  margin-bottom: var(--chart-spacing-md); /* Reduce margin below subtitle */
+  font-size: var(--chart-font-size-lg); /* Ensure consistent subtitle size */
+}
+
+/* Calendar Header */
+.day-name-label {
+  fill: #000000;
+  font-weight: 400;
+  text-anchor: middle;
+}
+
+/* Day Cell */
+.day-cell-bg {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+  transition: fill 0.3s ease;
+}
+
+.date-label {
+  fill: #000000;
+  font-weight: 400;
+}
+
+.mood-icon {
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Mood-specific styles */
+.mood-happy { background-color: #d5f4e6; border: 2px solid #2ecc71; }
+.mood-sad { background-color: #d6eaf8; border: 2px solid #3498db; }
+.mood-angry { background-color: #fadbd8; border: 2px solid #e74c3c; }
+
+/* Note: Summary styles moved to centralized ChartStyles.css */

@@ -1,0 +1,39 @@
+/**
+ * PatientSelector.css - Patient Selection Dropdown Styles
+ * 
+ * Styling for the patient selection dropdown component.
+ * Ensures consistent styling with the rest of the application.
+ */
+
+.patient-selector-container {
+  margin: 24px;
+}
+
+.patient-selector-label {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.patient-selector-select {
+  font-size: 18px;
+  padding: 6px 12px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.patient-selector-select:hover {
+  border-color: #2980b9;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.patient-selector-select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+

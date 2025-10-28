@@ -1,0 +1,62 @@
+/* InfoBox Styles - similar to legend styling */
+.info-box {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.info-box-title {
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 400;
+  font-size: 1em;
+  color: #000000;
+}
+
+.info-box-content {
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #000000;
+  text-align: left;
+}
+
+/* Scaling for expanded view */
+.expanded .info-box {
+  font-size: 1.1em;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.expanded .info-box-title {
+  font-size: 1.1em;
+  margin-bottom: 12px;
+}
+
+.expanded .info-box-content {
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+/* Additional scaling for blood pressure chart expanded view */
+.bp-chart-content.expanded .info-box {
+  font-size: 1.15em;
+  padding: 18px;
+}
+
+.bp-chart-content.expanded .info-box-title {
+  font-size: 1.15em;
+}
+
+/* Additional scaling for glucose chart expanded view */
+.glucose-chart-wrapper.expanded .info-box {
+  font-size: 1.15em;
+  padding: 18px;
+}
+
+.glucose-chart-wrapper.expanded .info-box-title {
+  font-size: 1.15em;
+}

@@ -1,0 +1,191 @@
+/* Global minimal text styling */
+* {
+  color: #000000;
+  font-family: 'Arial', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.App {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #000000;
+}
+
+.App-header {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.App-header h1 {
+  margin: 0 0 15px 0;
+  color: #000000;
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.role-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.patient-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.patient-selector label {
+  font-weight: 400;
+  color: #000000;
+  font-size: 1.1rem;
+}
+
+.patient-selector select {
+  padding: 8px 12px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.patient-selector select:hover {
+  border-color: #2980b9;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.patient-selector select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.tab-navigation {
+  display: flex;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+  padding: 15px 30px;
+  border: none;
+  background: transparent;
+  color: #000000;
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  margin: 0 5px;
+}
+
+.tab-button:hover {
+  color: #000000;
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.tab-button.active {
+  color: #000000;
+  border-bottom-color: #3498db;
+  background: rgba(52, 152, 219, 0.05);
+}
+
+.App-main {
+  padding: 30px 20px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+  color: #000000;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+/* Screenshot Mode Styles */
+.screenshot-toggle {
+  margin-top: 10px;
+}
+
+.screenshot-mode-button {
+  padding: 6px 16px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.screenshot-mode-button:hover {
+  background: #45a049;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.floating-screenshot-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 6px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.floating-screenshot-toggle:hover {
+  background: #d32f2f;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Screenshot Mode: Optimize page layout */
+.app-main:has(.screenshot-mode) {
+  padding: 20px;
+  max-width: 100%;
+}
+
+/* Screenshot Mode: Expand dashboard width */
+.patient-dashboard:has(.screenshot-mode),
+.physician-dashboard:has(.screenshot-mode) {
+  max-width: 100%;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Note: Chart-specific styles have been moved to their respective component CSS files */

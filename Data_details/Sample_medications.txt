@@ -1,0 +1,133 @@
+Medications
+
+=== HEART HEALTH AND HYPERTENSION ===
+
+Lisinopril (Prinivil, Zestril)
+Type: Prescribed
+Category: Heart health and hypertension
+Dose: 10 mg once daily
+
+Amlodipine (Norvasc)
+Type: Prescribed
+Category: Heart health and hypertension
+Dose: 5 mg once daily
+
+Metoprolol (Lopressor, Toprol-XL)
+Type: Prescribed
+Category: Heart health and hypertension
+Dose: 50 mg twice daily
+
+Atorvastatin (Lipitor)
+Type: Prescribed
+Category: Heart health and hypertension
+Dose: 20 mg once daily
+
+Warfarin (Coumadin)
+Type: Prescribed
+Category: Heart health and hypertension
+Dose: 5 mg once daily
+
+=== DIABETES (ORAL OR INJECTABLE) ===
+
+Metformin (Glucophage)
+Type: Prescribed
+Category: Diabetes (oral or injectable)
+Dose: 500 mg twice daily
+
+Glipizide (Glucotrol)
+Type: Prescribed
+Category: Diabetes (oral or injectable)
+Dose: 5 mg once daily
+
+Liraglutide (Victoza)
+Type: Prescribed
+Category: Diabetes (oral or injectable)
+Dose: 1.2 mg once daily
+
+Insulin Glargine (Lantus)
+Type: Prescribed
+Category: Diabetes (oral or injectable)
+Dose: 20 units once daily
+
+Empagliflozin (Jardiance)
+Type: Prescribed
+Category: Diabetes (oral or injectable)
+Dose: 10 mg once daily
+
+=== CHRONIC PAIN AND MUSCULOSKELETAL ===
+
+Naproxen (Naprosyn, Aleve)
+Type: Prescribed
+Category: Chronic pain and musculoskeletal
+Dose: 500 mg twice daily
+
+Gabapentin (Neurontin)
+Type: Prescribed
+Category: Chronic pain and musculoskeletal
+Dose: 300 mg three times daily
+
+=== MENTAL HEALTH (MOOD AND ANXIETY) ===
+
+Sertraline (Zoloft)
+Type: Prescribed
+Category: Mental health (mood and anxiety)
+Dose: 50 mg once daily
+
+Citalopram (Celexa)
+Type: Prescribed
+Category: Mental health (mood and anxiety)
+Dose: 20 mg once daily
+
+Venlafaxine (Effexor)
+Type: Prescribed
+Category: Mental health (mood and anxiety)
+Dose: 75 mg once daily
+
+Quetiapine (Seroquel)
+Type: Prescribed
+Category: Mental health (mood and anxiety)
+Dose: 100 mg once daily
+
+=== VITAMINS AND SUPPLEMENTS ===
+
+Vitamin D
+Type: Supplement
+Category: Vitamins and supplements
+Dose: 1000 IU once daily
+
+Folic Acid
+Type: Supplement
+Category: Vitamins and supplements
+Dose: 400 mcg once daily
+
+Iron
+Type: Supplement
+Category: Vitamins and supplements
+Dose: 15 mg once daily
+
+Magnesium
+Type: Supplement
+Category: Vitamins and supplements
+Dose: 400 mg once daily
+
+Calcium
+Type: Supplement
+Category: Vitamins and supplements
+Dose: 600 mg once daily
+
+=== OVER-THE-COUNTER PAIN MEDICATIONS ===
+
+Ibuprofen (Advil, Motrin)
+Type: Over-the-Counter (OTC)
+Category: Chronic pain and musculoskeletal
+Dose: 400 mg every 6 hours as needed
+
+Naproxen Sodium (Aleve)
+Type: Over-the-Counter (OTC)
+Category: Chronic pain and musculoskeletal
+Dose: 220 mg every 8-12 hours as needed
+
+Acetaminophen (Tylenol)
+Type: Over-the-Counter (OTC)
+Category: Chronic pain and musculoskeletal
+Dose: 500 mg every 6 hours as needed

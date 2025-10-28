@@ -1,0 +1,214 @@
+/* Dashboard Grid Styles - Universal Aspect Ratios */
+
+/* Patient Dashboard Grid - Universal minimum size */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+/* Physician Dashboard Grid - Optimized for sidebar layout */
+.physician-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* No data placeholder - now handled by unified Placeholder component */
+
+
+
+/* Expanded view styles */
+.expanded-view {
+  grid-column: 1 / -1;
+  margin: 16px 0;
+}
+
+/* Chart container base styles - Universal dimensions */
+.visualization-box,
+.physician-chart-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 480px; /* Reduced from 500px for better space usage */
+  display: flex;
+  flex-direction: column;
+}
+
+.visualization-box:hover,
+.physician-chart-container:hover {
+  border-color: #adb5bd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Visualization Header Styles - Universal */
+.visualization-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #dee2e6;
+  min-height: 60px; /* Universal header height */
+}
+
+.visualization-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.visualization-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.visualization-header select {
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 160px;
+  color: #000000;
+}
+
+.visualization-header select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.expand-button {
+  padding: 8px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+  color: #000000;
+}
+
+.expand-button:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+/* Visualization Content - Universal dimensions */
+.visualization-content {
+  flex-grow: 1;
+  padding: var(--chart-spacing-lg); /* Use CSS variable for consistency */
+  min-height: 380px; /* Reduced from 400px for better space usage */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center for better space usage */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.expanded-view .visualization-content {
+  padding: var(--chart-spacing-xl);
+  min-height: 650px; /* Reduced from 700px for better space usage */
+}
+
+/* Ensure all chart containers are properly sized and centered */
+.visualization-content > div {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Specific chart positioning for patient dashboard */
+.visualization-box-1 {
+  grid-column: 1;
+}
+
+.visualization-box-2 {
+  grid-column: 2;
+}
+
+.visualization-box-3 {
+  grid-column: 3;
+}
+
+/* Specific chart positioning for physician dashboard */
+.window-1 { grid-area: 1 / 1 / 2 / 2; }
+.window-2 { grid-area: 1 / 2 / 2 / 3; }
+.window-3 { grid-area: 1 / 3 / 2 / 4; }
+.window-4 { grid-area: 2 / 1 / 3 / 2; }
+.window-5 { grid-area: 2 / 2 / 3 / 3; }
+.window-6 { grid-area: 2 / 3 / 3 / 4; }
+
+/* Screenshot Mode Styles */
+/* Force 4-column grid layout for screenshot mode */
+.visualization-wrapper.screenshot-mode {
+  /* Remove specific positioning */
+  grid-area: auto !important;
+  grid-column: auto !important;
+}
+
+/* Patient Dashboard Grid in Screenshot Mode */
+.dashboard-grid:has(.screenshot-mode) {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px;
+  margin-top: 0;
+}
+
+/* Physician Dashboard Grid in Screenshot Mode */
+.physician-charts-grid:has(.screenshot-mode) {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px;
+  margin-top: 0;
+}
+
+/* Reduce padding and height for compact screenshot view */
+.visualization-wrapper.screenshot-mode .visualization-content {
+  padding: 16px;
+  min-height: 350px;
+}
+
+.visualization-wrapper.screenshot-mode .visualization-box,
+.visualization-wrapper.screenshot-mode .physician-chart-container {
+  min-height: 380px;
+}
+
+/* Ensure charts don't have extra margins in screenshot mode */
+.visualization-wrapper.screenshot-mode {
+  margin: 0;
+}
+
+/* Responsive screenshot mode for smaller screens */
+@media (max-width: 1800px) {
+  .dashboard-grid:has(.screenshot-mode),
+  .physician-charts-grid:has(.screenshot-mode) {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 1400px) {
+  .dashboard-grid:has(.screenshot-mode),
+  .physician-charts-grid:has(.screenshot-mode) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1801px) {
+  /* Ensure 4 columns on larger screens */
+  .dashboard-grid:has(.screenshot-mode),
+  .physician-charts-grid:has(.screenshot-mode) {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+

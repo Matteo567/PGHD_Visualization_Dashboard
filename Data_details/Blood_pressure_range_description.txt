@@ -1,0 +1,2 @@
+Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK).
+

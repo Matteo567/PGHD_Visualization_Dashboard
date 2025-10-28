@@ -1,0 +1,1150 @@
+/*
+ * ChartStyles.css - Comprehensive CSS for Digital Health Data Visualizations
+ * 
+ * This file contains all shared chart styling, variables, and common components
+ * used across the digital health dashboard application.
+ * 
+ * FUNCTIONALITY:
+ * - Provides consistent visual styling for all chart components
+ * - Defines color schemes for different data types (glucose, blood pressure, sleep, exercise, mood)
+ * - Implements design patterns for web application views
+ * - Manages chart states (loading, error, no data) with appropriate styling
+ * - Provides interactive element styling (buttons, navigation, tooltips)
+ * - Defines typography scale and spacing system for consistent layouts
+ * - Handles pain visualization with body mapping and intensity indicators
+ * - Supports body visualization with anatomical chart styling
+ * 
+ * FILE STRUCTURE:
+ * 1. CSS Custom Properties (Variables) - Colors, fonts, spacing, shadows
+ * 2. Base Chart Styles - Common chart container and SVG styling
+ * 3. Chart Components - Titles, subtitles, summaries, legends
+ * 4. Interactive Elements - Buttons, navigation, hover effects
+ * 5. Chart States - Loading, error, and no-data message styling
+ * 6. Specific Chart Types - Blood pressure, glucose, sleep, exercise, mood
+ * 7. Design System - Consistent styling and layout patterns
+ * 8. Pain Visualization - Body mapping, intensity scales, location indicators
+ * 9. Body Visualization - Anatomical chart styling and layout
+ * 
+ * USAGE NOTES:
+ * - All styling uses CSS custom properties for easy theming
+ * - Color scheme follows accessibility guidelines for colorblind users
+ * - Design system provides consistent styling across all components
+ * - Consistent spacing and typography across all chart components
+ */
+
+/* ====== DESIGN SYSTEM: CHART STYLES ====== */
+
+/* --- Color Palette --- */
+:root {
+  /* Primary Status Colors - Updated for colorblind accessibility */
+  --chart-color-primary: #2196F3; /* Blue - primary color for lines and borders */
+  --chart-color-good: #4CAF50; /* Green - keep for good status */
+  --chart-color-warning: #FFC107; /* Yellow - keep for warning */
+  --chart-color-danger: #F44336; /* Red - keep for danger */
+  --chart-color-info: #2196F3; /* Blue - keep for info */
+  --chart-color-secondary: #9C27B0; /* Purple - keep for secondary */
+  
+  /* New vibrant colors for glucose and blood pressure - Updated with new color scheme */
+  --chart-color-yellow: #1b9e77; /* Green */
+  --chart-color-blue: #d95f02; /* Orange */
+  --chart-color-orange: #7570b3; /* Purple */
+  
+  /* Sleep colors - Updated with new color scheme */
+  --chart-color-sleep-very-good: #a6cee3; /* Light blue */
+  --chart-color-sleep-fairly-good: #1f78b4; /* Blue */
+  --chart-color-sleep-fairly-bad: #b2df8a; /* Light green */
+  --chart-color-sleep-very-bad: #33a02c; /* Green */
+  
+  /* Exercise Activity Colors - Updated with new color scheme */
+  --chart-color-walking: #a6cee3; /* Light blue */
+  --chart-color-swimming: #1f78b4; /* Blue */
+  --chart-color-running: #b2df8a; /* Light green */
+  --chart-color-resistance: #33a02c; /* Green */
+  --chart-color-biking: #fb9a99; /* Light red */
+  --chart-color-balance: #e31a1c; /* Red */
+  --chart-color-other: #fdbf6f; /* Orange */
+  
+  /* Mood Colors - Updated with new color scheme */
+  --chart-color-mood-happy: #1b9e77; /* Green */
+  --chart-color-mood-sad: #d95f02; /* Orange */
+  --chart-color-mood-angry: #7570b3; /* Purple */
+  --chart-color-mood-happy-bg: #e8f5e8; /* Light green background */
+  --chart-color-mood-sad-bg: #fef3e0; /* Light orange background */
+  --chart-color-mood-angry-bg: #f0eef5; /* Light purple background */
+  
+  /* Neutral Colors */
+  --chart-color-neutral: #6c757d;
+  --chart-color-border: #dee2e6;
+  --chart-color-background: #f8f9fa;
+  --chart-color-text-primary: #000000;
+  --chart-color-text-secondary: #000000;
+  --chart-color-text-muted: #000000;
+  
+  /* Typography Scale */
+  --chart-font-family: 'Arial', sans-serif;
+  --chart-font-size-xs: 10px;
+  --chart-font-size-sm: 12px;
+  --chart-font-size-base: 14px;
+  --chart-font-size-md: 16px;
+  --chart-font-size-lg: 18px;
+  --chart-font-size-xl: 20px;
+  --chart-font-weight: 400;
+  --chart-font-weight-semibold: 600;
+  --chart-font-weight-bold: 700;
+  
+  /* Spacing Scale */
+  --chart-spacing-xs: 4px;
+  --chart-spacing-sm: 8px;
+  --chart-spacing-md: 12px;
+  --chart-spacing-lg: 16px;
+  --chart-spacing-xl: 20px;
+  --chart-spacing-xxl: 24px;
+  
+  /* Border Radius */
+  --chart-border-radius-sm: 4px;
+  --chart-border-radius-md: 8px;
+  --chart-border-radius-lg: 12px;
+  --chart-border-radius-round: 50%;
+  
+  /* Shadows */
+  --chart-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --chart-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --chart-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+  
+  /* Pain-specific spacing */
+  --pain-spacing-compact: 8px;
+  --pain-spacing-normal: 12px;
+  --pain-spacing-relaxed: 16px;
+  
+  /* Pain-specific dimensions */
+  --pain-body-width: 70px;
+  --pain-body-height: 140px;
+  --pain-body-expanded-width: 90px;
+  --pain-body-expanded-height: 180px;
+}
+
+/* --- Visualization Wrapper Base Styles --- */
+.visualization-wrapper {
+  font-family: var(--chart-font-family);
+  color: var(--chart-color-text-primary);
+}
+
+/* --- Chart Title Styles --- */
+.chart-title {
+  font-size: var(--chart-font-size-xl);
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  margin: 0 0 var(--chart-spacing-md) 0;
+  text-align: center;
+  padding: var(--chart-spacing-sm) 0;
+  border-bottom: 1px solid var(--chart-color-border);
+}
+
+.chart-svg {
+  width: 100%;
+  max-width: 100%;
+  font-family: var(--chart-font-family);
+  display: block;
+  margin: 0 auto;
+}
+
+/* Universal chart SVG styling for consistent sizing */
+.chart-svg,
+.sleep-chart svg,
+.pain-chart-wrapper svg,
+.mood-calendar-wrapper svg,
+.meal-chart-wrapper svg,
+.glucose-chart-wrapper svg,
+.bp-svg-container svg,
+.exercise-chart-content svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Universal chart wrapper styling */
+.glucose-chart-wrapper,
+.bp-svg-container,
+.exercise-chart-content,
+.sleep-chart,
+.pain-chart-wrapper,
+.mood-calendar-wrapper,
+.meal-chart-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Chart Grid and Axes --- */
+
+
+
+
+.chart-axis-label {
+  font-size: var(--chart-font-size-xs);
+  fill: var(--chart-color-text-secondary);
+  text-anchor: middle;
+  font-weight: var(--chart-font-weight);
+}
+
+
+
+.chart-grid-line-horizontal,
+.chart-grid-line-vertical {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+}
+
+.chart-grid-line-horizontal {
+  stroke-dasharray: 2, 2;
+}
+
+.chart-grid-line-vertical-time {
+  stroke: #f0f0f0;
+  stroke-width: 0.5;
+}
+
+/* --- Axis Labels with Units --- */
+.y-axis-title {
+  font-size: var(--chart-font-size-sm);
+  fill: var(--chart-color-text-primary);
+  font-weight: var(--chart-font-weight-semibold);
+}
+
+.x-axis-day-label {
+  fill: var(--chart-color-text-primary);
+  font-weight: var(--chart-font-weight-semibold);
+}
+
+.x-axis-date-label {
+  fill: var(--chart-color-text-secondary);
+}
+
+.time-label {
+  fill: var(--chart-color-text-muted);
+  font-weight: var(--chart-font-weight-semibold);
+  letter-spacing: 0.3px;
+}
+
+/* Prevent text overlap */
+.time-label {
+  dominant-baseline: hanging;
+  text-rendering: optimizeLegibility;
+}
+
+
+
+.data-bar {
+  transition: all 0.2s ease;
+  stroke: #ffffff;
+  stroke-width: 1;
+}
+
+.data-bar:hover {
+  opacity: 0.8;
+}
+
+/* --- Chart Specific Elements --- */
+.chart-subtitle {
+  font-size: var(--chart-font-size-md);
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  text-align: center;
+  margin: 0 0 var(--chart-spacing-sm) 0;
+}
+
+/* --- Summary Statistics Styles --- */
+.chart-summary {
+  padding: var(--chart-spacing-xl);
+  background: var(--chart-color-background);
+  border-radius: var(--chart-border-radius-md);
+  border: 1px solid var(--chart-color-border);
+  margin-top: var(--chart-spacing-lg);
+  max-width: 600px; /* Standardized width for all summary boxes */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* Ensure full width within max-width constraint */
+  box-sizing: border-box;
+}
+
+/* Summary container for side-by-side layout in expanded view */
+.summary-container {
+  display: flex;
+  gap: var(--chart-spacing-lg);
+  margin-top: var(--chart-spacing-lg);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Individual summary styling for side-by-side layout */
+.summary-container .chart-summary {
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px; /* Standardized to match other summary boxes */
+  margin: 0;
+}
+
+
+
+/* Expanded view - summary cards should expand with container like legends */
+.visualization-wrapper.expanded .chart-summary {
+  max-width: none;
+  width: 100%;
+}
+
+/* Expanded view - maintain universal aspect ratios while allowing more space */
+.visualization-wrapper.expanded .glucose-chart-container,
+.visualization-wrapper.expanded .bp-chart-content,
+.visualization-wrapper.expanded .exercise-chart-container,
+.visualization-wrapper.expanded .sleep-chart-content,
+.visualization-wrapper.expanded .mood-calendar-container,
+.visualization-wrapper.expanded .meal-contents-chart-container {
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+}
+
+/* Special handling for expanded pain visualization */
+.visualization-wrapper.expanded .pain-chart-container,
+.visualization-wrapper.expanded .physician-pain-chart-container {
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+}
+
+/* Removed redundant individual chart-specific summary width rules - now using universal styling */
+
+
+
+.chart-summary h4 {
+  margin: 0 0 var(--chart-spacing-md) 0;
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-lg);
+  font-weight: var(--chart-font-weight);
+}
+
+.summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-sm);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--chart-spacing-sm) 0;
+  border-bottom: 1px solid var(--chart-color-border);
+  transition: background-color 0.2s ease;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-item:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--chart-border-radius-sm);
+  margin: 0 calc(-1 * var(--chart-spacing-sm));
+  padding: var(--chart-spacing-sm);
+}
+
+.stat-label {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-secondary);
+  font-size: var(--chart-font-size-sm);
+}
+
+.stat-value {
+  font-weight: var(--chart-font-weight-semibold);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+}
+
+/* Status-specific stat value colors */
+.stat-value.good,
+.stat-value.low-risk,
+.stat-value.positive,
+.stat-value.in-range {
+  color: var(--chart-color-good);
+}
+
+.stat-value.warning,
+.stat-value.medium-risk,
+.stat-value.fair,
+.stat-value.mixed {
+  color: var(--chart-color-warning);
+}
+
+.stat-value.danger,
+.stat-value.high-risk,
+.stat-value.poor,
+.stat-value.needs-attention {
+  color: var(--chart-color-danger);
+}
+
+/* SVG tooltip enhancement */
+.data-bar rect:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+
+
+/* --- Legend Styles --- */
+.legend-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--chart-spacing-md);
+  padding: var(--chart-spacing-lg);
+  background: var(--chart-color-background);
+  border-radius: var(--chart-border-radius-md);
+  border: 1px solid var(--chart-color-border);
+  margin-top: var(--chart-spacing-lg);
+  min-height: 80px;
+  max-width: calc(100% - 32px); /* Reduced from 48px to 32px for better fit */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%; /* Ensure full width within max-width constraint */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent content from extending beyond container */
+}
+
+/* Legend items wrapper - this was missing and is needed for proper layout */
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--chart-spacing-sm); /* Slightly smaller gap between items */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%; /* Ensure items don't exceed container width */
+  box-sizing: border-box;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--chart-spacing-sm);
+  padding: var(--chart-spacing-sm) var(--chart-spacing-md);
+  background: white;
+  border-radius: var(--chart-border-radius-round);
+  box-shadow: var(--chart-shadow-sm);
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent items from shrinking */
+}
+
+.legend-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--chart-shadow-md);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--chart-border-radius-sm);
+  border: 1px solid var(--chart-color-border);
+}
+
+.legend-text {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+  white-space: nowrap;
+}
+
+.legend-label {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+  white-space: nowrap;
+  overflow: hidden; /* Prevent text from overflowing */
+  text-overflow: ellipsis; /* Show ellipsis for overflowing text */
+  max-width: 100%; /* Ensure text doesn't exceed container */
+  flex-shrink: 1; /* Allow text to shrink if needed */
+}
+
+/* --- Legend Icon Styles --- */
+.legend-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--chart-font-size-md);
+}
+
+.legend-color-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--chart-border-radius-round);
+  flex-shrink: 0;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px var(--chart-color-border);
+}
+
+/* --- Legend Shape Styles --- */
+.legend-shape {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: inline-block;
+  border-radius: var(--chart-border-radius-sm);
+}
+
+.legend-shape-outlined {
+  background-color: transparent;
+  border: 2px solid var(--chart-color-text-secondary);
+}
+
+.legend-shape-filled {
+  background-color: var(--chart-color-text-secondary);
+  border: 2px solid var(--chart-color-text-secondary);
+}
+
+/* Removed redundant individual chart-specific legend width rules - now using universal styling */
+
+/* Universal chart container styling for consistent dimensions */
+.glucose-chart-container,
+.bp-chart-content,
+.exercise-chart-container,
+.sleep-chart-content,
+.mood-calendar-container,
+.meal-contents-chart-container,
+.pain-chart-container,
+.physician-pain-chart-container {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-lg);
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--chart-color-border);
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 500px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Universal legend and summary width constraints for all chart containers */
+.glucose-chart-container .legend-container,
+.bp-chart-content .legend-container,
+.exercise-chart-container .legend-container,
+.sleep-chart-content .legend-container,
+.mood-calendar-container .legend-container,
+.meal-contents-chart-container .legend-container,
+.pain-chart-container .legend-container,
+.physician-pain-chart-container .legend-container,
+.glucose-chart-container .pain-legend-wrapper .legend-container,
+.bp-chart-content .pain-legend-wrapper .legend-container,
+.exercise-chart-container .pain-legend-wrapper .legend-container,
+.sleep-chart-content .pain-legend-wrapper .legend-container,
+.mood-calendar-container .pain-legend-wrapper .legend-container,
+.meal-contents-chart-container .pain-legend-wrapper .legend-container,
+.pain-chart-container .pain-legend-wrapper .legend-container,
+.physician-pain-chart-container .pain-legend-wrapper .legend-container {
+  max-width: calc(100% - 48px); /* Account for container padding (24px on each side) */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Universal summary width constraints for all chart containers */
+.glucose-chart-container .chart-summary,
+.bp-chart-content .chart-summary,
+.exercise-chart-container .chart-summary,
+.sleep-chart-content .chart-summary,
+.mood-calendar-container .chart-summary,
+.meal-contents-chart-container .chart-summary,
+.pain-chart-container .chart-summary,
+.physician-pain-chart-container .chart-summary {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Hover effects for all chart containers */
+.glucose-chart-container:hover,
+.bp-chart-content:hover,
+.exercise-chart-container:hover,
+.sleep-chart-content:hover,
+.mood-calendar-container:hover,
+.meal-contents-chart-container:hover,
+.pain-chart-container:hover,
+.physician-pain-chart-container:hover {
+  border-color: #adb5bd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Expanded view styling for all containers */
+.visualization-wrapper.expanded .glucose-chart-container,
+.visualization-wrapper.expanded .bp-chart-content,
+.visualization-wrapper.expanded .exercise-chart-container,
+.visualization-wrapper.expanded .mood-calendar-container,
+.visualization-wrapper.expanded .meal-contents-chart-container,
+.visualization-wrapper.expanded .pain-chart-container,
+.visualization-wrapper.expanded .physician-pain-chart-container {
+  padding: 32px;
+  min-height: 700px;
+}
+
+/* Sleep chart should size naturally without forced minimum height */
+.visualization-wrapper.expanded .sleep-chart-content {
+  padding: 32px;
+  min-height: 0; /* Allow natural sizing */
+}
+
+/* Sleep line chart container and chart styles - using universal width constraints */
+.sleep-line-chart-container,
+.sleep-line-chart {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Expanded view - sleep line chart should expand to full width */
+.visualization-wrapper.expanded .sleep-line-chart {
+  max-width: none;
+  width: 100%;
+}
+
+/* Expanded view - sleep line chart container should also expand */
+.visualization-wrapper.expanded .sleep-line-chart-container {
+  max-width: none;
+  width: 100%;
+}
+
+/* Ensure SVG inside sleep line chart expands properly */
+.visualization-wrapper.expanded .sleep-line-chart svg {
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+/* Expanded view - legends and summaries should expand to full width but respect container padding */
+.visualization-wrapper.expanded .legend-container,
+.visualization-wrapper.expanded .chart-summary {
+  max-width: calc(100% - 64px); /* Account for expanded container padding (32px on each side) */
+  width: 100%;
+}
+
+
+
+/* Physician pain chart container base styles */
+.physician-pain-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Pain line chart container and chart styles - using universal width constraints */
+.pain-line-chart-container,
+.pain-line-chart {
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Expanded view - pain line chart should expand to full width */
+.visualization-wrapper.expanded .pain-line-chart {
+  max-width: none;
+  width: 100%;
+}
+
+/* Expanded view - pain line chart container should also expand */
+.visualization-wrapper.expanded .pain-line-chart-container {
+  max-width: none;
+  width: 100%;
+}
+
+/* Ensure SVG inside pain line chart expands properly */
+.visualization-wrapper.expanded .pain-line-chart svg {
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+/* Pain location info styles - using universal width constraints */
+.pain-location-info {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Removed redundant chart summary rule - already defined in universal styling */
+
+/* Removed redundant summary stats rules - already defined in universal styling */
+
+/* Removed physician-specific legend overrides - now using universal styling */
+
+/* --- Chart Button Styles --- */
+.chart-button {
+  padding: var(--chart-spacing-sm) var(--chart-spacing-md);
+  border: 1px solid var(--chart-color-border);
+  background: white;
+  border-radius: var(--chart-border-radius-sm);
+  font-family: var(--chart-font-family);
+  font-size: var(--chart-font-size-sm);
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chart-button:hover {
+  background: var(--chart-color-background);
+  border-color: var(--chart-color-neutral);
+}
+
+.chart-button:active {
+  transform: scale(0.98);
+}
+
+/* --- Pain Chart Base Styles --- */
+.pain-chart-container {
+  max-width: 100%; /* Allow container to expand to parent width */
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* Pain Chart Wrapper - center and constrain width */
+.pain-chart-wrapper {
+  max-width: 600px; /* Allow wrapper to expand more */
+  margin: 0 auto;
+}
+
+/* Pain Legend Wrapper - ensure it doesn't extend beyond container */
+.pain-legend-wrapper {
+  width: 100%;
+  max-width: calc(100% - 48px); /* Account for container padding */
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.pain-chart-container .chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pain-chart-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- Loading and Error States --- */
+/* Now handled by unified Placeholder component */
+
+/* --- Chart Navigation --- */
+.chart-navigation {
+  display: flex;
+  gap: var(--chart-spacing-xs);
+  align-items: center;
+}
+
+.nav-button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--chart-color-border);
+  background: white;
+  border-radius: var(--chart-border-radius-sm);
+  cursor: pointer;
+  font-size: var(--chart-font-size-lg);
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-button:hover {
+  background: var(--chart-color-background);
+  border-color: var(--chart-color-neutral);
+}
+
+.nav-button:active {
+  background: var(--chart-color-border);
+  transform: scale(0.95);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visualization-wrapper.expanded .visualization-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Summary Section Styles --- */
+.summary-section {
+  background: var(--chart-color-background);
+  border: 1px solid var(--chart-color-border);
+  border-radius: var(--chart-border-radius-md);
+  padding: var(--chart-spacing-lg);
+  margin-top: var(--chart-spacing-md);
+}
+
+.summary-label {
+  display: block;
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  margin-bottom: var(--chart-spacing-md);
+  font-size: var(--chart-font-size-md);
+}
+
+.summary-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: var(--chart-spacing-md);
+  border: 1px solid var(--chart-color-border);
+  border-radius: var(--chart-border-radius-sm);
+  font-family: var(--chart-font-family);
+  font-size: var(--chart-font-size-md);
+  line-height: 1.4;
+  resize: vertical;
+  background: white;
+  transition: border-color 0.2s ease;
+  color: var(--chart-color-text-primary);
+}
+
+.summary-textarea:focus {
+  outline: none;
+  border-color: var(--chart-color-info);
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.summary-textarea::placeholder {
+  color: var(--chart-color-text-muted);
+  font-style: normal;
+}
+
+
+
+
+
+.summary-label {
+  font-weight: var(--chart-font-weight-medium);
+  color: var(--chart-color-text-secondary);
+  font-size: var(--chart-font-size-sm);
+}
+
+/* --- Pain Chart Body Layout Styles --- */
+.pain-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--chart-spacing-sm); /* Further reduced gap for dashboard */
+  padding: var(--chart-spacing-sm); /* Reduced padding for dashboard */
+  background: var(--chart-color-background);
+  border-radius: var(--chart-border-radius-md);
+  border: 1px solid var(--chart-color-border);
+  margin-bottom: var(--chart-spacing-sm);
+  max-width: 600px; /* Match legend width for visual consistency */
+  width: 100%; /* Use full available width up to max-width */
+  overflow: hidden; /* Prevent overflow */
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pain-item-info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-xs); /* Reduced gap for dashboard */
+  min-width: 150px; /* Reduced minimum width for dashboard */
+  max-width: calc(100% - 200px); /* Reduced space for SVG */
+  overflow: hidden;
+}
+
+.pain-item-date {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+  text-align: left;
+  flex-shrink: 0;
+  margin-bottom: var(--chart-spacing-xs);
+}
+
+.pain-item-body {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 200px; /* Reduced width for dashboard */
+  max-width: 200px;
+}
+
+.pain-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-xs);
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.pain-level {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+  margin-bottom: var(--chart-spacing-xs);
+  min-width: auto;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pain-location {
+  color: var(--chart-color-text-secondary);
+  font-size: var(--chart-font-size-sm);
+  text-align: left;
+  min-width: auto;
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  line-height: 1.3;
+}
+
+.body-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0; /* Remove margin to fit better */
+  width: 100%;
+  height: 100%;
+}
+
+.body-views {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--chart-spacing-sm); /* Reduced gap for dashboard */
+  width: 100%;
+  max-width: 180px; /* Reduced max-width for dashboard */
+  justify-content: center;
+  margin: 0;
+}
+
+.body-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-xs);
+  flex: 1;
+}
+
+.body-view-label {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-secondary);
+  font-size: var(--chart-font-size-xs); /* Smaller font */
+  text-align: center;
+  margin-bottom: var(--chart-spacing-xs);
+}
+
+.body-svg {
+  width: 80px; /* Smaller size for dashboard */
+  height: 160px; /* Maintain 2:1 aspect ratio */
+  padding: var(--chart-spacing-xs);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Expanded view scaling for pain chart */
+.expanded .body-svg {
+  width: 140px; /* Increased size for expanded view */
+  height: 280px; /* Maintain 2:1 aspect ratio */
+  padding: var(--chart-spacing-sm);
+}
+
+.expanded .pain-item-date {
+  font-size: var(--chart-font-size-md);
+}
+
+.expanded .pain-level {
+  font-size: var(--chart-font-size-md);
+}
+
+.expanded .pain-location {
+  font-size: var(--chart-font-size-md);
+}
+
+.expanded .pain-intensity {
+  font-size: var(--chart-font-size-sm);
+}
+
+.expanded .body-view-label {
+  font-size: var(--chart-font-size-sm);
+}
+
+/* Expanded view optimizations to reduce white space */
+.visualization-wrapper.expanded .pain-chart-container {
+  padding: 16px; /* Force reduce from 30px to 16px in expanded mode */
+  max-width: none;
+  width: 100%;
+}
+
+/* Optimize pain list items in expanded mode */
+.visualization-wrapper.expanded .pain-list-item {
+  padding: var(--chart-spacing-lg); /* Increased padding for better breathing room */
+  margin-bottom: var(--chart-spacing-md); /* Increased margin between items */
+  gap: var(--chart-spacing-lg); /* Increased gap for better separation */
+  max-width: 900px; /* Increased to accommodate larger SVGs */
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center; /* Better vertical alignment */
+}
+
+/* Enhanced expanded pain item body layout */
+.visualization-wrapper.expanded .pain-item-body {
+  min-width: 250px; /* Increased to accommodate larger SVGs */
+  max-width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Better pain item info layout in expanded mode */
+.visualization-wrapper.expanded .pain-item-info {
+  min-width: 200px; /* Increased minimum width for better text layout */
+  max-width: calc(100% - 300px); /* Adjusted to accommodate larger SVG area */
+}
+
+/* Better horizontal space utilization in expanded mode */
+.visualization-wrapper.expanded .body-views {
+  gap: var(--chart-spacing-md); /* Reduced gap */
+  justify-content: center;
+  width: 100%;
+  max-width: 400px; /* Increased for larger SVGs */
+  margin: 0 auto;
+}
+
+/* Optimize body container in expanded mode */
+.visualization-wrapper.expanded .body-container {
+  margin: 0; /* Remove margin */
+  width: 100%;
+}
+
+
+
+/* Additional expanded view optimizations */
+.visualization-wrapper.expanded .pain-chart-wrapper {
+  gap: var(--chart-spacing-sm); /* Reduced gap between title and content */
+}
+
+.visualization-wrapper.expanded .chart-title {
+  margin-bottom: var(--chart-spacing-xs); /* Reduced margin */
+}
+
+.visualization-wrapper.expanded .chart-subtitle {
+  margin-bottom: var(--chart-spacing-sm); /* Reduced margin */
+}
+
+/* Optimize pain list spacing in expanded mode */
+.visualization-wrapper.expanded .pain-list {
+  gap: var(--chart-spacing-xs); /* Reduced gap between items */
+}
+
+/* Ensure pain text has enough space */
+.pain-chart-container .pain-list-item .pain-item-details .pain-location,
+.pain-chart-container .pain-list-item .pain-item-details .pain-intensity {
+  min-width: 150px;
+  margin-right: 15px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+/* Additional improvements for pain visualization */
+.pain-list-item:hover {
+  background: var(--chart-color-background-hover, #f0f0f0);
+  border-color: var(--chart-color-primary);
+  transition: all 0.2s ease-in-out;
+}
+
+.pain-item-details .pain-level,
+.pain-item-details .pain-location {
+  display: flex;
+  align-items: center;
+  gap: var(--chart-spacing-xs);
+  line-height: 1.4;
+}
+
+.pain-item-details strong {
+  color: var(--chart-color-text-primary);
+  font-weight: var(--chart-font-weight-bold);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+/* Improve body SVG scaling */
+.body-svg svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Better spacing for pain chart container */
+.pain-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-lg);
+}
+
+.pain-chart-wrapper {
+  flex: 1;
+}
+
+.pain-legend-wrapper {
+  flex-shrink: 0;
+}
+
+/* Improve no data message */
+.no-pain-data {
+  text-align: center;
+  color: var(--chart-color-text-muted);
+  font-style: italic;
+  padding: var(--chart-spacing-xl);
+  background: var(--chart-color-background);
+  border: 1px dashed var(--chart-color-border);
+  border-radius: var(--chart-border-radius-md);
+  margin: var(--chart-spacing-md) 0;
+}
+
+
+
+/* Removed redundant pain chart container rules - already defined in universal styling */
+
+/* Additional improvements for pain visualization */
+.legend-label {
+  font-weight: var(--chart-font-weight);
+  color: var(--chart-color-text-primary);
+  font-size: var(--chart-font-size-sm);
+  white-space: nowrap;
+  overflow: hidden; /* Prevent text from overflowing */
+  text-overflow: ellipsis; /* Show ellipsis for overflowing text */
+  max-width: 100%; /* Ensure text doesn't exceed container */
+  flex-shrink: 1; /* Allow text to shrink if needed */
+}

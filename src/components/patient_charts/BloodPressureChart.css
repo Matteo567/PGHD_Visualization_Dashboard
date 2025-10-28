@@ -1,0 +1,284 @@
+@import '../ChartStyles.css';
+
+.bp-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 500px;
+}
+
+.bp-chart-container.expanded {
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  flex-grow: 1;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 700px;
+}
+
+.bp-main-title {
+  font-size: 18px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0 0 12px 0;
+  text-align: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.bp-chart-container.expanded .bp-main-title {
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  padding: 12px 0;
+}
+
+.bp-charts-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.bp-chart-container.expanded .bp-charts-wrapper {
+  flex-direction: row;
+  gap: 24px;
+  flex-grow: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Header with toggle */
+.bp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.bp-header .bp-main-title {
+  margin: 0;
+}
+
+.bp-header .chart-subtitle {
+  margin: 0;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Combined Chart Styles */
+.combined-chart {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.combined-chart .chart-subtitle {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* I-Bar Chart Styles */
+.combined-data-bars .bp-reading-group {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.combined-data-bars .bp-reading-group:hover {
+  opacity: 0.8;
+}
+
+.combined-data-bars .bp-reading-group line {
+  transition: stroke-width 0.2s ease;
+}
+
+.combined-data-bars .bp-reading-group:hover line {
+  stroke-width: 4;
+}
+
+.combined-data-bars .bp-reading-group circle {
+  transition: r 0.2s ease;
+}
+
+.combined-data-bars .bp-reading-group:hover circle {
+  r: 5;
+}
+
+/* Dual Y-Axis Styles */
+.dual-y-axis {
+  pointer-events: none;
+}
+
+.y-axis-left .y-axis-title {
+  fill: black;
+  font-weight: 600;
+}
+
+.y-axis-right .y-axis-title {
+  fill: var(--chart-color-green);
+  font-weight: 600;
+}
+
+.systolic-label {
+  fill: black;
+  font-weight: 500;
+}
+
+.diastolic-label {
+  fill: var(--chart-color-green);
+  font-weight: 500;
+}
+
+/* Ensure proper spacing for dual axes */
+.combined-chart .bp-svg-container {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Grid lines for dual axis */
+.dual-y-axis .chart-grid-line-horizontal {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+  stroke-dasharray: 2,2;
+}
+
+/* Blood Pressure Range Background */
+.bp-range-background {
+  pointer-events: none;
+}
+
+.bp-range-background rect {
+  transition: opacity 0.3s ease;
+}
+
+.bp-range-high {
+  fill: var(--chart-color-orange);
+  opacity: 0.08;
+}
+
+.bp-range-pre-high {
+  fill: var(--chart-color-yellow);
+  opacity: 0.08;
+}
+
+.bp-range-ideal {
+  fill: var(--chart-color-blue);
+  opacity: 0.08;
+}
+
+.bp-range-low {
+  fill: var(--chart-color-danger);
+  opacity: 0.08;
+}
+
+/* Subtle border for range boundaries */
+.bp-range-background rect {
+  stroke: none;
+}
+
+/* Ensure data points appear above background */
+.combined-data-bars {
+  z-index: 10;
+}
+
+
+/* Legend */
+.bp-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px;
+  margin: 4px 0;
+}
+
+/* Blood pressure chart legend - using universal structure with consistent dimensions */
+.bp-chart-container .legend-container {
+  margin-bottom: var(--chart-spacing-sm);
+  min-height: 80px; /* Match universal legend height */
+  max-width: calc(100% - 32px); /* Reduced from 48px to 32px for better fit */
+  padding: var(--chart-spacing-md); /* Ensure consistent padding */
+  overflow: hidden; /* Prevent content from extending beyond container */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+
+.bp-chart-container.expanded .legend-container {
+  max-width: calc(100% - 48px); /* Account for expanded container padding */
+  margin: 0 auto 20px auto;
+  overflow: hidden; /* Prevent content from extending beyond container */
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+
+/* Ensure legend items don't overflow in blood pressure chart */
+.bp-chart-container .legend-container .legend-items {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bp-chart-container .legend-container .legend-item {
+  max-width: calc(100% - 16px); /* Ensure items don't touch container edges */
+  box-sizing: border-box;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  max-width: 600px;
+}
+
+.chart-section.expanded {
+  min-width: 0;
+  max-width: 600px;
+  flex: 1;
+}
+
+

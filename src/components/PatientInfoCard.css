@@ -1,0 +1,210 @@
+/* Shared Patient Info Card Styles */
+.patient-info-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.patient-info-card h3 {
+  margin: 0 0 16px 0;
+  color: #000000;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+/* 3-column grid layout - only for patient variant */
+.patient-info-card.patient .patient-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Physician variant - single column layout */
+.patient-info-card.physician .patient-info-grid {
+  display: block;
+}
+
+/* Patient variant styling */
+.patient-info-card.patient .patient-basic-info {
+  margin-bottom: 0;
+}
+
+.patient-info-card.patient .patient-basic-info h4 {
+  margin: 0 0 12px 0;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
+.patient-info-card.patient .patient-basic-info > div {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.patient-info-card.patient .patient-basic-info span {
+  font-weight: 400;
+  color: #000000;
+  min-width: 60px;
+}
+
+.patient-info-card.patient .conditions-section,
+.patient-info-card.patient .medications-section {
+  margin-bottom: 0;
+}
+
+.patient-info-card.patient .conditions-section h4,
+.patient-info-card.patient .medications-section h4 {
+  margin: 0 0 12px 0;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
+/* Physician variant styling - restore original layout */
+.patient-info-card.physician .patient-basic-info {
+  margin-bottom: 16px;
+}
+
+.patient-info-card.physician .patient-basic-info h4 {
+  margin: 0 0 12px 0;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
+.patient-info-card.physician .patient-basic-info > div {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.patient-info-card.physician .patient-basic-info span {
+  font-weight: 400;
+  color: #000000;
+  min-width: 120px; /* Restore original width */
+}
+
+.patient-info-card.physician .conditions-section,
+.patient-info-card.physician .medications-section {
+  margin-bottom: 16px;
+}
+
+.patient-info-card.physician .conditions-section h4,
+.patient-info-card.physician .medications-section h4 {
+  margin: 0 0 12px 0;
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 8px;
+}
+
+.patient-info-card.physician .conditions-section > span,
+.patient-info-card.physician .medications-section > span {
+  display: none; /* Hide original labels since we're using h4 headers */
+}
+
+.conditions-list,
+.medications-list {
+  margin-top: 4px;
+}
+
+.condition-item {
+  font-size: 0.9rem;
+  color: #000000;
+  margin-bottom: 4px;
+}
+
+.medication-item {
+  font-size: 0.9rem;
+  color: #000000;
+  margin-bottom: 4px;
+}
+
+/* Patient variant - detailed medication view */
+.patient-info-card.patient .medication-item {
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.patient-info-card.patient .medication-name {
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 4px;
+}
+
+.patient-info-card.patient .medication-details {
+  display: flex;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #000000;
+  margin-bottom: 4px;
+}
+
+.patient-info-card.patient .medication-dosage {
+  font-size: 0.85rem;
+  color: #000000;
+  font-style: normal;
+}
+
+/* Physician variant - simplified view */
+.patient-info-card.physician {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.patient-info-card.physician .medication-item {
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #000000;
+}
+
+.patient-info-card.physician .medication-name {
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 2px;
+}
+
+.patient-info-card.physician .medication-details {
+  font-size: 0.8rem;
+  color: #000000;
+  font-style: normal;
+}
+
+/* Responsive design for smaller screens - only for patient variant */
+@media (max-width: 768px) {
+  .patient-info-card.patient .patient-info-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .patient-info-card.patient .patient-basic-info,
+  .patient-info-card.patient .conditions-section,
+  .patient-info-card.patient .medications-section {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .patient-info-card.patient .patient-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  .patient-info-card.patient .medications-section {
+    grid-column: 1 / -1;
+  }
+}
+
+

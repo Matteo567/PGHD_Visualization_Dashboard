@@ -1,0 +1,81 @@
+/*
+ Placeholder.css - Shared Placeholder Component Styles
+ 
+ Provides consistent styling for all placeholder states:
+ - No data scenarios
+ - Loading states  
+ - Error states
+ - Patient selection prompts
+ 
+ Replaces scattered chart-placeholder styles throughout the application.
+ */
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  padding: var(--chart-spacing-xl);
+  text-align: center;
+  color: var(--chart-color-text-muted);
+  background: var(--chart-color-background);
+  border-radius: var(--chart-border-radius-md);
+  border: 1px solid var(--chart-color-border);
+}
+
+.placeholder-icon {
+  font-size: 2rem;
+  margin-bottom: var(--chart-spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--chart-color-background);
+  border: 2px solid var(--chart-color-border);
+}
+
+.placeholder-icon.error {
+  color: var(--chart-color-danger);
+  border-color: var(--chart-color-danger);
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.placeholder-icon.info {
+  color: var(--chart-color-info);
+  border-color: var(--chart-color-info);
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.placeholder-icon.no-data {
+  color: var(--chart-color-neutral);
+  border-color: var(--chart-color-neutral);
+  background: rgba(108, 117, 125, 0.1);
+}
+
+.placeholder-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--chart-color-border);
+  border-top: 3px solid var(--chart-color-info);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--chart-spacing-md);
+}
+
+.placeholder-message {
+  font-size: var(--chart-font-size-base);
+  color: var(--chart-color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+

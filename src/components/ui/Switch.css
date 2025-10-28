@@ -1,0 +1,68 @@
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.switch-label {
+  font-size: 14px;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.switch-label.active {
+  color: #333;
+  background-color: #f0f0f0;
+  font-weight: 500;
+}
+
+.switch-button {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: #ccc;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s ease;
+}
+
+.switch-button.checked {
+  background-color: #4CAF50;
+}
+
+.switch-button:hover {
+  opacity: 0.8;
+}
+
+.switch-button:focus {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
+}
+
+.switch-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switch-indicator {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.switch-button.checked .switch-indicator {
+  transform: translateX(20px);
+}
+
+

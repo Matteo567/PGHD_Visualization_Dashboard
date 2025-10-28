@@ -1,0 +1,45 @@
+Conditions
+
+Probabilities for conditions: 
+
+A report from the Public Health Agency leverages the 2017–2018 Canadian Community Health Survey (CCHS) shows that 73% of adults 65+ have at least 1 of 10 common chronic conditions: Hypertension (65.7%), Periodontal Disease (52%), Ischemic Heart Disease (27%) Diabetes (26.8%), Osteoarthritis (25.1%), Cancer (25.1%), Chronic Obstructive Pulmonary Disease (20.2%), Asthma (10.7%), and/or Mood or anxiety disorders (10.5%). Conservative estimates indicate that about 37% of seniors report having at least two of the ten common chronic diseases.
+
+Hypertension (65.7%):
+Relevant data: systolic blood pressure, diastolic blood pressure, medication intake.
+
+Periodontal disease (52.0%):
+No directly mapped health data in this set.
+
+Osteoarthritis (38.0%):
+Relevant data: pain location, pain level, and exercise type.
+
+Ischemic heart disease (27.0%):
+Relevant data: systolic and diastolic blood pressure, exercise data.
+
+Diabetes (26.8%):
+Relevant data: glucose level, medication intake, and meal contents.
+
+Osteoporosis (25.1%):
+Relevant data: pain location, pain level, and exercise type.
+
+Cancer (21.5%):
+No directly mapped health data here.
+
+Chronic Obstructive Pulmonary Disease (COPD) (20.2%):
+No directly mapped health data here.
+
+Asthma (10.7%):
+No directly mapped health data here.
+
+Mood & anxiety disorders (10.5%):
+Relevant data: mood tracking (happy, contempt, sad, angry), medication intake, and sleep quality.
+
+Notes:
+
+Mood tracking is not exclusive to mood or anxiety disorders, but it is expected to be more prominent or relevant in these groups.
+
+Pain and exercise data are broadly relevant to many chronic conditions, not exclusive to osteoarthritis.
+
+Medication intake is a broad indicator applicable across multiple conditions.
+
+Some conditions like periodontal disease, cancer, COPD, and asthma are not specifically tracked by the current dataset variables.

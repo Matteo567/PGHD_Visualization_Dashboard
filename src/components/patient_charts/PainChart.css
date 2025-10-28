@@ -1,0 +1,229 @@
+/* Pain Chart Styles */
+.pain-chart-container {
+  font-family: var(--chart-font-family);
+}
+
+.pain-chart-container h3 {
+  text-align: center;
+  color: #000000;
+  margin-bottom: 25px;
+  font-weight: 400;
+}
+
+.pain-chart-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-sm);
+  margin-bottom: var(--chart-spacing-md);
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Pain List Styles */
+.pain-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-md);
+  width: 100%;
+}
+
+.pain-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-sm);
+}
+
+.pain-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--chart-spacing-md);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.pain-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-xs);
+}
+
+.pain-item-date {
+  font-size: 0.9em;
+  color: #666;
+  font-weight: 500;
+}
+
+.pain-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pain-level,
+.pain-location {
+  font-size: 0.85em;
+  color: #333;
+}
+
+.pain-item-body {
+  margin-left: var(--chart-spacing-md);
+}
+
+.no-pain-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: var(--chart-spacing-lg);
+}
+
+/* Pain Line Chart Styles */
+.pain-line-chart-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--chart-spacing-md);
+}
+
+.pain-line-chart {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--chart-spacing-md);
+}
+
+/* Legend styles */
+.pain-legend-wrapper {
+  margin-top: var(--chart-spacing-md);
+  padding-top: var(--chart-spacing-md);
+  border-top: 1px solid #eee;
+}
+
+/* Body SVG Styles */
+.body-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.body-views {
+  display: flex;
+  gap: var(--chart-spacing-md);
+}
+
+.body-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-xs);
+}
+
+.body-view-label {
+  font-size: 0.8em;
+  color: #666;
+  font-weight: 500;
+}
+
+.body-svg {
+  width: 60px;
+  height: auto;
+}
+
+/* Physician View Styles */
+.physician-pain-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-lg);
+  width: 100%;
+}
+
+.pain-location-info {
+  text-align: center;
+  padding: var(--chart-spacing-md);
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.pain-location-info h4 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1em;
+}
+
+/* Summary styles */
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-md);
+  margin-top: var(--chart-spacing-lg);
+}
+
+.chart-summary {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: var(--chart-spacing-md);
+}
+
+.chart-summary h4 {
+  margin: 0 0 var(--chart-spacing-sm) 0;
+  color: #333;
+  font-size: 1em;
+}
+
+.summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-xs);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.stat-label {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 0.9em;
+  color: #333;
+  font-weight: 500;
+}
+

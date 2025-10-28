@@ -1,0 +1,225 @@
+.sleep-chart-container {
+  font-family: var(--chart-font-family);
+}
+
+.sleep-chart-container h3 {
+  text-align: center;
+  color: #000000;
+  margin-bottom: 25px;
+  font-weight: 400;
+}
+
+.sleep-chart-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-spacing-md); /* Reduced from var(--chart-spacing-lg) to 12px */
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+}
+
+.sleep-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 15px 10px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.sleep-quality-row,
+.bed-icons-row,
+.sleep-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 2px;
+}
+
+/* Dashboard view - smaller sizing */
+.sleep-chart-container:not(.physician-view) .sleep-quality-row,
+.sleep-chart-container:not(.physician-view) .bed-icons-row,
+.sleep-chart-container:not(.physician-view) .sleep-info-row {
+  justify-content: space-between;
+  gap: 0;
+}
+
+.sleep-chart-container:not(.physician-view) .sleep-quality-item,
+.sleep-chart-container:not(.physician-view) .bed-item,
+.sleep-chart-container:not(.physician-view) .sleep-info-item {
+  width: 9%;
+  min-width: 45px;
+}
+
+.sleep-chart-container:not(.physician-view) .bed-icon-wrapper {
+  width: 45px;
+  max-width: 45px;
+}
+
+.sleep-chart-container:not(.physician-view) .sleep-hours {
+  font-size: 0.8em;
+}
+
+.sleep-chart-container:not(.physician-view) .day-label {
+  font-size: 0.7em;
+}
+
+.sleep-chart-container:not(.physician-view) .date-label {
+  font-size: 0.6em;
+}
+
+.sleep-quality-item,
+.bed-item,
+.sleep-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 8.5%;
+  text-align: center;
+  min-width: 30px;
+  flex-shrink: 0;
+}
+
+.sleep-quality-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.bed-icon-wrapper {
+  width: 45px;
+  max-width: 45px; 
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.bed-icon path {
+  stroke-width: 1;
+  stroke: #555;
+}
+
+.bed-icon {
+  width: 100%;
+  height: auto;
+}
+
+.sleep-hours {
+  font-size: 0.75em;
+  color: #000000;
+  font-weight: 400;
+  margin: 0;
+}
+
+.day-label {
+  font-size: 0.65em;
+  color: #000000;
+  margin: 0;
+}
+
+.date-label {
+  font-size: 0.6em;
+  color: #666666;
+  margin: 0;
+}
+
+.sleep-fill-rect {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Legend styles */
+.sleep-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 15px;
+  gap: 8px;
+}
+
+.legend-color-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+}
+
+.legend-label {
+  font-size: 0.9em;
+  color: #000000;
+}
+
+/* Note: Summary styles moved to centralized ChartStyles.css */
+
+/* Sleep Header with Toggle */
+.sleep-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-sm);
+  margin-bottom: var(--chart-spacing-md);
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Line Chart Styles */
+.sleep-line-chart {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--chart-spacing-md);
+}
+
+/* Legend styles - override global legend styles to remove extra space */
+.sleep-chart-content .legend-container {
+  margin-top: var(--chart-spacing-sm); /* Reduced from var(--chart-spacing-lg) to 8px */
+  margin-bottom: 0; /* Remove bottom margin */
+  min-height: auto; /* Remove fixed min-height to allow natural sizing */
+  padding: var(--chart-spacing-md); /* Reduced padding from var(--chart-spacing-lg) to 12px */
+}
+
+
+

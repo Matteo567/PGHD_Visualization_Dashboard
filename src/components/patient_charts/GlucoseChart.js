@@ -402,7 +402,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
           <>
             <InfoBox 
               title="Blood Glucose Information"
-              content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range."
+              content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range (Diabetes Canada)."
             />
             <div className="summary-container">
               <div className="chart-summary">

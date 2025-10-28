@@ -306,7 +306,7 @@ const XAxis = ({ config, weekDays }) => (
             y={config.height - config.padding.bottom + 15}
             textAnchor="middle"
             fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             12a
           </text>
@@ -316,7 +316,7 @@ const XAxis = ({ config, weekDays }) => (
             y={config.height - config.padding.bottom + 15}
             textAnchor="middle"
             fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             12p
           </text>
@@ -324,21 +324,21 @@ const XAxis = ({ config, weekDays }) => (
           {/* Day and Date Labels */}
           <text
             x={dayCenterX}
-            y={config.height - config.padding.bottom + 35}
+            y={config.height - config.padding.bottom + 40}
             textAnchor="middle"
             className="x-axis-day-label"
             fontSize={config.fontSize.dayLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             {formatDayLabel(day)}
           </text>
           <text
             x={dayCenterX}
-            y={config.height - config.padding.bottom + 52}
+            y={config.height - config.padding.bottom + 62}
             textAnchor="middle"
             className="x-axis-date-label"
             fontSize={config.fontSize.dateLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             {day.getDate()}
           </text>
@@ -361,7 +361,7 @@ const XAxis = ({ config, weekDays }) => (
       y={config.height - config.padding.bottom + 15}
       textAnchor="middle"
       fontSize={config.fontSize.timeLabel}
-      style={{fontSize: '8px'}}
+      style={{fontSize: '13px'}}
     >
       12a
     </text>
@@ -550,9 +550,9 @@ const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHove
         fontSize: {
           yAxis: 16,
           yAxisTitle: 18,
-          timeLabel: 14,
-          dayLabel: 14,
-          dateLabel: 14,
+          timeLabel: 22,
+          dayLabel: 22,
+          dateLabel: 22,
         },
         barWidth: 12,
         yAxisRange: { systolic: 200, diastolic: 120 },
@@ -571,9 +571,9 @@ const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHove
         fontSize: {
           yAxis: 14,
           yAxisTitle: 16,
-          timeLabel: 12,
-          dayLabel: 12,
-          dateLabel: 12,
+          timeLabel: 19,
+          dayLabel: 19,
+          dateLabel: 19,
         },
         barWidth: 8,
         yAxisRange: { systolic: 200, diastolic: 120 },
@@ -619,9 +619,9 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
         fontSize: {
           yAxis: 16,
           yAxisTitle: 18,
-          timeLabel: 14,
-          dayLabel: 14,
-          dateLabel: 14,
+          timeLabel: 22,
+          dayLabel: 22,
+          dateLabel: 22,
         },
         barWidth: 12,
         yAxisRange: { systolic: 200, diastolic: 120 },
@@ -640,9 +640,9 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
         fontSize: {
           yAxis: 14,
           yAxisTitle: 16,
-          timeLabel: 12,
-          dayLabel: 12,
-          dateLabel: 12,
+          timeLabel: 19,
+          dayLabel: 19,
+          dateLabel: 19,
         },
         barWidth: 8,
         yAxisRange: { systolic: 200, diastolic: 120 },

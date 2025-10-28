@@ -321,14 +321,14 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
           })}
           
           {/* Line path */}
-          <path d={pathData} fill="none" stroke="#007bff" strokeWidth="3" />
+          <path d={pathData} fill="none" stroke="#cccccc" strokeWidth="3" />
           
           {/* Data points */}
           {chartData.map((day, index) => {
             const x = getX(index);
             const y = getY(day.hours);
-            const showLabel = isExtendedView ? index % 7 === 0 : true; // Show every 7th day for extended view
-            const dateStr = day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const dateNum = day.date.getDate();
+            const dayAbbr = day.day || ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day.date.getDay()];
             
             return (
               <g key={index}>
@@ -343,29 +343,25 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
                 <text x={x} y={y - 15} fontSize="10" fill="#333" textAnchor="middle">
                   {day.hours.toFixed(1)}h
                 </text>
-                {showLabel && (
-                  <>
-                    <text 
-                      x={x} 
-                      y={config.height - config.padding.bottom + 15} 
-                      fontSize={config.fontSize.xAxis} 
-                      textAnchor="middle" 
-                      className="x-axis-day-label"
-                    >
-                      {day.day}
-                    </text>
-                    <text 
-                      x={x} 
-                      y={config.height - config.padding.bottom + 30} 
-                      fontSize={config.fontSize.xAxis - 1} 
-                      textAnchor="middle" 
-                      className="x-axis-date-label"
-                      fill="var(--chart-color-text-secondary)"
-                    >
-                      {dateStr}
-                    </text>
-                  </>
-                )}
+                <text 
+                  x={x} 
+                  y={config.height - config.padding.bottom + 15} 
+                  fontSize={config.fontSize.xAxis} 
+                  textAnchor="middle" 
+                  className="x-axis-day-label"
+                >
+                  {dayAbbr}
+                </text>
+                <text 
+                  x={x} 
+                  y={config.height - config.padding.bottom + 30} 
+                  fontSize={config.fontSize.xAxis - 1} 
+                  textAnchor="middle" 
+                  className="x-axis-date-label"
+                  fill="var(--chart-color-text-secondary)"
+                >
+                  {dateNum}
+                </text>
               </g>
             );
           })}

@@ -330,34 +330,29 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
           {/* X-axis labels */}
           {chartData.map((point, index) => {
             const x = config.padding.left + (index * dayWidth);
-            const showLabel = isExtendedView ? index % 7 === 0 : true; // Show every 7th day for extended view
-            const dateStr = point.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const dateNum = point.date.getDate();
             
             return (
               <g key={index}>
-                {showLabel && (
-                  <>
-                    <text 
-                      x={x} 
-                      y={config.height - config.padding.bottom + 15} 
-                      fontSize={config.fontSize.xAxis} 
-                      textAnchor="middle" 
-                      className="x-axis-day-label"
-                    >
-                      {point.day}
-                    </text>
-                    <text 
-                      x={x} 
-                      y={config.height - config.padding.bottom + 30} 
-                      fontSize={config.fontSize.xAxis - 1} 
-                      textAnchor="middle" 
-                      className="x-axis-date-label"
-                      fill="var(--chart-color-text-secondary)"
-                    >
-                      {dateStr}
-                    </text>
-                  </>
-                )}
+                <text 
+                  x={x} 
+                  y={config.height - config.padding.bottom + 15} 
+                  fontSize={config.fontSize.xAxis} 
+                  textAnchor="middle" 
+                  className="x-axis-day-label"
+                >
+                  {point.day}
+                </text>
+                <text 
+                  x={x} 
+                  y={config.height - config.padding.bottom + 30} 
+                  fontSize={config.fontSize.xAxis - 1} 
+                  textAnchor="middle" 
+                  className="x-axis-date-label"
+                  fill="var(--chart-color-text-secondary)"
+                >
+                  {dateNum}
+                </text>
               </g>
             );
           })}
@@ -365,7 +360,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
           {/* Line */}
           <path 
             d={linePath} 
-            stroke="var(--chart-color-primary)" 
+            stroke="#cccccc" 
             strokeWidth="3" 
             fill="none"
           />
@@ -381,7 +376,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
                 cy={y} 
                 r="4" 
                 fill={point.color} 
-                stroke="var(--chart-color-primary)" 
+                stroke="#cccccc" 
                 strokeWidth="2"
               />
             );

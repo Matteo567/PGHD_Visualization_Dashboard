@@ -59,7 +59,10 @@ const CSV_CONFIG = {
 const fetchPatientCsvData = async (patientId) => {
   try {
     // Add cache busting to ensure fresh data
-    const response = await fetch(`/synthetic_patients/${patientId}.csv?v=${Date.now()}`);
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://matteo567.github.io/PGHD_Visualization_Dashboard' 
+      : '';
+    const response = await fetch(`${baseUrl}/synthetic_patients/${patientId}.csv?v=${Date.now()}`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch CSV for ${patientId}: ${response.status} ${response.statusText}`);

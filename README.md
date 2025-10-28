@@ -2,6 +2,12 @@
 
 A React-based health data visualization dashboard for patients and physicians. This project demonstrates modern web development practices with a focus on clean architecture and reusable components.
 
+## 🚀 Live Dashboard
+
+**[👉 View Live Dashboard](https://matteo567.github.io/PGHD_Visualization_Dashboard/)**
+
+Experience the full interactive dashboard with 100 synthetic patients and comprehensive health data visualizations.
+
 ## Project Overview
 
 This application provides health data visualization with dual interfaces:

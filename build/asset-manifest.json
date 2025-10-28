@@ -1,19 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.3ed6c964.css",
-    "main.js": "/static/js/main.c321fa81.js",
-    "static/css/653.f03b1a0b.chunk.css": "/static/css/653.f03b1a0b.chunk.css",
-    "static/js/653.978ff6d4.chunk.js": "/static/js/653.978ff6d4.chunk.js",
-    "static/js/18.36f6034d.chunk.js": "/static/js/18.36f6034d.chunk.js",
-    "index.html": "/index.html",
-    "main.3ed6c964.css.map": "/static/css/main.3ed6c964.css.map",
-    "main.c321fa81.js.map": "/static/js/main.c321fa81.js.map",
-    "653.f03b1a0b.chunk.css.map": "/static/css/653.f03b1a0b.chunk.css.map",
-    "653.978ff6d4.chunk.js.map": "/static/js/653.978ff6d4.chunk.js.map",
-    "18.36f6034d.chunk.js.map": "/static/js/18.36f6034d.chunk.js.map"
+    "main.css": "/PGHD_Visualization_Dashboard/static/css/main.584c12d1.css",
+    "main.js": "/PGHD_Visualization_Dashboard/static/js/main.5bf64a64.js",
+    "index.html": "/PGHD_Visualization_Dashboard/index.html",
+    "main.584c12d1.css.map": "/PGHD_Visualization_Dashboard/static/css/main.584c12d1.css.map",
+    "main.5bf64a64.js.map": "/PGHD_Visualization_Dashboard/static/js/main.5bf64a64.js.map"
   },
   "entrypoints": [
-    "static/css/main.3ed6c964.css",
-    "static/js/main.c321fa81.js"
+    "static/css/main.584c12d1.css",
+    "static/js/main.5bf64a64.js"
   ]
 }

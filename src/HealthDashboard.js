@@ -124,8 +124,8 @@ const HealthDashboard = ({ patientId, screenshotMode = false }) => {
           
           <div className="dashboard-controls">
             <div className="qr-code-section">
-              <h3>Patient Dashboard Access</h3>
-              <p>Scan to access patient view</p>
+              <h3>Access Health Dashboard</h3>
+              <p>Scan QR code for quick access</p>
               <img 
                 src={`${process.env.PUBLIC_URL}/Public_dashboard_QR_code.png`}
                 alt="QR Code for PGHD Dashboard"

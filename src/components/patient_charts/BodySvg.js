@@ -11,7 +11,7 @@
  Essential for pain location mapping and anatomical reference in health assessments.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 
 const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
   const defaultFill = '#F5F5F5';

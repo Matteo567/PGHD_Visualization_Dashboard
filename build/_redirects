@@ -1,5 +1,0 @@
-# GitHub Pages redirects file
-# This ensures that CSV files and other static assets are served correctly
-
-# Allow all static files to be served
-/*    /index.html   200

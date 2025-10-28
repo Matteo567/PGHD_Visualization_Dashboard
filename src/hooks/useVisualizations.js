@@ -35,7 +35,7 @@
  */
 
 import React from 'react';
-import { VISUALIZATION_CONFIG, DASHBOARD_CONFIG } from '../constants';
+import { VISUALIZATION_CONFIG } from '../constants';
 
 // Import all chart components
 import GlucoseChart from '../components/patient_charts/GlucoseChart';
@@ -50,8 +50,6 @@ import SleepChart from '../components/patient_charts/SleepChart';
  Simple hook for managing visualizations
  */
 const useVisualizations = (viewMode, data) => {
-  const config = DASHBOARD_CONFIG[viewMode];
-  
   // All available visualization types with their components
   const allVisualizations = {
     pain: { ...VISUALIZATION_CONFIG.pain, component: PainChart },
@@ -98,8 +96,7 @@ const useVisualizations = (viewMode, data) => {
     allVisualizations,
     availableVisualizations,
     selectedVisualizations,
-    handleVisualizationChange,
-    config
+    handleVisualizationChange
   };
 };
 

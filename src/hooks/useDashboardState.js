@@ -19,31 +19,15 @@ function useDashboardState() {
   const [showThreeMonthSummaries, setShowThreeMonthSummaries] = useState(false);
   
   // Chart expansion functions
-  const expandChart = (chartId) => {
-    setExpandedChart(chartId);
-  };
-  
-  const collapseChart = () => {
-    setExpandedChart(null);
-  };
-  
   const toggleChart = (chartId) => {
     if (expandedChart === chartId) {
-      collapseChart();
+      setExpandedChart(null);
     } else {
-      expandChart(chartId);
+      setExpandedChart(chartId);
     }
   };
   
   // Summary toggle functions
-  const enableThreeMonthSummaries = () => {
-    setShowThreeMonthSummaries(true);
-  };
-  
-  const disableThreeMonthSummaries = () => {
-    setShowThreeMonthSummaries(false);
-  };
-  
   const toggleThreeMonthSummaries = () => {
     setShowThreeMonthSummaries(prev => !prev);
   };
@@ -54,13 +38,9 @@ function useDashboardState() {
     showThreeMonthSummaries,
     
     // Chart functions
-    expandChart,
-    collapseChart,
     toggleChart,
     
     // Summary functions
-    enableThreeMonthSummaries,
-    disableThreeMonthSummaries,
     toggleThreeMonthSummaries
   };
 }

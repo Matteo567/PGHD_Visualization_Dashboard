@@ -59,19 +59,3 @@ export const VISUALIZATION_CONFIG = {
   mealContents: { name: 'Meal Contents' },
   sleep: { name: 'Sleep' }
 };
-
-// Shared dashboard configuration - now supports unlimited charts
-export const DASHBOARD_CONFIG = {
-  patient: {
-    // No longer using fixed defaultVisualizations since we show all available
-    defaultVisualizations: {},
-    maxCharts: null // null means unlimited
-  },
-  physician: {
-    // No longer using fixed defaultVisualizations since we show all available
-    defaultVisualizations: {},
-    maxCharts: null // null means unlimited
-  }
-};
-
-

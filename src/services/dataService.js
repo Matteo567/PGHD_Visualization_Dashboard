@@ -45,8 +45,12 @@ import Papa from 'papaparse';
 const CSV_CONFIG = {
   header: true,
   skipEmptyLines: true,
-  transformHeader: (header) => header.trim(),
-  transform: (value) => value?.trim(),
+  transformHeader: (header) => header?.trim() || '',
+  transform: (value) => value?.trim() || '',
+  dynamicTyping: false, // Keep everything as strings to avoid parsing issues
+  delimiter: ',',
+  quoteChar: '"',
+  escapeChar: '"'
 };
 
 /*
@@ -58,11 +62,9 @@ const CSV_CONFIG = {
  */
 const fetchPatientCsvData = async (patientId) => {
   try {
-    // Add cache busting to ensure fresh data
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://matteo567.github.io/PGHD_Visualization_Dashboard' 
-      : '';
-    const response = await fetch(`${baseUrl}/synthetic_patients/${patientId}.csv?v=${Date.now()}`);
+    // Use relative path for both dev and production (works with PUBLIC_URL)
+    const url = `${process.env.PUBLIC_URL}/synthetic_patients/${patientId}.csv?v=${Date.now()}`;
+    const response = await fetch(url);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch CSV for ${patientId}: ${response.status} ${response.statusText}`);
@@ -79,7 +81,7 @@ const fetchPatientCsvData = async (patientId) => {
     if (parsed.errors.length > 0) {
       // Log parsing errors for debugging but don't throw (only in development)
       if (process.env.NODE_ENV === 'development') {
-        console.error(`CSV parsing errors for ${patientId}:`, parsed.errors);
+        console.warn(`CSV parsing warnings for ${patientId}:`, parsed.errors);
       }
     }
     
@@ -259,7 +261,7 @@ function processMultiColumnGlucose(row, baseDate) {
     const value = parseFloat(row[`Glucose_${i}`]);
     const timeStr = row[`Glucose_Time_${i}`];
     
-    if (value > 0 && timeStr) {
+    if (!isNaN(value) && value > 0 && timeStr && timeStr.trim() !== '') {
       const reading = createGlucoseReading(
         baseDate,
         value,
@@ -276,7 +278,7 @@ function processMultiColumnGlucose(row, baseDate) {
 
 function processSingleColumnGlucose(row, baseDate) {
   const value = parseFloat(row['Glucose_Level']);
-  if (value > 0) {
+  if (!isNaN(value) && value > 0) {
     const randomHour = Math.floor(Math.random() * 24);
     const randomMinute = Math.floor(Math.random() * 60);
     const date = new Date(baseDate);
@@ -335,7 +337,7 @@ export function processBloodPressureData(rows) {
           const diastolic = parseInt(row[`Diastolic_${i}`]);
           const timeStr = row[`BP_Time_${i}`];
           
-          if (systolic > 0 && diastolic > 0 && timeStr) {
+          if (!isNaN(systolic) && !isNaN(diastolic) && systolic > 0 && diastolic > 0 && timeStr && timeStr.trim() !== '') {
             const timeParts = timeStr.split(':');
             if (timeParts.length >= 2) {
               const hours = parseInt(timeParts[0], 10);
@@ -361,7 +363,7 @@ export function processBloodPressureData(rows) {
         const systolic = parseInt(row['Systolic_BP']);
         const diastolic = parseInt(row['Diastolic_BP']);
         
-        if (systolic > 0 && diastolic > 0) {
+        if (!isNaN(systolic) && !isNaN(diastolic) && systolic > 0 && diastolic > 0) {
           const randomHour = Math.floor(Math.random() * 24);
           const randomMinute = Math.floor(Math.random() * 60);
           const date = new Date(baseDate);
@@ -417,14 +419,14 @@ export function processExerciseData(rows) {
             for (let i = 1; i <= 5; i++) {
                 const type = row[`Exercise_Type_${i}`]?.toLowerCase();
                 const minutes = parseFloat(row[`Exercise_Minutes_${i}`]);
-                if (type && minutes > 0) {
+                if (type && type.trim() !== '' && !isNaN(minutes) && minutes > 0) {
                     categorizeExercise(type, minutes, exerciseByDate[dateKey]);
                 }
             }
         } else {
             const type = row['Exercise_Type']?.toLowerCase();
             const minutes = parseFloat(row['Exercise_Minutes']);
-            if (type && minutes > 0) {
+            if (type && type.trim() !== '' && !isNaN(minutes) && minutes > 0) {
                 categorizeExercise(type, minutes, exerciseByDate[dateKey]);
             }
         }
@@ -459,7 +461,7 @@ export function processMoodData(rows) {
     
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (row['Mood']) {
+      if (row['Mood'] && row['Mood'].trim() !== '') {
         moodData.push({
           date: new Date(row['Date']),
           mood: row['Mood'],
@@ -479,12 +481,15 @@ export function processPainData(rows) {
     
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (row['Pain_Location'] && row['Pain_Level']) {
-        painData.push({
-          date: new Date(row['Date']),
-          location: row['Pain_Location'].toLowerCase(),
-          level: parseInt(row['Pain_Level'])
-        });
+      if (row['Pain_Location'] && row['Pain_Location'].trim() !== '' && row['Pain_Level'] !== undefined) {
+        const painLevel = parseInt(row['Pain_Level']);
+        if (!isNaN(painLevel)) {
+          painData.push({
+            date: new Date(row['Date']),
+            location: row['Pain_Location'].toLowerCase(),
+            level: painLevel
+          });
+        }
       }
     }
   
@@ -500,12 +505,16 @@ export function processSleepData(rows) {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       if (row['Sleep_Hours'] && row['Sleep_Quality']) {
-        sleepData.push({
-          date: new Date(row['Date']),
-          hours: parseFloat(row['Sleep_Hours']),
-          quality: row['Sleep_Quality'],
-          qualityCode: parseInt(row['Sleep_Quality_Code'])
-        });
+        const hours = parseFloat(row['Sleep_Hours']);
+        const qualityCode = parseInt(row['Sleep_Quality_Code']);
+        if (!isNaN(hours) && !isNaN(qualityCode)) {
+          sleepData.push({
+            date: new Date(row['Date']),
+            hours: hours,
+            quality: row['Sleep_Quality'],
+            qualityCode: qualityCode
+          });
+        }
       }
     }
   

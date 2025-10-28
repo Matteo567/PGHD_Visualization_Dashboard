@@ -1,0 +1,223 @@
+/*
+ HealthDashboard.css - Unified Health Dashboard Styles
+ 
+ This stylesheet provides styling for the unified health dashboard that combines
+ patient and physician dashboard features with a clean, accessible design.
+ */
+
+.health-dashboard {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: var(--background-color, #f8f9fa);
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+  align-items: flex-start;
+}
+
+/* Make patient info card much wider in unified dashboard */
+.dashboard-header .patient-info-card {
+  flex: 1;
+  min-width: 0; /* Allow flex item to shrink below content size */
+}
+
+/* Optimize the internal layout for unified dashboard */
+.dashboard-header .patient-info-card .patient-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Make the content use more space within each section */
+.dashboard-header .patient-info-card .patient-basic-info,
+.dashboard-header .patient-info-card .conditions-section,
+.dashboard-header .patient-info-card .medications-section {
+  padding: 0 10px;
+}
+
+/* Simple spacing for patient details */
+.dashboard-header .patient-info-card .patient-basic-info > div {
+  margin-bottom: 8px;
+}
+
+/* Simple medication display */
+.dashboard-header .patient-info-card .medication-item {
+  margin-bottom: 6px;
+}
+
+.dashboard-header .patient-info-card .medication-name {
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.dashboard-header .patient-info-card .medication-details {
+  font-size: 0.9em;
+  color: #000000;
+}
+
+/* Simple condition display */
+.dashboard-header .patient-info-card .condition-item {
+  margin-bottom: 4px;
+}
+
+.dashboard-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 300px;
+  flex-shrink: 0;
+}
+
+.qr-code-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.qr-code-section h3 {
+  margin: 0 0 10px 0;
+  color: var(--text-primary, #000000);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.qr-code-section p {
+  margin: 0 0 15px 0;
+  color: var(--text-secondary, #000000);
+  font-size: 14px;
+}
+
+.qr-code-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color, #e0e0e0);
+}
+
+.summary-toggle-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-toggle-section h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-primary, #000000);
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.toggle-description {
+  margin: 10px 0 0 0;
+  color: var(--text-secondary, #000000);
+  font-size: 12px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Loading and error states */
+.loading-screen,
+.error-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: var(--text-primary, #000000);
+}
+
+.error-screen {
+  color: var(--error-color, #d32f2f);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .health-dashboard {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .dashboard-header .patient-info-card {
+    flex: none; /* Reset flex for mobile */
+  }
+  
+  .dashboard-header .patient-info-card .patient-info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .dashboard-controls {
+    min-width: auto;
+  }
+  
+  .qr-code-section,
+  .summary-toggle-section {
+    padding: 15px;
+  }
+  
+  .qr-code-image {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Medium screens - 2 column layout */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-header .patient-info-card .patient-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+  
+  .dashboard-header .patient-info-card .medications-section {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Screenshot mode adjustments */
+.health-dashboard.screenshot-mode {
+  padding: 10px;
+}
+
+.health-dashboard.screenshot-mode .dashboard-header {
+  display: none;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .health-dashboard {
+    background-color: var(--background-color-dark, #1a1a1a);
+  }
+  
+  .qr-code-section,
+  .summary-toggle-section {
+    background: var(--card-background-dark, #2d2d2d);
+    color: var(--text-primary-dark, #ffffff);
+  }
+  
+  .qr-code-section h3,
+  .summary-toggle-section h3 {
+    color: var(--text-primary-dark, #ffffff);
+  }
+  
+  .qr-code-section p,
+  .toggle-description {
+    color: var(--text-secondary-dark, #cccccc);
+  }
+  
+  .qr-code-image {
+    border-color: var(--border-color-dark, #404040);
+  }
+}

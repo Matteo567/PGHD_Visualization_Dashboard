@@ -55,7 +55,7 @@ import Legend from '../Legend';
 import './SleepChart.css';
 
 
-const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { sleepData, loading, error } = usePatientData(patientId, 'sleep');
   const [useLineChart, setUseLineChart] = useState(false); // Toggle state for chart view
   
@@ -244,7 +244,7 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
     
     if (!chartData || chartData.length === 0) return null;
 
-    const maxHours = Math.max(...chartData.map(d => d.hours));
+    const maxHours = chartData.length > 0 ? Math.max(...chartData.map(d => d.hours)) : 0;
     const minHours = 0; // Always start Y-axis at 0
     const range = Math.max(maxHours - minHours, 1); // Ensure minimum range of 1
     const padding = Math.max(range * 0.1, 0.5); // 10% padding, minimum 0.5
@@ -439,8 +439,14 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
               {weekData.map((day, index) => (
                 <div key={`info-${index}`} className="sleep-info-item">
                   <div className="sleep-hours">{day.hours.toFixed(1)}h</div>
-                  <div className="day-label">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(day.date).getDay()]}</div>
-                  <div className="date-label">{new Date(day.date).getDate()}</div>
+                  <div className="day-label">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][(() => {
+                    const date = new Date(day.date);
+                    return !isNaN(date.getTime()) ? date.getDay() : 0;
+                  })()]}</div>
+                  <div className="date-label">{(() => {
+                    const date = new Date(day.date);
+                    return !isNaN(date.getTime()) ? date.getDate() : 'Invalid';
+                  })()}</div>
                 </div>
               ))}
             </div>
@@ -449,8 +455,8 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
         
         <Legend title="Sleep Quality" items={legendItems} hide={screenshotMode} />
 
-        {/* Show summary for physician view only */}
-        {viewMode === 'physician' && weekSummary && (
+        {/* Show summary for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>
@@ -484,7 +490,7 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
               </div>
             </div>
             
-            {threeMonthSummary && (
+            {showThreeMonthSummaries && threeMonthSummary && (
               <div className="chart-summary">
                 <h4>3-Month Summary</h4>
                 <div className="summary-stats">

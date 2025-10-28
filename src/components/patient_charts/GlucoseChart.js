@@ -247,7 +247,7 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
 };
 
 // --- Main Component ---
-const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const healthRangeLegendItems = [
     { label: 'Above range', color: RANGE_COLORS['above range'] },
     { label: 'In range', color: RANGE_COLORS['in range'] },
@@ -397,79 +397,85 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
           <Legend title="Prandial State" items={mealTimeLegendItems} hide={screenshotMode} />
         </div>
         
-        {/* Show InfoBox for patient view, summary for physician view */}
-        {viewMode === 'physician' && weekSummary ? (
-          <div className="summary-container">
-            <div className="chart-summary">
-              <h4>Week Summary</h4>
-              <div className="summary-stats">
-                <div className="stat-item">
-                  <span className="stat-label">Average Glucose:</span>
-                  <span className="stat-value">
-                    {weekSummary.avgGlucose} mmol/L
-                  </span>
-                </div>
-
-                <div className="stat-item">
-                  <span className="stat-label">Readings In Range:</span>
-                  <span className="stat-value">
-                    {weekSummary.rangePercentage}% ({weekSummary.inRangeReadings}/{weekSummary.totalReadings})
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">High/Low Readings:</span>
-                  <span className="stat-value">
-                    {weekSummary.highReadings} high, {weekSummary.lowReadings} low
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Reading Days:</span>
-                  <span className="stat-value">
-                    {weekSummary.daysWithReadings}/7 days
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            {threeMonthSummary && (
+        {/* Show InfoBox for patient view, summary for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary ? (
+          <>
+            <InfoBox 
+              title="Blood Glucose Information"
+              content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range."
+            />
+            <div className="summary-container">
               <div className="chart-summary">
-                <h4>3-Month Summary</h4>
+                <h4>Week Summary</h4>
                 <div className="summary-stats">
                   <div className="stat-item">
                     <span className="stat-label">Average Glucose:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.avgGlucose} mmol/L
+                      {weekSummary.avgGlucose} mmol/L
                     </span>
                   </div>
 
                   <div className="stat-item">
                     <span className="stat-label">Readings In Range:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.rangePercentage}% ({threeMonthSummary.inRangeReadings}/{threeMonthSummary.totalReadings})
+                      {weekSummary.rangePercentage}% ({weekSummary.inRangeReadings}/{weekSummary.totalReadings})
                     </span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">High/Low Readings:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.highReadings} high, {threeMonthSummary.lowReadings} low
+                      {weekSummary.highReadings} high, {weekSummary.lowReadings} low
                     </span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Reading Days:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.daysWithReadings} days
+                      {weekSummary.daysWithReadings}/7 days
                     </span>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        ) : viewMode === 'patient' ? (
+              
+              {showThreeMonthSummaries && threeMonthSummary && (
+                <div className="chart-summary">
+                  <h4>3-Month Summary</h4>
+                  <div className="summary-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Average Glucose:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.avgGlucose} mmol/L
+                      </span>
+                    </div>
+
+                    <div className="stat-item">
+                      <span className="stat-label">Readings In Range:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.rangePercentage}% ({threeMonthSummary.inRangeReadings}/{threeMonthSummary.totalReadings})
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">High/Low Readings:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.highReadings} high, {threeMonthSummary.lowReadings} low
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Reading Days:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.daysWithReadings} days
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
           <InfoBox 
             title="Blood Glucose Information"
-            content="These are general targets for adults with diabetes: For blood sugar taken before a meal, the target is 4.0 to 7.0 mmol/L. For blood sugar two hours after a meal, the target is 5.0 to 10.0 mmol/L. The general target for an A1C is 7.0% or less (Diabetes Canada). Always consult your healthcare provider to confirm the right targets for you."
+            content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range."
           />
-        ) : null}
+        )}
       </div>
       
       {/* Custom Tooltip */}

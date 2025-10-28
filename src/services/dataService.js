@@ -216,69 +216,102 @@ export function processPatientData(rows, patientId) {
   };
 }
 
+// Helper functions for glucose data processing
+function parseTimeString(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string' || !timeStr.includes(':')) {
+    return { hours: 0, minutes: 0 };
+  }
+  
+  const timeParts = timeStr.split(':');
+  if (timeParts.length < 2) {
+    return { hours: 0, minutes: 0 };
+  }
+  
+  const hours = parseInt(timeParts[0], 10);
+  const minutes = parseInt(timeParts[1], 10);
+  
+  return {
+    hours: isNaN(hours) ? 0 : hours,
+    minutes: isNaN(minutes) ? 0 : minutes
+  };
+}
+
+function createGlucoseReading(baseDate, value, timeStr, range, measurementType) {
+  const { hours, minutes } = parseTimeString(timeStr);
+  const date = new Date(baseDate);
+  date.setHours(hours, minutes);
+  
+  return {
+    date: date,
+    value: value,
+    range: range,
+    measurementType: measurementType
+  };
+}
+
+function processMultiColumnGlucose(row, baseDate) {
+  const readings = [];
+  
+  for (let i = 1; i <= 4; i++) {
+    const value = parseFloat(row[`Glucose_${i}`]);
+    const timeStr = row[`Glucose_Time_${i}`];
+    
+    if (value > 0 && timeStr) {
+      const reading = createGlucoseReading(
+        baseDate,
+        value,
+        timeStr,
+        row[`Glucose_Range_${i}`],
+        row[`Glucose_Measurement_Type_${i}`]
+      );
+      readings.push(reading);
+    }
+  }
+  
+  return readings;
+}
+
+function processSingleColumnGlucose(row, baseDate) {
+  const value = parseFloat(row['Glucose_Level']);
+  if (value > 0) {
+    const randomHour = Math.floor(Math.random() * 24);
+    const randomMinute = Math.floor(Math.random() * 60);
+    const date = new Date(baseDate);
+    date.setHours(randomHour, randomMinute);
+    
+    let range = 'in range';
+    if (value < 70) range = 'below range';
+    else if (value > 180) range = 'above range';
+    
+    return [{
+      date: date,
+      value: value,
+      range: range,
+      measurementType: 'Random'
+    }];
+  }
+  return [];
+}
+
 /**
  * Processes blood glucose data from CSV rows
  */
 export function processGlucoseData(rows) {
   const readings = [];
+  
+  rows.forEach(row => {
+    const baseDate = new Date(row['Date']);
+    const hasMultiColumn = row['Glucose_1'] !== undefined;
     
-    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      const row = rows[rowIndex];
-      const baseDate = new Date(row['Date']);
-      
-      // Check if data has multiple glucose readings per day
-      const hasMultiColumn = row['Glucose_1'] !== undefined;
-      
-      if (hasMultiColumn) {
-        // Process up to 4 readings per day
-        for (let i = 1; i <= 4; i++) {
-          const value = parseFloat(row[`Glucose_${i}`]);
-          const timeStr = row[`Glucose_Time_${i}`];
-          
-          if (value > 0 && timeStr) {
-            const timeParts = timeStr.split(':');
-            const hours = parseInt(timeParts[0]);
-            const minutes = parseInt(timeParts[1]);
-            
-            const date = new Date(baseDate);
-            date.setHours(hours, minutes);
-            
-            readings.push({
-              date: date,
-              value: value,
-              range: row[`Glucose_Range_${i}`],
-              measurementType: row[`Glucose_Measurement_Type_${i}`]
-            });
-          }
-        }
-      } else {
-        // Single reading format
-        const value = parseFloat(row['Glucose_Level']);
-        if (value > 0) {
-          const randomHour = Math.floor(Math.random() * 24);
-          const randomMinute = Math.floor(Math.random() * 60);
-          const date = new Date(baseDate);
-          date.setHours(randomHour, randomMinute);
-          
-          let range = 'in range';
-          if (value < 70) {
-            range = 'below range';
-          } else if (value > 180) {
-            range = 'above range';
-          }
-          
-          readings.push({
-            date: date,
-            value: value,
-            range: range,
-            measurementType: 'Random'
-          });
-        }
-      }
+    if (hasMultiColumn) {
+      readings.push(...processMultiColumnGlucose(row, baseDate));
+    } else {
+      readings.push(...processSingleColumnGlucose(row, baseDate));
     }
-    
-    return readings;
-  }
+  });
+  
+  return readings;
+}
 
 /**
  * Processes blood pressure data from CSV rows
@@ -301,19 +334,23 @@ export function processBloodPressureData(rows) {
           
           if (systolic > 0 && diastolic > 0 && timeStr) {
             const timeParts = timeStr.split(':');
-            const hours = parseInt(timeParts[0]);
-            const minutes = parseInt(timeParts[1]);
-            
-            const date = new Date(baseDate);
-            date.setHours(hours, minutes);
-            
-            readings.push({ 
-              date: date, 
-              systolic: systolic, 
-              diastolic: diastolic, 
-              systolicType: row[`Systolic_Type_${i}`],
-              diastolicType: row[`Diastolic_Type_${i}`]
-            });
+            if (timeParts.length >= 2) {
+              const hours = parseInt(timeParts[0], 10);
+              const minutes = parseInt(timeParts[1], 10);
+              
+              if (!isNaN(hours) && !isNaN(minutes)) {
+                const date = new Date(baseDate);
+                date.setHours(hours, minutes);
+                
+                readings.push({ 
+                  date: date, 
+                  systolic: systolic, 
+                  diastolic: diastolic, 
+                  systolicType: row[`Systolic_Type_${i}`],
+                  diastolicType: row[`Diastolic_Type_${i}`]
+                });
+              }
+            }
           }
         }
       } else {

@@ -20,7 +20,7 @@
 }
 
 .error-message {
-  color: #666;
+  color: #000000;
   margin-bottom: 15px;
 }
 
@@ -34,7 +34,7 @@
 
 .error-summary {
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 400;
 }
 
 .error-pre {

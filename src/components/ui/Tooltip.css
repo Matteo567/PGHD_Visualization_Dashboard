@@ -23,29 +23,29 @@
 }
 
 .custom-tooltip .tooltip-title {
-  font-weight: bold;
+  font-weight: 400;
   margin-bottom: 4px;
-  color: #333;
+  color: #000000;
 }
 
 .custom-tooltip .tooltip-value {
   margin-bottom: 2px;
-  color: #333;
+  color: #000000;
 }
 
 .custom-tooltip .tooltip-range {
   margin-bottom: 2px;
-  color: #333;
+  color: #000000;
 }
 
 .custom-tooltip .tooltip-time {
   margin-bottom: 2px;
-  color: #666;
+  color: #000000;
   font-size: 11px;
 }
 
 .custom-tooltip .tooltip-date {
-  color: #666;
+  color: #000000;
   font-size: 11px;
 }
 

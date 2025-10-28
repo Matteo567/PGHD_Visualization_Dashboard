@@ -703,7 +703,7 @@ const bloodPressureLegendItems = [
 
 
 // --- Main Component ---
-const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { bloodPressureData, loading, error } = usePatientData(patientId, 'bloodPressure');
   const [containerWidth, setContainerWidth] = useState(400);
   const [tooltipData, setTooltipData] = useState(null);
@@ -904,70 +904,76 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
         
         <Legend title="Blood Pressure Category:" items={bloodPressureLegendItems} hide={screenshotMode} />
         
-        {/* Show InfoBox for patient view, summary for physician view */}
-        {viewMode === 'physician' && weekSummary ? (
-          <div className="summary-container">
-            <div className="chart-summary">
-              <h4>Week Summary</h4>
-              <div className="summary-stats">
-                <div className="stat-item">
-                  <span className="stat-label">Average BP:</span>
-                  <span className="stat-value">
-                    {weekSummary.avgSystolic}/{weekSummary.avgDiastolic} mmHg
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Peak BP:</span>
-                  <span className="stat-value">
-                    {weekSummary.maxSystolic}/{weekSummary.maxDiastolic} mmHg
-                  </span>
-                </div>
-
-                <div className="stat-item">
-                  <span className="stat-label">Reading Days:</span>
-                  <span className="stat-value">
-                    {weekSummary.daysWithReadings}/7 days
-                  </span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Total Readings:</span>
-                  <span className="stat-value">
-                    {weekSummary.totalReadings}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            {threeMonthSummary && (
+        {/* Show InfoBox for patient view, summary for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary ? (
+          <>
+            <InfoBox 
+              title="Blood Pressure Information" 
+              content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
+            />
+            <div className="summary-container">
               <div className="chart-summary">
-                <h4>3-Month Summary</h4>
+                <h4>Week Summary</h4>
                 <div className="summary-stats">
                   <div className="stat-item">
                     <span className="stat-label">Average BP:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.avgSystolic}/{threeMonthSummary.avgDiastolic} mmHg
+                      {weekSummary.avgSystolic}/{weekSummary.avgDiastolic} mmHg
                     </span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Peak BP:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.maxSystolic}/{threeMonthSummary.maxDiastolic} mmHg
+                      {weekSummary.maxSystolic}/{weekSummary.maxDiastolic} mmHg
+                    </span>
+                  </div>
+
+                  <div className="stat-item">
+                    <span className="stat-label">Reading Days:</span>
+                    <span className="stat-value">
+                      {weekSummary.daysWithReadings}/7 days
                     </span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Total Readings:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.totalReadings}
+                      {weekSummary.totalReadings}
                     </span>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+              
+              {showThreeMonthSummaries && threeMonthSummary && (
+                <div className="chart-summary">
+                  <h4>3-Month Summary</h4>
+                  <div className="summary-stats">
+                    <div className="stat-item">
+                      <span className="stat-label">Average BP:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.avgSystolic}/{threeMonthSummary.avgDiastolic} mmHg
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Peak BP:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.maxSystolic}/{threeMonthSummary.maxDiastolic} mmHg
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Total Readings:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.totalReadings}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <InfoBox 
             title="Blood Pressure Information" 
-            content="Blood pressure readings help monitor cardiovascular health. Systolic pressure (top number) measures pressure when the heart beats, while diastolic pressure (bottom number) measures pressure when the heart rests between beats."
+            content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
           />
         )}
       </div>

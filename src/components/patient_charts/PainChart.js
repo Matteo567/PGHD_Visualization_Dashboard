@@ -21,7 +21,7 @@ import './PainChart.css';
 
 import BodySVG from './BodySvg';
 
-const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { painData, isLoading: loading, error } = usePatientData(patientId, 'pain');
   const [useLineChart, setUseLineChart] = useState(false); // Toggle state for chart view
   
@@ -78,85 +78,101 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthPainData = painData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
+  // Helper functions for data processing
+  const processPainData = (painData) => {
+    const dateMap = {};
+    const locationCounts = {};
+
+    painData.forEach(item => {
+      const dateKey = item.date.toDateString();
+      dateMap[dateKey] = item.level;
+      
+      const location = item.location.toLowerCase();
+      locationCounts[location] = (locationCounts[location] || 0) + 1;
+    });
+
+    return { dateMap, locationCounts };
+  };
+
+  const findMostCommonLocation = (locationCounts) => {
+    let mostCommon = null;
+    let maxCount = 0;
+    
+    Object.entries(locationCounts).forEach(([location, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostCommon = location;
+      }
+    });
+    
+    return mostCommon;
+  };
+
+  const createWeekChartData = (dateMap, startOfWeek) => {
+    const data = [];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(date.getDate() + i);
+      const dateKey = date.toDateString();
+      const painLevel = dateMap[dateKey] || 0;
+      
+      data.push({
+        date,
+        day: dayNames[date.getDay()],
+        level: painLevel,
+        color: getPainColor(painLevel)
+      });
+    }
+    
+    return data;
+  };
+
+  const calculateAveragePain = (painData) => {
+    if (painData.length === 0) return 0;
+    const totalPain = painData.reduce((sum, item) => sum + item.level, 0);
+    return totalPain / painData.length;
+  };
+
   // Process data for chart
   let chartData = [];
   let mostCommonLocation = null;
   let averagePainLevel = 0;
   
   if (weekPainData.length > 0) {
-    const dateMap = new Map();
-    const locationCounts = new Map();
-
-    weekPainData.forEach(item => {
-      const dateKey = item.date.toDateString();
-      dateMap.set(dateKey, item.level);
-      
-      const location = item.location.toLowerCase();
-      locationCounts.set(location, (locationCounts.get(location) || 0) + 1);
-    });
-
-    let mostCommon = null;
-    let maxCount = 0;
-    for (const [location, count] of locationCounts) {
-      if (count > maxCount) {
-        maxCount = count;
-        mostCommon = location;
-      }
-    }
-
-    const data = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(date.getDate() + i);
-      const dateKey = date.toDateString();
-      const painLevel = dateMap.get(dateKey) || 0;
-      
-      data.push({
-        date,
-        day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
-        level: painLevel,
-        color: getPainColor(painLevel)
-      });
-    }
-
-    const totalPain = weekPainData.reduce((sum, item) => sum + item.level, 0);
-    const avgPain = weekPainData.length > 0 ? (totalPain / weekPainData.length) : 0;
-
-    chartData = data;
-    mostCommonLocation = mostCommon;
-    averagePainLevel = avgPain;
+    const { dateMap, locationCounts } = processPainData(weekPainData);
+    mostCommonLocation = findMostCommonLocation(locationCounts);
+    chartData = createWeekChartData(dateMap, startOfWeek);
+    averagePainLevel = calculateAveragePain(weekPainData);
   }
 
-  // Process data for extended chart (3 weeks)
-  let extendedChartData = [];
-  if (isExpanded) {
-
-    // Combine all three weeks of data
+  const createExtendedChartData = () => {
     const allWeeksData = [...prevWeekPainData, ...weekPainData, ...nextWeekPainData];
+    const dateMap = {};
     
-    // Create a map of dates to pain levels for all 3 weeks
-    const dateMap = new Map();
     allWeeksData.forEach(item => {
       const dateKey = item.date.toDateString();
-      dateMap.set(dateKey, item.level);
+      dateMap[dateKey] = item.level;
     });
 
-    // Generate chart data for all 21 days (3 weeks)
     const data = [];
     const weekLabels = ['Prev Week', 'Current Week', 'Next Week'];
+    const weekStarts = [prevWeekStart, startOfWeek, nextWeekStart];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
     for (let week = 0; week < 3; week++) {
-      const weekStart = week === 0 ? prevWeekStart : week === 1 ? startOfWeek : nextWeekStart;
+      const weekStart = weekStarts[week];
       
       for (let day = 0; day < 7; day++) {
         const date = new Date(weekStart);
         date.setDate(date.getDate() + day);
         const dateKey = date.toDateString();
-        const painLevel = dateMap.get(dateKey) || 0;
+        const painLevel = dateMap[dateKey] || 0;
         
         data.push({
           date,
-          day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
+          day: dayNames[date.getDay()],
           level: painLevel,
           color: getPainColor(painLevel),
           week: week,
@@ -165,8 +181,11 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
       }
     }
 
-    extendedChartData = data;
-  }
+    return data;
+  };
+
+  // Process data for extended chart (3 weeks)
+  const extendedChartData = isExpanded ? createExtendedChartData() : [];
 
   // Calculate 3-month summary statistics for physician view
   let threeMonthSummary = null;
@@ -480,70 +499,145 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
     );
   }
 
-  // Physician view
+  // Physician/Unified view
   return (
       <div className="physician-pain-chart-container">
-        <div className="pain-line-chart-container">
+        <div className="pain-chart-header">
           <h3 className="chart-title">Pain</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
-          <PainLineChart 
-            data={chartData} 
-            isExpanded={isExpanded} 
-            extendedData={extendedChartData}
-          />
-        </div>
-
-        <div className="pain-location-info">
-          <h4>Pain Location: {mostCommonLocation || 'N/A'}</h4>
+          
+          {/* View Toggle */}
+          <div className="view-toggle">
+            <button 
+              className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
+              onClick={() => setUseLineChart(false)}
+            >
+              List View
+            </button>
+            <button 
+              className={`toggle-btn ${useLineChart ? 'active' : ''}`}
+              onClick={() => setUseLineChart(true)}
+            >
+              Line Chart
+            </button>
+          </div>
         </div>
         
-        <div className="pain-legend-wrapper">
-          <Legend title="Pain Intensity Scale (0-10)" items={painLegendItems} />
-        </div>
-
-        <div className="summary-container">
-          <div className="chart-summary">
-            <h4>Week Summary</h4>
-            <div className="summary-stats">
-              <div className="stat-item">
-                <span className="stat-label">Average Pain Intensity:</span>
-                <span className="stat-value">{averagePainLevel.toFixed(1)}/10</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Most Common Location:</span>
-                <span className="stat-value">{mostCommonLocation || 'N/A'}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Days with Pain:</span>
-                <span className="stat-value">{weekPainData.length}/7</span>
-              </div>
+        {/* Conditional Chart Rendering */}
+        {useLineChart ? (
+          <div className="pain-line-chart-container">
+            <PainLineChart 
+              data={chartData} 
+              isExpanded={isExpanded} 
+              extendedData={extendedChartData}
+            />
+            <div className="pain-location-info">
+              <h4>Pain Location: {mostCommonLocation || 'N/A'}</h4>
+            </div>
+            <div className="pain-legend-wrapper">
+              <Legend title="Pain Intensity Scale (0-10)" items={painLegendItems} />
             </div>
           </div>
-          
-          {threeMonthSummary && (
+        ) : (
+          <div className="pain-content-wrapper">
+            {/* Main Body SVG showing most common pain location and average level */}
+            {mostCommonLocation && (
+              <div className="main-pain-visualization">
+                <h4>Most Common Pain Location: {mostCommonLocation}</h4>
+                <Body 
+                  location={mostCommonLocation} 
+                  level={Math.round(averagePainLevel)} 
+                />
+              </div>
+            )}
+            <div className="pain-list">
+              {weekPainData.length > 0 ? (
+                weekPainData.map((item, index) => (
+                  <div key={index} className="pain-list-item">
+                    <div className="pain-item-info">
+                      <div className="pain-item-date">
+                        {new Date(item.date).toLocaleDateString('en-US', { 
+                          weekday: 'short', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                      <div className="pain-item-details">
+                        <div className="pain-level">
+                          Pain Level: <span style={{ color: getPainColor(item.level) }}>
+                            {item.level}/10
+                          </span>
+                        </div>
+                        <div className="pain-location">
+                          Location: {item.location || 'Not specified'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="pain-item-body">
+                      <Body 
+                        location={item.location} 
+                        level={item.level}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="no-pain-data">No pain data available for this week</div>
+              )}
+            </div>
+            
+            <div className="pain-legend-wrapper">
+              <Legend title="Pain Intensity Scale (0-10)" items={painLegendItems} hide={screenshotMode} />
+            </div>
+          </div>
+        )}
+
+        {/* Show summaries for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && (
+          <div className="summary-container">
             <div className="chart-summary">
-              <h4>3-Month Summary</h4>
+              <h4>Week Summary</h4>
               <div className="summary-stats">
                 <div className="stat-item">
                   <span className="stat-label">Average Pain Intensity:</span>
-                  <span className="stat-value">{threeMonthSummary.averagePainLevel.toFixed(1)}/10</span>
+                  <span className="stat-value">{averagePainLevel.toFixed(1)}/10</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Most Common Location:</span>
-                  <span className="stat-value">
-                    {threeMonthSummary.mostCommonLocation || 'N/A'} ({threeMonthSummary.mostCommonLocationCount}x)
-                  </span>
+                  <span className="stat-value">{mostCommonLocation || 'N/A'}</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-label">Days with Pain:</span>
-                  <span className="stat-value">
-                    {threeMonthSummary.daysWithPain}/{threeMonthSummary.daysInThreeMonths}
-                  </span>
+                  <span className="stat-value">{weekPainData.length}/7</span>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+            
+            {showThreeMonthSummaries && threeMonthSummary && (
+              <div className="chart-summary">
+                <h4>3-Month Summary</h4>
+                <div className="summary-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">Average Pain Intensity:</span>
+                    <span className="stat-value">{threeMonthSummary.averagePainLevel.toFixed(1)}/10</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Most Common Location:</span>
+                    <span className="stat-value">
+                      {threeMonthSummary.mostCommonLocation || 'N/A'} ({threeMonthSummary.mostCommonLocationCount}x)
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Days with Pain:</span>
+                    <span className="stat-value">
+                      {threeMonthSummary.daysWithPain}/{threeMonthSummary.daysInThreeMonths}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
   );
 };

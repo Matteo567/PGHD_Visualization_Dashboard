@@ -64,8 +64,11 @@ const exerciseLegendItems = exerciseTypes.map(({ label, color, emoji }) => ({
   color,
 }));
 
-const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { exerciseData, loading, error } = usePatientData(patientId, 'exercise');
+  
+  // State for toggling between activity breakdown and weekly goals view
+  const [showWeeklyGoals, setShowWeeklyGoals] = useState(false);
   
   // Use navigation from parent or fallback to internal navigation
   const useInternalNavigation = !navigation;
@@ -123,26 +126,56 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     return itemDate >= startOfThreeMonths && itemDate <= endOfThreeMonths;
   });
 
+  // Helper functions for exercise data processing
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const groupedData = daysOfWeek.reduce((acc, day) => {
-    acc[day] = { walking: 0, swimming: 0, running: 0, biking: 0, 'muscle-strengthening': 0, balance: 0, other: 0, totalMinutes: 0 };
-    return acc;
-  }, {});
-
-  weekData.forEach(item => {
-    if (!item.date) return;
-    const dayName = daysOfWeek[new Date(item.date).getDay()];
-    if (groupedData[dayName]) {
-      groupedData[dayName].walking += Number(item.walking) || 0;
-      groupedData[dayName].swimming += Number(item.swimming) || 0;
-      groupedData[dayName].running += Number(item.running) || 0;
-      groupedData[dayName].biking += Number(item.biking) || 0;
-      groupedData[dayName]['muscle-strengthening'] += Number(item['muscle-strengthening']) || 0;
-      groupedData[dayName].balance += Number(item.balance) || 0;
-      groupedData[dayName].other += Number(item.other) || 0;
-      groupedData[dayName].totalMinutes = groupedData[dayName].walking + groupedData[dayName].swimming + groupedData[dayName].running + groupedData[dayName].biking + groupedData[dayName]['muscle-strengthening'] + groupedData[dayName].balance + groupedData[dayName].other;
-    }
+  
+  const initializeDayData = () => ({
+    walking: 0,
+    swimming: 0,
+    running: 0,
+    biking: 0,
+    'muscle-strengthening': 0,
+    balance: 0,
+    other: 0,
+    totalMinutes: 0
   });
+
+  const processExerciseData = (weekData) => {
+    const groupedData = {};
+    
+    // Initialize all days
+    daysOfWeek.forEach(day => {
+      groupedData[day] = initializeDayData();
+    });
+    
+    // Process each exercise item
+    weekData.forEach(item => {
+      if (!item.date) return;
+      
+      const date = new Date(item.date);
+      const dayName = !isNaN(date.getTime()) ? daysOfWeek[date.getDay()] : 'Invalid';
+      const dayData = groupedData[dayName];
+      
+      if (dayData) {
+        dayData.walking += Number(item.walking) || 0;
+        dayData.swimming += Number(item.swimming) || 0;
+        dayData.running += Number(item.running) || 0;
+        dayData.biking += Number(item.biking) || 0;
+        dayData['muscle-strengthening'] += Number(item['muscle-strengthening']) || 0;
+        dayData.balance += Number(item.balance) || 0;
+        dayData.other += Number(item.other) || 0;
+        
+        // Calculate total minutes
+        dayData.totalMinutes = dayData.walking + dayData.swimming + dayData.running + 
+                             dayData.biking + dayData['muscle-strengthening'] + 
+                             dayData.balance + dayData.other;
+      }
+    });
+    
+    return groupedData;
+  };
+
+  const groupedData = processExerciseData(weekData);
 
   // Calculate weekly exercise categories for physician view
   const aerobic = Object.values(groupedData).reduce((sum, day) => 
@@ -174,7 +207,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     flexibility: Math.min(100, Math.round((weeklyCategories.flexibilitySessions / flexibilityGoal) * 100))
   };
 
-  const maxVal = Math.max(...Object.values(groupedData).map(day => day.totalMinutes), 0);
+  const exerciseValues = Object.values(groupedData).map(day => day.totalMinutes);
+  const maxVal = exerciseValues.length > 0 ? Math.max(...exerciseValues, 0) : 0;
   const maxDuration = Math.max(60, Math.ceil(maxVal / 30) * 30);
 
   const generateYAxisLabels = (max) => {
@@ -213,7 +247,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     
     // Calculate average session length
     const totalSessions = weekData.filter(item => {
-      const dayName = daysOfWeek[new Date(item.date).getDay()];
+      const date = new Date(item.date);
+      const dayName = !isNaN(date.getTime()) ? daysOfWeek[date.getDay()] : 'Invalid';
       return groupedData[dayName] && groupedData[dayName].totalMinutes > 0;
     }).length;
     
@@ -239,7 +274,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     const threeMonthGroupedData = {};
     threeMonthData.forEach(item => {
       if (!item.date) return;
-      const dayName = daysOfWeek[new Date(item.date).getDay()];
+      const date = new Date(item.date);
+      const dayName = !isNaN(date.getTime()) ? daysOfWeek[date.getDay()] : 'Invalid';
       if (!threeMonthGroupedData[dayName]) {
         threeMonthGroupedData[dayName] = { walking: 0, swimming: 0, running: 0, biking: 0, 'muscle-strengthening': 0, balance: 0, other: 0, totalMinutes: 0 };
       }
@@ -274,7 +310,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     
     // Calculate average session length
     const totalSessions = threeMonthData.filter(item => {
-      const dayName = daysOfWeek[new Date(item.date).getDay()];
+      const date = new Date(item.date);
+      const dayName = !isNaN(date.getTime()) ? daysOfWeek[date.getDay()] : 'Invalid';
       return threeMonthGroupedData[dayName] && threeMonthGroupedData[dayName].totalMinutes > 0;
     }).length;
     
@@ -297,8 +334,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     return `${startStr} to ${endStr}`;
   };
 
-  // Physician view - simplified bar chart
-  if (viewMode === 'physician') {
+  // Physician/Unified view - simplified bar chart or weekly goals
+  if (viewMode === 'physician' || (viewMode === 'unified' && showWeeklyGoals)) {
     const categories = [
       { 
         name: 'Aerobic', 
@@ -328,8 +365,28 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
 
     return (
       <div className={`exercise-chart-container ${isExpanded ? 'expanded' : ''}`}>
-        <h3 className="chart-title">Exercise Goals Progress</h3>
-        <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
+        <div className="exercise-header">
+          <h3 className="chart-title">Exercise Goals Progress</h3>
+          <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
+          
+          {/* View Toggle - Always show for unified mode */}
+          {viewMode === 'unified' && (
+            <div className="view-toggle">
+              <button 
+                className={`toggle-btn ${!showWeeklyGoals ? 'active' : ''}`}
+                onClick={() => setShowWeeklyGoals(false)}
+              >
+                Activity Breakdown
+              </button>
+              <button 
+                className={`toggle-btn ${showWeeklyGoals ? 'active' : ''}`}
+                onClick={() => setShowWeeklyGoals(true)}
+              >
+                Weekly Goals
+              </button>
+            </div>
+          )}
+        </div>
         
         <div className="physician-exercise-bars">
           {categories.map((category, index) => (
@@ -389,8 +446,28 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
 
   return (
       <div className={`exercise-chart-container ${isExpanded ? 'expanded' : ''}`}>
-        <h3 className="chart-title">Activity Breakdown by Type</h3>
-        <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
+        <div className="exercise-header">
+          <h3 className="chart-title">Activity Breakdown by Type</h3>
+          <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
+          
+          {/* View Toggle */}
+          {viewMode === 'unified' && (
+            <div className="view-toggle">
+              <button 
+                className={`toggle-btn ${!showWeeklyGoals ? 'active' : ''}`}
+                onClick={() => setShowWeeklyGoals(false)}
+              >
+                Activity Breakdown
+              </button>
+              <button 
+                className={`toggle-btn ${showWeeklyGoals ? 'active' : ''}`}
+                onClick={() => setShowWeeklyGoals(true)}
+              >
+                Weekly Goals
+              </button>
+            </div>
+          )}
+        </div>
         
         <svg 
           width="100%" 
@@ -467,9 +544,6 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
                             fontSize={isExpanded ? 8 : 6}
                             fill="black"
                             className="duration-label"
-                            style={{ 
-                              fontWeight: 'bold'
-                            }}
                           >
                             {Math.round(minutes)}
                           </text>
@@ -494,8 +568,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
           hide={screenshotMode}
         />
 
-        {/* Show summary for physician view only */}
-        {viewMode === 'physician' && weekSummary && (
+        {/* Show summary for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>
@@ -534,7 +608,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
               </div>
             </div>
             
-            {threeMonthSummary && (
+            {showThreeMonthSummaries && threeMonthSummary && (
               <div className="chart-summary">
                 <h4>3-Month Summary</h4>
                 <div className="summary-stats">

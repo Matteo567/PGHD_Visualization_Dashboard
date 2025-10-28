@@ -3,7 +3,7 @@
  Provides navigation state and functions for charts
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
   const [currentDate, setCurrentDate] = useState(initialDate);

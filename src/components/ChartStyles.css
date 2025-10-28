@@ -89,8 +89,6 @@
   --chart-font-size-lg: 18px;
   --chart-font-size-xl: 20px;
   --chart-font-weight: 400;
-  --chart-font-weight-semibold: 600;
-  --chart-font-weight-bold: 700;
   
   /* Spacing Scale */
   --chart-spacing-xs: 4px;
@@ -213,12 +211,12 @@
 .y-axis-title {
   font-size: var(--chart-font-size-sm);
   fill: var(--chart-color-text-primary);
-  font-weight: var(--chart-font-weight-semibold);
+  font-weight: var(--chart-font-weight);
 }
 
 .x-axis-day-label {
   fill: var(--chart-color-text-primary);
-  font-weight: var(--chart-font-weight-semibold);
+  font-weight: var(--chart-font-weight);
 }
 
 .x-axis-date-label {
@@ -227,7 +225,7 @@
 
 .time-label {
   fill: var(--chart-color-text-muted);
-  font-weight: var(--chart-font-weight-semibold);
+  font-weight: var(--chart-font-weight);
   letter-spacing: 0.3px;
 }
 
@@ -362,7 +360,7 @@
 }
 
 .stat-value {
-  font-weight: var(--chart-font-weight-semibold);
+  font-weight: var(--chart-font-weight);
   color: var(--chart-color-text-primary);
   font-size: var(--chart-font-size-sm);
 }
@@ -847,7 +845,7 @@
 
 
 .summary-label {
-  font-weight: var(--chart-font-weight-medium);
+  font-weight: var(--chart-font-weight);
   color: var(--chart-color-text-secondary);
   font-size: var(--chart-font-size-sm);
 }
@@ -894,8 +892,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 200px; /* Reduced width for dashboard */
-  max-width: 200px;
+  min-width: 180px; /* Reduced width for dashboard */
+  max-width: 180px;
 }
 
 .pain-item-details {
@@ -943,7 +941,7 @@
   align-items: flex-start;
   gap: var(--chart-spacing-sm); /* Reduced gap for dashboard */
   width: 100%;
-  max-width: 180px; /* Reduced max-width for dashboard */
+  max-width: 160px; /* Reduced max-width for dashboard */
   justify-content: center;
   margin: 0;
 }
@@ -965,17 +963,15 @@
 }
 
 .body-svg {
-  width: 80px; /* Smaller size for dashboard */
-  height: 160px; /* Maintain 2:1 aspect ratio */
+  width: 100%; /* Responsive width */
+  height: auto; /* Auto height for aspect ratio */
+  max-width: 70px; /* Maximum size for dashboard */
   padding: var(--chart-spacing-xs);
-  max-width: 100%;
-  max-height: 100%;
 }
 
 /* Expanded view scaling for pain chart */
 .expanded .body-svg {
-  width: 140px; /* Increased size for expanded view */
-  height: 280px; /* Maintain 2:1 aspect ratio */
+  max-width: 120px; /* Increased max size for expanded view */
   padding: var(--chart-spacing-sm);
 }
 
@@ -1019,8 +1015,8 @@
 
 /* Enhanced expanded pain item body layout */
 .visualization-wrapper.expanded .pain-item-body {
-  min-width: 250px; /* Increased to accommodate larger SVGs */
-  max-width: 250px;
+  min-width: 220px; /* Increased to accommodate larger SVGs */
+  max-width: 220px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1037,7 +1033,7 @@
   gap: var(--chart-spacing-md); /* Reduced gap */
   justify-content: center;
   width: 100%;
-  max-width: 400px; /* Increased for larger SVGs */
+  max-width: 200px; /* Adjusted for larger SVGs */
   margin: 0 auto;
 }
 
@@ -1093,7 +1089,7 @@
 
 .pain-item-details strong {
   color: var(--chart-color-text-primary);
-  font-weight: var(--chart-font-weight-bold);
+  font-weight: var(--chart-font-weight);
   min-width: 80px;
   flex-shrink: 0;
 }

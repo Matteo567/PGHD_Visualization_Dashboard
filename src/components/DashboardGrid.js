@@ -28,10 +28,8 @@ import './DashboardGrid.css';
  @param {Function} props.renderVisualization - Function to render visualizations
  @param {boolean} props.disabled - Whether the grid is disabled
  @param {string} props.placeholderText - Text to show when no data is available
- @param {boolean} props.showSummaries - Whether to show summaries (unused)
- @param {Object} props.summaryTexts - Summary texts (unused)
- @param {Function} props.onSummaryChange - Summary change handler (unused)
  @param {Object} props.chartNavigation - Navigation objects for each chart type
+ @param {boolean} props.screenshotMode - Whether in screenshot mode
  @returns {JSX.Element} The dashboard grid component
  */
 const DashboardGrid = ({
@@ -45,10 +43,6 @@ const DashboardGrid = ({
   renderVisualization,
   disabled = false,
   placeholderText = "No data available for this patient.",
-  // New props for physician summary functionality
-  showSummaries = false,
-  summaryTexts = {},
-  onSummaryChange = null,
   // Navigation props
   chartNavigation = {},
   // Screenshot mode
@@ -63,6 +57,10 @@ const DashboardGrid = ({
     physician: {
       className: 'physician-charts-grid',
       chartClassNames: ['physician-chart-container']
+    },
+    unified: {
+      className: 'dashboard-grid',
+      chartClassNames: ['visualization-box']
     }
   };
 
@@ -73,7 +71,21 @@ const DashboardGrid = ({
 
   // If there's an expanded item, show only that
   if (expandedItem) {
-    const selectedViz = selectedVisualizations[expandedItem];
+    // Extract the visualization type from the chart ID
+    // Chart IDs are formatted as "${viewMode}-chart-${index}"
+    const chartIdParts = expandedItem.split('-');
+    const chartIndex = parseInt(chartIdParts[chartIdParts.length - 1]);
+    const availableVizTypes = Object.keys(availableVisualizations);
+    const selectedViz = availableVizTypes[chartIndex];
+    
+    if (!selectedViz) {
+      return (
+        <div className={config.className}>
+          <Placeholder message="Invalid expanded chart" type="error" />
+        </div>
+      );
+    }
+    
     const navigation = chartNavigation[selectedViz];
     
     const wrapperProps = {

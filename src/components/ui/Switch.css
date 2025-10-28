@@ -7,16 +7,16 @@
 
 .switch-label {
   font-size: 14px;
-  color: #666;
+  color: #000000;
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .switch-label.active {
-  color: #333;
+  color: #000000;
   background-color: #f0f0f0;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .switch-button {

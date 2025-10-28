@@ -90,8 +90,8 @@ const useVisualizations = (viewMode, data) => {
   }
 
   const handleVisualizationChange = (chartId, visualizationType) => {
-    // This function is kept for compatibility but may not be needed
-    // since we're now showing all available visualizations
+    // Visualization changes are handled automatically by showing all available visualizations
+    // This function is kept for API compatibility but is not actively used
   };
 
   return {

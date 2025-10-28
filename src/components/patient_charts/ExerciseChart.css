@@ -1,3 +1,44 @@
+/* Exercise Header with Toggle */
+.exercise-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-sm);
+  margin-bottom: var(--chart-spacing-md);
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  color: #000000;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+  color: #000000;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
 /* Exercise Chart Specific Styles */
 .exercise-chart-container {
   display: flex;
@@ -84,15 +125,15 @@
 }
 
 .category-name {
-  font-weight: 600;
+  font-weight: 400;
   font-size: 16px;
-  color: #333;
+  color: #000000;
 }
 
 .category-percentage {
-  font-weight: 700;
+  font-weight: 400;
   font-size: 18px;
-  color: #666;
+  color: #000000;
 }
 
 .bar-container {
@@ -127,17 +168,17 @@
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  color: #666;
+  color: #000000;
   margin-top: 4px;
 }
 
 .category-value {
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .category-goal {
   font-size: 12px;
-  color: #888;
+  color: #000000;
 }
 
 

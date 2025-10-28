@@ -33,20 +33,41 @@ const MOOD_BACKGROUNDS = {
 };
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const getCalendarConfig = (isExpanded) => ({
-  svgWidth: isExpanded ? 700 : 350,
-  svgHeight: isExpanded ? 600 : 300,
-  cellWidth: isExpanded ? 100 : 50,
-  cellHeight: isExpanded ? 85 : 44,
-  dayLabelY: isExpanded ? 55 : 30,
-  dayLabelFontSize: isExpanded ? 16 : 9,
-  dateLabelX: isExpanded ? 12 : 5,
-  dateLabelY: isExpanded ? 22 : 12,
-  dateLabelFontSize: isExpanded ? 14 : 8,
-  moodIconFontSize: isExpanded ? 36 : 20,
-  startX: isExpanded ? 50 : 25,
-  startY: isExpanded ? 100 : 55,
-});
+// Separate configurations for clarity
+const CHART_CONFIGS = {
+  normal: {
+    svgWidth: 350,
+    svgHeight: 300,
+    cellWidth: 50,
+    cellHeight: 44,
+    dayLabelY: 30,
+    dayLabelFontSize: 9,
+    dateLabelX: 5,
+    dateLabelY: 12,
+    dateLabelFontSize: 8,
+    moodIconFontSize: 20,
+    startX: 25,
+    startY: 55,
+  },
+  expanded: {
+    svgWidth: 700,
+    svgHeight: 600,
+    cellWidth: 100,
+    cellHeight: 85,
+    dayLabelY: 55,
+    dayLabelFontSize: 16,
+    dateLabelX: 12,
+    dateLabelY: 22,
+    dateLabelFontSize: 14,
+    moodIconFontSize: 36,
+    startX: 50,
+    startY: 100,
+  }
+};
+
+const getCalendarConfig = (isExpanded) => {
+  return isExpanded ? CHART_CONFIGS.expanded : CHART_CONFIGS.normal;
+};
 
 // --- Helper Functions ---
 const normalizeMood = (mood) => (mood && MOODS[mood.toLowerCase()]) ? mood.toLowerCase() : null;
@@ -84,7 +105,10 @@ const CalendarHeader = ({ config }) => (
 const DayCell = ({ config, date, moods }) => {
   const dayOfMonth = date.getDate();
   const dayOfWeek = date.getDay();
-  const weekOfMonth = Math.floor((dayOfMonth - 1 + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7);
+  const weekOfMonth = Math.floor((dayOfMonth - 1 + (() => {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    return !isNaN(firstDay.getTime()) ? firstDay.getDay() : 0;
+  })()) / 7);
   const x = config.startX + dayOfWeek * config.cellWidth;
   const y = config.startY + weekOfMonth * (config.cellHeight + 2);
   const primaryMood = moods.length > 0 ? moods[0] : null;
@@ -119,7 +143,10 @@ const Calendar = ({ isExpanded, moodByDate, currentMonth, monthDisplay }) => {
   const config = getCalendarConfig(isExpanded);
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = (() => {
+      const lastDay = new Date(year, month + 1, 0);
+      return !isNaN(lastDay.getTime()) ? lastDay.getDate() : 30;
+    })();
 
   return (
     <div className="mood-calendar-svg-container">
@@ -141,7 +168,7 @@ const Calendar = ({ isExpanded, moodByDate, currentMonth, monthDisplay }) => {
 };
 
 // --- Main Component ---
-const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { moodData, isLoading: loading, error } = usePatientData(patientId, 'mood');
   
   // Use navigation from parent or fallback to internal navigation
@@ -149,7 +176,17 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
   const internalNavigation = useChartNavigation('mood');
   const nav = navigation || internalNavigation;
   
-  const currentMonth = nav.currentDate;
+  // For mood chart, determine the month to display based on the navigation
+  // If using weekly navigation, show the month that contains the current week
+  let currentMonth;
+  if (nav.navigationType === 'week') {
+    // Use the week's start date to determine which month to display
+    const weekRange = nav.getDateRange();
+    currentMonth = new Date(weekRange.start.getFullYear(), weekRange.start.getMonth(), 1);
+  } else {
+    // Use monthly navigation directly
+    currentMonth = nav.currentDate;
+  }
 
   const moodByDate = moodData
     .filter(d => d.date.getFullYear() === currentMonth.getFullYear() && d.date.getMonth() === currentMonth.getMonth())
@@ -160,7 +197,10 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
       return acc;
     }, {});
 
-  const monthDisplay = nav.getFormattedDateRange();
+  // Get appropriate month display based on navigation type
+  const monthDisplay = nav.navigationType === 'week' 
+    ? currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : nav.getFormattedDateRange();
 
   // Get 3-month data
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
@@ -200,7 +240,10 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
     });
 
     // Days in current month
-    const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+    const daysInMonth = (() => {
+      const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+      return !isNaN(lastDay.getTime()) ? lastDay.getDate() : 30;
+    })();
     const daysWithMood = new Set(currentMonthData.map(d => d.date.getDate())).size;
 
     // Calculate mood score (happy=3, sad=1, angry=1)
@@ -277,8 +320,8 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
           <Legend title="Mood" items={moodLegendItems} hide={screenshotMode} />
       </div>
 
-      {/* Show summary for physician view only */}
-      {viewMode === 'physician' && monthSummary && (
+      {/* Show summary for physician/unified view */}
+      {(viewMode === 'physician' || viewMode === 'unified') && monthSummary && (
         <div className="summary-container">
           <div className="chart-summary">
             <h4>Month Summary</h4>
@@ -306,7 +349,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
             </div>
           </div>
           
-          {threeMonthSummary && (
+          {showThreeMonthSummaries && threeMonthSummary && (
             <div className="chart-summary">
               <h4>3-Month Summary</h4>
               <div className="summary-stats">

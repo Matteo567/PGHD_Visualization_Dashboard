@@ -10,6 +10,7 @@
   font-weight: 400;
 }
 
+/* Pain Chart Header with Toggle */
 .pain-chart-header {
   display: flex;
   flex-direction: column;
@@ -34,20 +35,52 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.2s ease;
-  color: #666;
+  color: #000000;
 }
 
 .toggle-btn:hover {
   background: #e0e0e0;
-  color: #333;
+  color: #000000;
 }
 
 .toggle-btn.active {
   background: #007bff;
   color: white;
   box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Main Pain Visualization */
+.main-pain-visualization {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--chart-spacing-md);
+  padding: var(--chart-spacing-md);
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: var(--chart-spacing-md);
+}
+
+.main-pain-visualization h4 {
+  margin: 0;
+  color: #000000;
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.main-pain-visualization .body-container {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.main-pain-visualization .body-views {
+  max-width: 200px;
+}
+
+.main-pain-visualization .body-svg {
+  max-width: 90px;
 }
 
 /* Pain List Styles */
@@ -83,8 +116,8 @@
 
 .pain-item-date {
   font-size: 0.9em;
-  color: #666;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 400;
 }
 
 .pain-item-details {
@@ -96,16 +129,26 @@
 .pain-level,
 .pain-location {
   font-size: 0.85em;
-  color: #333;
+  color: #000000;
 }
 
 .pain-item-body {
   margin-left: var(--chart-spacing-md);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pain-item-body .body-svg {
+  width: 100%;
+  height: auto;
+  max-width: 100px;
 }
 
 .no-pain-data {
   text-align: center;
-  color: #666;
+  color: #000000;
   font-style: italic;
   padding: var(--chart-spacing-lg);
 }
@@ -137,11 +180,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .body-views {
   display: flex;
-  gap: var(--chart-spacing-md);
+  gap: var(--chart-spacing-sm);
+  width: 100%;
+  max-width: 160px;
+  justify-content: center;
 }
 
 .body-view {
@@ -149,17 +196,20 @@
   flex-direction: column;
   align-items: center;
   gap: var(--chart-spacing-xs);
+  flex: 1;
 }
 
 .body-view-label {
-  font-size: 0.8em;
-  color: #666;
-  font-weight: 500;
+  font-size: 0.75em;
+  color: #000000;
+  font-weight: 400;
+  text-align: center;
 }
 
 .body-svg {
-  width: 60px;
+  width: 100%;
   height: auto;
+  max-width: 70px;
 }
 
 /* Physician View Styles */
@@ -179,7 +229,7 @@
 
 .pain-location-info h4 {
   margin: 0;
-  color: #333;
+  color: #000000;
   font-size: 1.1em;
 }
 
@@ -199,7 +249,7 @@
 
 .chart-summary h4 {
   margin: 0 0 var(--chart-spacing-sm) 0;
-  color: #333;
+  color: #000000;
   font-size: 1em;
 }
 
@@ -218,12 +268,12 @@
 
 .stat-label {
   font-size: 0.9em;
-  color: #666;
+  color: #000000;
 }
 
 .stat-value {
   font-size: 0.9em;
-  color: #333;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 400;
 }
 

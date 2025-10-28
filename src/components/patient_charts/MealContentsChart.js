@@ -299,8 +299,6 @@ const MealGrid = ({ config, weekDays, patientData, isExpanded }) => {
           const mealData = getMealData(dayData, meal);
           const mealTime = getMealTime(dayData, meal);
           
-          // Debug logging removed for production
-          
           return (
             <MealCell
               key={`${dayIndex}-${mealIndex}`}
@@ -320,7 +318,7 @@ const MealGrid = ({ config, weekDays, patientData, isExpanded }) => {
 
 
 // --- Main Component ---
-const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false }) => {
+const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { mealData: patientData, loading, error } = usePatientData(patientId);
   
   // Use navigation from parent or fallback to internal navigation
@@ -562,8 +560,8 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode =
             />
         </div>
 
-        {/* Show summary for physician view only */}
-        {viewMode === 'physician' && weekSummary && (
+        {/* Show summary for physician/unified view */}
+        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>
@@ -595,7 +593,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode =
               </div>
             </div>
             
-            {threeMonthSummary && (
+            {showThreeMonthSummaries && threeMonthSummary && (
               <div className="chart-summary">
                 <h4>3-Month Summary</h4>
                 <div className="summary-stats">

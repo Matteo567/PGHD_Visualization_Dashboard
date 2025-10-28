@@ -189,14 +189,14 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.2s ease;
-  color: #666;
+  color: #000000;
 }
 
 .toggle-btn:hover {
   background: #e0e0e0;
-  color: #333;
+  color: #000000;
 }
 
 .toggle-btn.active {

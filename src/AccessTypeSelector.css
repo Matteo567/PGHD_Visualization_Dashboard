@@ -1,0 +1,38 @@
+/**
+ * AccessTypeSelector.css - Access Type Selection Dropdown Styles
+ * 
+ * Minimal styling for the access type selection dropdown component.
+ */
+
+.access-type-selector-container {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.access-type-selector-label {
+  font-weight: 400;
+  margin-right: 0;
+  font-size: 1rem;
+}
+
+.access-type-selector-select {
+  font-size: 1rem;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  color: #000000;
+  cursor: pointer;
+}
+
+.access-type-selector-select:hover {
+  border-color: #999;
+}
+
+.access-type-selector-select:focus {
+  outline: none;
+  border-color: #666;
+}
+

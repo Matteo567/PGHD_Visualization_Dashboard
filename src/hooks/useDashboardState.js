@@ -1,18 +1,5 @@
-/*
- useDashboardState.js - Custom Hook for Dashboard State Management
- 
- This hook provides a simplified interface for managing dashboard state including
- chart expansion, summary toggles, and other UI state. It replaces complex
- state management patterns with clear, descriptive function names.
- 
- Benefits:
- - Clear function names instead of complex state setters
- - Centralized state management
- - Easier to understand and maintain
- - Better separation of concerns
- */
-
-import React, { useState } from 'react';
+// Hook for managing dashboard state including chart expansion and summary toggles
+import { useState } from 'react';
 
 function useDashboardState() {
   const [expandedChart, setExpandedChart] = useState(null);

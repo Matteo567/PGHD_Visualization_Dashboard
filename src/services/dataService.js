@@ -1,42 +1,7 @@
 /*
  dataService.js - Patient Data Service
  
- This service handles all data operations for the health dashboard:
- - Fetches patient CSV data from the server
- - Parses and processes CSV data using PapaParse
- - Transforms raw data into structured health metrics
- - Provides data validation and error handling
- - Manages patient information, medications, and health tracking data
- - Supports all health metric types (glucose, BP, exercise, mood, pain, sleep, meals)
- 
- Architecture:
- - Uses PapaParse library for CSV parsing
- - Implements service class pattern for data operations
- - Provides comprehensive error handling and validation
- - Supports multiple data formats and structures
- 
- Data Processing:
- - CSV parsing with header validation
- - Data transformation and normalization
- - Type conversion and validation
- - Error recovery and fallback mechanisms
- 
- Health Metrics Supported:
- - Blood glucose monitoring with meal context
- - Blood pressure tracking with risk categorization
- - Exercise activity tracking and categorization
- - Mood assessment and tracking
- - Pain reporting with anatomical mapping
- - Sleep quality and duration analysis
- - Nutritional intake and meal composition
- 
- Error Handling:
- - Network error recovery
- - CSV parsing error handling
- - Data validation and sanitization
- - Graceful degradation for missing data
- 
- Core service for data management and processing throughout the application.
+ This service handles all data operations for the health dashboard. It fetches patient CSV data from the server and parses and processes CSV data using PapaParse. It transforms raw data into structured health metrics and provides data validation and error handling. The service manages patient information, medications, and health tracking data. It supports all health metric types including glucose, blood pressure, exercise, mood, pain, sleep, and meals. The service uses the PapaParse library for CSV parsing and implements a service class pattern for data operations. It provides error handling and validation and supports multiple data formats and structures. Data processing includes CSV parsing with header validation, data transformation and normalization, type conversion and validation, and error recovery and fallback mechanisms. The service handles blood glucose monitoring with meal context, blood pressure tracking with risk categorization, exercise activity tracking and categorization, mood assessment and tracking, pain reporting with anatomical mapping, sleep quality and duration analysis, and nutritional intake and meal composition. Error handling includes network error recovery, CSV parsing error handling, data validation and sanitization, and graceful degradation for missing data.
  */
 
 import Papa from 'papaparse';
@@ -54,11 +19,7 @@ const CSV_CONFIG = {
 };
 
 /*
- Fetches and parses CSV data for a specific patient
- 
- - @param {string} patientId - The patient identifier
- - @returns {Promise<Array>} Parsed CSV data as array of objects
- - @throws {Error} If CSV fetch or parsing fails
+ Fetches and parses CSV data for a specific patient. Returns parsed CSV data as array of objects. Throws error if CSV fetch or parsing fails.
  */
 const fetchPatientCsvData = async (patientId) => {
   try {
@@ -127,12 +88,7 @@ export async function getPatientData(patientId) {
 }
 
 /**
- * Processes raw CSV data into structured patient information and health metrics
- * 
- * - @param {Array} rows - Raw CSV data rows
- * - @param {string} patientId - The patient identifier
- * - @returns {Object} Structured patient data object
- * - @throws {Error} If data structure is invalid or processing fails
+ * Processes raw CSV data into structured patient information and health metrics. Returns structured patient data object. Throws error if data structure is invalid or processing fails.
  */
 export function processPatientData(rows, patientId) {
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -153,46 +109,51 @@ export function processPatientData(rows, patientId) {
     dataAvailable: 'May 2025'
   };
 
-  // Process medications using the cleaner individual medication fields
+  // Process medications from the first row
   const detailedMedications = [];
-  
-  // Get medication data from the first row (should be consistent across all rows for a patient)
   const medicationNamesStr = firstRowData['Medication_Names'] || '';
-  const medicationTypesStr = firstRowData['Medication_Types'] || '';
-  const medicationCategoriesStr = firstRowData['Medication_Categories'] || '';
   const medicationDosagesStr = firstRowData['Medication_Dosages'] || '';
   
-  // Split the semicolon-separated strings into arrays
-  const medicationNames = medicationNamesStr ? medicationNamesStr.split('; ').filter(Boolean) : [];
-  const medicationTypes = medicationTypesStr ? medicationTypesStr.split('; ').filter(Boolean) : [];
-  const medicationCategories = medicationCategoriesStr ? medicationCategoriesStr.split('; ').filter(Boolean) : [];
-  const medicationDosages = medicationDosagesStr ? medicationDosagesStr.split('; ').filter(Boolean) : [];
-  
-  // Process each medication
-  for (let i = 0; i < Math.max(medicationNames.length, medicationTypes.length, medicationCategories.length, medicationDosages.length); i++) {
-    const name = medicationNames[i] || '';
-    const type = medicationTypes[i] || '';
-    const category = medicationCategories[i] || '';
-    const dosage = medicationDosages[i] || '';
+  if (medicationNamesStr && medicationDosagesStr) {
+    const medicationNames = medicationNamesStr.split('; ').filter(Boolean);
+    const medicationDosages = medicationDosagesStr.split('; ').filter(Boolean);
     
-    if (name && name.trim() && 
-        !name.includes('Dose not specified') && 
-        name.length < 100 && // Filter out extremely long medication names
-        !name.includes('Folic Acid Iron Magnesium Calcium Pain and Inflammation')) {
-      detailedMedications.push({
-        name: name.trim(),
-        schedule: dosage.trim(), // Use dosage as schedule
-        category: '', // Don't include category in visualization
-        dosage: ''
-      });
+    // Validates if a medication name is valid for processing
+    function isValidMedicationName(name) {
+      if (name.length === 0 || name.length >= 100) return false;
+      if (name.includes('Dose not specified')) return false;
+      if (name.includes('Folic Acid Iron Magnesium Calcium Pain and Inflammation')) return false;
+      return true;
     }
+    
+    medicationNames.forEach((medicationName, index) => {
+      const name = medicationName.trim();
+      const dosage = medicationDosages[index]?.trim() || '';
+      
+      if (isValidMedicationName(name)) {
+        detailedMedications.push({
+          name: name,
+          schedule: dosage,
+          category: '',
+          dosage: ''
+        });
+      }
+    });
   }
 
-  // Process conditions
+  // Process conditions from all rows
   const conditionsSet = new Set();
-  const conditionsRaw = [...new Set(rows.map(row => row['Chronic_Conditions'] || row['Conditions']).filter(Boolean))];
-  conditionsRaw.forEach(conditionString => {
-    conditionString.split(';').forEach(c => conditionsSet.add(c.trim()));
+  rows.forEach(row => {
+    const conditionString = row['Chronic_Conditions'] || row['Conditions'] || '';
+    if (conditionString) {
+      const conditions = conditionString.split(';');
+      conditions.forEach(condition => {
+        const trimmed = condition.trim();
+        if (trimmed) {
+          conditionsSet.add(trimmed);
+        }
+      });
+    }
   });
 
   // Process all data types
@@ -216,12 +177,11 @@ export function processPatientData(rows, patientId) {
     moodData,
     painData,
     mealData,
-    sleepData,
-    rawData: rows
+    sleepData
   };
 }
 
-// Helper functions for glucose data processing
+// Helper functions for processing glucose data
 function parseTimeString(timeStr) {
   if (!timeStr || typeof timeStr !== 'string' || !timeStr.includes(':')) {
     return { hours: 0, minutes: 0 };
@@ -299,9 +259,9 @@ function processSingleColumnGlucose(row, baseDate) {
 }
 
 /**
- * Processes blood glucose data from CSV rows
+ * Processes blood glucose data from CSV rows.
  */
-export function processGlucoseData(rows) {
+function processGlucoseData(rows) {
   const readings = [];
   
   rows.forEach(row => {
@@ -319,130 +279,179 @@ export function processGlucoseData(rows) {
 }
 
 /**
- * Processes blood pressure data from CSV rows
+ * Creates a date with time from a base date and time string.
  */
-export function processBloodPressureData(rows) {
+function createDateWithTime(baseDate, timeStr) {
+  const timeParts = timeStr.split(':');
+  if (timeParts.length < 2) return null;
+  
+  const hours = parseInt(timeParts[0], 10);
+  const minutes = parseInt(timeParts[1], 10);
+  
+  if (isNaN(hours) || isNaN(minutes)) return null;
+  
+  const date = new Date(baseDate);
+  date.setHours(hours, minutes);
+  return date;
+}
+
+/**
+ * Determines blood pressure type based on systolic and diastolic values.
+ */
+function getBPType(systolic, diastolic) {
+  if (systolic >= 180 || diastolic >= 120) return 'hypertensive crisis';
+  if (systolic >= 140 || diastolic >= 90) return 'high';
+  if (systolic >= 130 || diastolic >= 80) return 'elevated';
+  return 'normal';
+}
+
+/**
+ * Processes a single blood pressure reading from multi-column format.
+ */
+function processMultiColumnBPReading(row, index, baseDate) {
+  const systolic = parseInt(row[`Systolic_${index}`]);
+  const diastolic = parseInt(row[`Diastolic_${index}`]);
+  const timeStr = row[`BP_Time_${index}`];
+  
+  const isValid = !isNaN(systolic) && !isNaN(diastolic) && 
+                  systolic > 0 && diastolic > 0 && 
+                  timeStr && timeStr.trim() !== '';
+  
+  if (!isValid) return null;
+  
+  const date = createDateWithTime(baseDate, timeStr);
+  if (!date) return null;
+  
+  return {
+    date,
+    systolic,
+    diastolic,
+    systolicType: row[`Systolic_Type_${index}`],
+    diastolicType: row[`Diastolic_Type_${index}`]
+  };
+}
+
+/**
+ * Processes a single blood pressure reading from single-column format.
+ */
+function processSingleColumnBPReading(row, baseDate) {
+  const systolic = parseInt(row['Systolic_BP']);
+  const diastolic = parseInt(row['Diastolic_BP']);
+  
+  if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) {
+    return null;
+  }
+  
+  // Generate random time for single reading format when timestamp is not available
+  const randomHour = Math.floor(Math.random() * 24);
+  const randomMinute = Math.floor(Math.random() * 60);
+  const date = new Date(baseDate);
+  date.setHours(randomHour, randomMinute);
+  
+  const bpType = getBPType(systolic, diastolic);
+  
+  return {
+    date,
+    systolic,
+    diastolic,
+    systolicType: bpType,
+    diastolicType: bpType
+  };
+}
+
+/**
+ * Processes blood pressure data from CSV rows.
+ */
+function processBloodPressureData(rows) {
   const readings = [];
+  
+  for (const row of rows) {
+    const baseDate = new Date(row['Date']);
+    const hasMultiColumn = row['Systolic_1'] !== undefined;
     
-    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      const row = rows[rowIndex];
-      const baseDate = new Date(row['Date']);
-      
-      const hasMultiColumn = row['Systolic_1'] !== undefined;
-      
-      if (hasMultiColumn) {
-        // Process up to 4 readings per day
-        for (let i = 1; i <= 4; i++) {
-          const systolic = parseInt(row[`Systolic_${i}`]);
-          const diastolic = parseInt(row[`Diastolic_${i}`]);
-          const timeStr = row[`BP_Time_${i}`];
-          
-          if (!isNaN(systolic) && !isNaN(diastolic) && systolic > 0 && diastolic > 0 && timeStr && timeStr.trim() !== '') {
-            const timeParts = timeStr.split(':');
-            if (timeParts.length >= 2) {
-              const hours = parseInt(timeParts[0], 10);
-              const minutes = parseInt(timeParts[1], 10);
-              
-              if (!isNaN(hours) && !isNaN(minutes)) {
-                const date = new Date(baseDate);
-                date.setHours(hours, minutes);
-                
-                readings.push({ 
-                  date: date, 
-                  systolic: systolic, 
-                  diastolic: diastolic, 
-                  systolicType: row[`Systolic_Type_${i}`],
-                  diastolicType: row[`Diastolic_Type_${i}`]
-                });
-              }
-            }
-          }
-        }
-      } else {
-        // Single reading format
-        const systolic = parseInt(row['Systolic_BP']);
-        const diastolic = parseInt(row['Diastolic_BP']);
-        
-        if (!isNaN(systolic) && !isNaN(diastolic) && systolic > 0 && diastolic > 0) {
-          const randomHour = Math.floor(Math.random() * 24);
-          const randomMinute = Math.floor(Math.random() * 60);
-          const date = new Date(baseDate);
-          date.setHours(randomHour, randomMinute);
-          
-          let systolicType = 'normal';
-          let diastolicType = 'normal';
-          
-          if (systolic >= 180 || diastolic >= 120) {
-            systolicType = 'hypertensive crisis';
-            diastolicType = 'hypertensive crisis';
-          } else if (systolic >= 140 || diastolic >= 90) {
-            systolicType = 'high';
-            diastolicType = 'high';
-          } else if (systolic >= 130 || diastolic >= 80) {
-            systolicType = 'elevated';
-            diastolicType = 'elevated';
-          }
-          
-          readings.push({ 
-            date: date, 
-            systolic: systolic, 
-            diastolic: diastolic, 
-            systolicType: systolicType,
-            diastolicType: diastolicType
-          });
-        }
+    if (hasMultiColumn) {
+      // Process up to 4 readings per day
+      for (let j = 1; j <= 4; j++) {
+        const reading = processMultiColumnBPReading(row, j, baseDate);
+        if (reading) readings.push(reading);
       }
+    } else {
+      // Single reading format
+      const reading = processSingleColumnBPReading(row, baseDate);
+      if (reading) readings.push(reading);
     }
+  }
   
   return readings;
 }
 
 /**
- * Processes exercise data from CSV rows
- * 
- * - @param {Array} rows - CSV data rows
- * - @returns {Array} Processed exercise data with activity types and durations
+ * Creates initial exercise data structure for a date.
  */
-export function processExerciseData(rows) {
+function createExerciseDayData(date) {
+  return {
+    date,
+    walking: 0,
+    swimming: 0,
+    running: 0,
+    biking: 0,
+    'muscle-strengthening': 0,
+    balance: 0,
+    other: 0,
+    totalMinutes: 0
+  };
+}
+
+/**
+ * Processes a single exercise entry.
+ */
+function processExerciseEntry(row, index, dayData) {
+  const typeKey = index ? `Exercise_Type_${index}` : 'Exercise_Type';
+  const minutesKey = index ? `Exercise_Minutes_${index}` : 'Exercise_Minutes';
+  
+  const type = row[typeKey]?.toLowerCase();
+  const minutes = parseFloat(row[minutesKey]);
+  
+  if (type && type.trim() !== '' && !isNaN(minutes) && minutes > 0) {
+    categorizeExercise(type, minutes, dayData);
+  }
+}
+
+/**
+ * Processes exercise data from CSV rows. Returns processed exercise data with activity types and durations.
+ */
+function processExerciseData(rows) {
   const exerciseByDate = {};
+  
+  for (const row of rows) {
+    const date = new Date(row['Date']);
+    const dateKey = date.toDateString();
     
-    rows.forEach(row => {
-        const date = new Date(row['Date']);
-        const dateKey = date.toDateString();
-        if (!exerciseByDate[dateKey]) {
-            exerciseByDate[dateKey] = { date, walking: 0, swimming: 0, running: 0, biking: 0, 'muscle-strengthening': 0, balance: 0, other: 0, totalMinutes: 0 };
-        }
-        
-        const hasMultiColumn = row['Exercise_Type_1'] !== undefined;
-        
-        if (hasMultiColumn) {
-            for (let i = 1; i <= 5; i++) {
-                const type = row[`Exercise_Type_${i}`]?.toLowerCase();
-                const minutes = parseFloat(row[`Exercise_Minutes_${i}`]);
-                if (type && type.trim() !== '' && !isNaN(minutes) && minutes > 0) {
-                    categorizeExercise(type, minutes, exerciseByDate[dateKey]);
-                }
-            }
-        } else {
-            const type = row['Exercise_Type']?.toLowerCase();
-            const minutes = parseFloat(row['Exercise_Minutes']);
-            if (type && type.trim() !== '' && !isNaN(minutes) && minutes > 0) {
-                categorizeExercise(type, minutes, exerciseByDate[dateKey]);
-            }
-        }
-    });
+    if (!exerciseByDate[dateKey]) {
+      exerciseByDate[dateKey] = createExerciseDayData(date);
+    }
+    
+    const dayData = exerciseByDate[dateKey];
+    const hasMultiColumn = row['Exercise_Type_1'] !== undefined;
+    
+    if (hasMultiColumn) {
+      // Process up to 5 exercise entries per day
+      for (let j = 1; j <= 5; j++) {
+        processExerciseEntry(row, j, dayData);
+      }
+    } else {
+      // Single exercise entry
+      processExerciseEntry(row, null, dayData);
+    }
+  }
   
   return Object.values(exerciseByDate).filter(d => d.totalMinutes > 0);
 }
 
 /**
- * Categorizes exercise activities into predefined types
- * 
- * - @param {string} type - Exercise type from CSV
- * - @param {number} minutes - Duration in minutes
- * - @param {Object} dayData - Daily exercise data object
+ * Categorizes exercise activities into predefined types and adds them to the daily exercise data object.
  */
-export function categorizeExercise(type, minutes, dayData) {
+function categorizeExercise(type, minutes, dayData) {
   if (type.includes('walking')) dayData.walking += minutes;
     else if (type.includes('swimming')) dayData.swimming += minutes;
     else if (type.includes('running')) dayData.running += minutes;
@@ -454,113 +463,103 @@ export function categorizeExercise(type, minutes, dayData) {
 }
 
 /**
- * Processes mood data from CSV rows
+ * Processes mood data from CSV rows.
  */
-export function processMoodData(rows) {
+function processMoodData(rows) {
   const moodData = [];
     
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row['Mood'] && row['Mood'].trim() !== '') {
-        moodData.push({
-          date: new Date(row['Date']),
-          mood: row['Mood'],
-          category: row['Mood'] || 'neutral'
-        });
-      }
+  rows.forEach(row => {
+    if (row['Mood'] && row['Mood'].trim() !== '') {
+      moodData.push({
+        date: new Date(row['Date']),
+        mood: row['Mood'],
+        category: row['Mood'] || 'neutral'
+      });
     }
+  });
   
   return moodData;
 }
 
 /**
- * Processes pain data from CSV rows
+ * Processes pain data from CSV rows.
  */
-export function processPainData(rows) {
+function processPainData(rows) {
   const painData = [];
     
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row['Pain_Location'] && row['Pain_Location'].trim() !== '' && row['Pain_Level'] !== undefined) {
-        const painLevel = parseInt(row['Pain_Level']);
-        if (!isNaN(painLevel)) {
-          painData.push({
-            date: new Date(row['Date']),
-            location: row['Pain_Location'].toLowerCase(),
-            level: painLevel
-          });
-        }
+  rows.forEach(row => {
+    if (row['Pain_Location'] && row['Pain_Location'].trim() !== '' && row['Pain_Level'] !== undefined) {
+      const painLevel = parseInt(row['Pain_Level']);
+      if (!isNaN(painLevel)) {
+        painData.push({
+          date: new Date(row['Date']),
+          location: row['Pain_Location'].toLowerCase(),
+          level: painLevel
+        });
       }
     }
+  });
   
   return painData;
 }
 
 /**
- * Processes sleep data from CSV rows
+ * Processes sleep data from CSV rows.
  */
-export function processSleepData(rows) {
+function processSleepData(rows) {
   const sleepData = [];
     
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row['Sleep_Hours'] && row['Sleep_Quality']) {
-        const hours = parseFloat(row['Sleep_Hours']);
-        const qualityCode = parseInt(row['Sleep_Quality_Code']);
-        if (!isNaN(hours) && !isNaN(qualityCode)) {
-          sleepData.push({
-            date: new Date(row['Date']),
-            hours: hours,
-            quality: row['Sleep_Quality'],
-            qualityCode: qualityCode
-          });
-        }
+  rows.forEach(row => {
+    if (row['Sleep_Hours'] && row['Sleep_Quality']) {
+      const hours = parseFloat(row['Sleep_Hours']);
+      const qualityCode = parseInt(row['Sleep_Quality_Code']);
+      if (!isNaN(hours) && !isNaN(qualityCode)) {
+        sleepData.push({
+          date: new Date(row['Date']),
+          hours: hours,
+          quality: row['Sleep_Quality'],
+          qualityCode: qualityCode
+        });
       }
     }
+  });
   
   return sleepData;
 }
 
 /**
- * Processes meal data from CSV rows
+ * Checks if a meal has any food components.
  */
-export function processMealData(rows) {
-  const filteredRows = [];
-    
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Late Night Snack'];
-      let hasMealData = false;
-      
-      // Check each meal type
-      for (let j = 0; j < mealTypes.length; j++) {
-        const mealType = mealTypes[j];
-        const time = row[`${mealType}_Time`];
-        const protein = row[`${mealType}_Protein`];
-        const carbs = row[`${mealType}_Carbohydrates`];
-        const vegetables = row[`${mealType}_Vegetables`];
-        const fruit = row[`${mealType}_Fruit`];
-        const alcohol = row[`${mealType}_Alcohol`];
-        const sugar = row[`${mealType}_Added_Sugar`];
-        
-        // Check if time exists and at least one food component is present
-        const hasFood = protein === 1 || protein === '1' || 
-                       carbs === 1 || carbs === '1' || 
-                       vegetables === 1 || vegetables === '1' || 
-                       fruit === 1 || fruit === '1' || 
-                       alcohol === 1 || alcohol === '1' || 
-                       (sugar && sugar !== '' && sugar !== 'NaN');
-        
-        if (time && hasFood) {
-          hasMealData = true;
-          break;
-        }
-      }
-      
-      if (hasMealData) {
-        filteredRows.push(row);
-      }
-    }
+function hasMealComponents(row, mealType) {
+  const components = [
+    row[`${mealType}_Protein`],
+    row[`${mealType}_Carbohydrates`],
+    row[`${mealType}_Vegetables`],
+    row[`${mealType}_Fruit`],
+    row[`${mealType}_Alcohol`],
+    row[`${mealType}_Added_Sugar`]
+  ];
   
-  return filteredRows;
+  return components.some(comp => 
+    comp === 1 || comp === '1' || (comp && comp !== '' && comp !== 'NaN')
+  );
+}
+
+/**
+ * Checks if a row has any meal data.
+ */
+function hasAnyMealData(row) {
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Late Night Snack'];
+  
+  return mealTypes.some(mealType => {
+    const time = row[`${mealType}_Time`];
+    return time && hasMealComponents(row, mealType);
+  });
+}
+
+/**
+ * Processes meal data from CSV rows and returns rows that have meal data.
+ */
+function processMealData(rows) {
+  return rows.filter(row => hasAnyMealData(row));
 }

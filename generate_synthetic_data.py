@@ -69,7 +69,7 @@ def generate_patient_name(gender, male_names, female_names):
         return random.choice(female_names)
 
 def parse_medications_with_dosages(filename):
-    '''Parse medications from the Sample_medications.txt format with improved structure for dashboard integration.'''
+    '''Parse medications from the Sample_medications.txt format.'''
     all_medications = []
     
     current_medication = None
@@ -313,9 +313,7 @@ def assign_conditions():
     if random.random() < 0.105: # 10.5% prevalence
         conditions.append("Mood and/or anxiety disorder")
     
-    # Ensure all patients have at least two chronic conditions
-    # This reflects the reality that 37% of seniors have at least two conditions
-    # and we want all patients to have meaningful data for the dashboard
+    # All patients have at least two chronic conditions to reflect that many seniors have multiple conditions and to provide meaningful dashboard data
     
     # If no conditions were assigned, assign two common ones
     if len(conditions) == 0:
@@ -341,70 +339,60 @@ def assign_conditions():
     return conditions
 
 def assign_medications_by_conditions(conditions, all_medications):
-    """Assign medications based on patient conditions, with improved structure for dashboard.
-    
-    Handles all conditions with updated prevalence rates:
-    - Hypertension, Ischemic heart disease: heart health medications
-    - Diabetes: diabetes medications
-    - Osteoarthritis, Osteoporosis: pain management medications
-    - Mood and/or anxiety disorder: mental health medications
-    - Cancer, COPD, Asthma: general medications and supplements
-    """
+    """Assign medications based on patient conditions."""
     assigned_meds = []
     category_counts = {}
     cond_set = set(conditions)
 
-    # Shuffle meds to randomize selection
+    # Check which conditions the patient has (used later for default medication if needed)
+    has_hypertension = "Hypertension" in cond_set or "Ischemic heart disease" in cond_set
+    has_diabetes = "Diabetes" in cond_set
+    has_pain = "Osteoarthritis" in cond_set or "Osteoporosis" in cond_set
+    has_mood_disorder = "Mood and/or anxiety disorder" in cond_set
+    has_respiratory = "COPD" in cond_set or "Asthma" in cond_set
+    has_cancer = "Cancer" in cond_set
+
+    # Shuffle medications to randomize selection
     random.shuffle(all_medications)
 
     # Assign medications based on conditions
     for med, med_type, category, dosage in all_medications:
+        # Only allow up to 2 medications per category
         if category_counts.get(category, 0) >= 2:
             continue
 
         should_assign = False
         
-        # Heart health conditions (Hypertension, Ischemic heart disease)
-        if "Heart health and hypertension" in category and ("Hypertension" in cond_set or "Ischemic heart disease" in cond_set):
+        # Match medication categories to conditions
+        if "Heart health and hypertension" in category and has_hypertension:
             should_assign = True
-        
-        # Diabetes
-        elif "Diabetes" in category and "Diabetes" in cond_set:
+        elif "Diabetes" in category and has_diabetes:
             should_assign = True
-        
-        # Musculoskeletal conditions (Osteoarthritis, Osteoporosis)
-        elif "Chronic pain and musculoskeletal" in category and ("Osteoarthritis" in cond_set or "Osteoporosis" in cond_set):
+        elif "Chronic pain and musculoskeletal" in category and has_pain:
             should_assign = True
-        
-        # Mental health conditions (Mood and/or anxiety disorder)
-        elif "Mental health" in category and "Mood and/or anxiety disorder" in cond_set:
+        elif "Mental health" in category and has_mood_disorder:
             should_assign = True
-        
-        # Respiratory conditions (COPD, Asthma) - may need general medications
-        elif ("COPD" in cond_set or "Asthma" in cond_set) and "Other" in category:
+        elif has_respiratory and "Other" in category:
             should_assign = random.random() < 0.6
-        
-        # Cancer patients often need various medications
-        elif "Cancer" in cond_set and ("Other" in category or "Vitamins and supplements" in category):
+        elif has_cancer and ("Other" in category or "Vitamins and supplements" in category):
             should_assign = random.random() < 0.7
-        
-        # Vitamins and supplements for general health
         elif "Vitamins and supplements" in category:
             should_assign = random.random() < 0.7
 
-        if should_assign and random.random() < 0.9:  # High probability to ensure meds are assigned
+        # Add medication if it should be assigned with 90% probability
+        if should_assign and random.random() < 0.9:
             assigned_meds.append((med, med_type, category, dosage))
             category_counts[category] = category_counts.get(category, 0) + 1
 
-    # Ensure at least one medication if none were assigned
+    # If no medications were assigned, add at least one default medication
     if not assigned_meds:
-        if "Hypertension" in cond_set or "Ischemic heart disease" in cond_set:
+        if has_hypertension:
             assigned_meds.append(("Lisinopril", "Prescribed", "Heart health and hypertension", "10 mg once daily"))
-        elif "Diabetes" in cond_set:
+        elif has_diabetes:
             assigned_meds.append(("Metformin", "Prescribed", "Diabetes (oral or injectable)", "500 mg twice daily"))
-        elif "Osteoarthritis" in cond_set or "Osteoporosis" in cond_set:
+        elif has_pain:
             assigned_meds.append(("Ibuprofen", "Prescribed", "Chronic pain and musculoskeletal", "400 mg as needed"))
-        elif "Mood and/or anxiety disorder" in cond_set:
+        elif has_mood_disorder:
             assigned_meds.append(("Sertraline", "Prescribed", "Mental health (mood and anxiety)", "50 mg once daily"))
         else:
             assigned_meds.append(("Vitamin D", "Supplement", "Vitamins and supplements", "1000 IU once daily"))
@@ -412,7 +400,7 @@ def assign_medications_by_conditions(conditions, all_medications):
     return assigned_meds
 
 def get_bp_type(systolic, diastolic):
-    # Updated blood pressure risk categories based on Blood_pressure_range_description.txt
+    # Blood pressure risk categories based on Blood_pressure_range_description.txt
     if systolic < 90:
         systolic_type = "Low blood pressure"
     elif 90 <= systolic <= 120:
@@ -754,7 +742,7 @@ def generate_patient_data(patient_id, conditions, age, gender, patient_name, pat
 # ---------------------------------------------
 # Main Script: Generate Data for All Patients
 # ---------------------------------------------
-# Only create the public directory that the app actually uses
+# Create the public directory for the application
 if not os.path.exists("public/synthetic_patients"):
     os.makedirs("public/synthetic_patients")
 print("Generating synthetic health data for 100 patients...")
@@ -798,7 +786,7 @@ for i in range(1, 101):
     df['Chronic_Conditions'] = "; ".join(patient_conditions)
     df['Pain_Location'] = patient_pain_location
     
-    # Save only to public directory (the one actually used by the app)
+    # Save to public directory
     filename_public = f"public/synthetic_patients/Patient_{patient_id}.csv"
     
     df.to_csv(filename_public, index=False)
@@ -810,7 +798,7 @@ for i in range(1, 101):
         df.insert(0, 'Patient_ID', patient_id)
         all_patients_df = pd.concat([all_patients_df, df], ignore_index=True)
 
-# Save all data to a single CSV in both locations with error handling
+# Save all data to a single CSV with error handling
 def save_csv_with_retry(df, filepath, max_retries=3):
     """Save CSV file with retry logic for permission errors"""
     for attempt in range(max_retries):
@@ -830,7 +818,7 @@ def save_csv_with_retry(df, filepath, max_retries=3):
             print(f"Unexpected error saving {filepath}: {e}")
             return False
 
-# Try to save the combined file (only to public directory)
+# Save the combined file to public directory
 print("Saving combined patient data...")
 success_public = save_csv_with_retry(all_patients_df, "public/synthetic_patients_all.csv")
 

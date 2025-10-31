@@ -72,6 +72,12 @@
   --chart-color-mood-sad-bg: #fef3e0; /* Light orange background */
   --chart-color-mood-angry-bg: #f0eef5; /* Light purple background */
   
+  /* Blood Pressure Colors - Colorblind friendly */
+  --chart-color-bp-low: #7570b3; /* Purple-blue for low */
+  --chart-color-bp-ideal: #4CAF50; /* Green for ideal */
+  --chart-color-bp-pre-high: #fdbf6f; /* Orange for pre-high */
+  --chart-color-bp-high: #F44336; /* Red for high */
+  
   /* Neutral Colors */
   --chart-color-neutral: #6c757d;
   --chart-color-border: #dee2e6;

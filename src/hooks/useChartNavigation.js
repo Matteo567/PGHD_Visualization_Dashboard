@@ -1,9 +1,5 @@
-/*
- Simple chart navigation hook
- Provides navigation state and functions for charts
- */
-
-import React, { useState } from 'react';
+// Hook for managing chart navigation with week or month navigation
+import { useState } from 'react';
 
 const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
@@ -18,6 +14,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     if (navigationType === 'month') {
       newDate.setMonth(newDate.getMonth() - 1);
     } else {
+      // Subtract 7 days for week navigation
       newDate.setDate(newDate.getDate() - 7);
     }
     setCurrentDate(newDate);
@@ -29,41 +26,45 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     if (navigationType === 'month') {
       newDate.setMonth(newDate.getMonth() + 1);
     } else {
+      // Add 7 days for week navigation
       newDate.setDate(newDate.getDate() + 7);
     }
     setCurrentDate(newDate);
   };
 
-  // Get date range for current period
+  // Get month date range (first day to last day of current month)
+  const getMonthDateRange = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 0); // Last day of month (day 0 of next month)
+    return { start: startOfMonth, end: endOfMonth };
+  };
+
+  // Get week date range (Sunday to Saturday)
+  const getWeekDateRange = () => {
+    const startOfWeek = new Date(currentDate);
+    const currentDayOfWeek = startOfWeek.getDay(); // 0 = Sunday, 6 = Saturday
+    const daysToSubtract = currentDayOfWeek; // Go back to Sunday
+    
+    startOfWeek.setDate(startOfWeek.getDate() - daysToSubtract);
+    startOfWeek.setHours(0, 0, 0, 0); // Start of day
+    
+    const endOfWeek = new Date(startOfWeek);
+    const daysInWeek = 6; // Sunday to Saturday = 7 days, but we start on Sunday so add 6
+    endOfWeek.setDate(endOfWeek.getDate() + daysInWeek);
+    endOfWeek.setHours(23, 59, 59, 999); // End of day
+    
+    return { start: startOfWeek, end: endOfWeek };
+  };
+
+  // Get date range for current period (week or month)
   const getDateRange = () => {
     if (navigationType === 'month') {
-      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-      return { start: startOfMonth, end: endOfMonth };
+      return getMonthDateRange();
     } else {
-      const startOfWeek = new Date(currentDate);
-      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-      startOfWeek.setHours(0, 0, 0, 0);
-      
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(endOfWeek.getDate() + 6);
-      endOfWeek.setHours(23, 59, 59, 999);
-      
-      return { start: startOfWeek, end: endOfWeek };
+      return getWeekDateRange();
     }
-  };
-
-  // Get current month/year display
-  const getCurrentMonthYear = () => {
-    return currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  };
-
-  // Get current week display
-  const getCurrentWeekDisplay = () => {
-    const range = getDateRange();
-    const startStr = range.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = range.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} - ${endStr}`;
   };
 
   // Get formatted date range with year (e.g., "May 1 - 7, 2025" for weeks or "May 1 - 31, 2025" for months)
@@ -84,17 +85,19 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     }
   };
 
-  // Get 3-month date range
+  // Get 3-month date range (3 months before current date)
   const getThreeMonthRange = () => {
     const endOfThreeMonths = new Date(currentDate);
     const startOfThreeMonths = new Date(currentDate);
     startOfThreeMonths.setMonth(startOfThreeMonths.getMonth() - 3);
     
+    // Make sure we don't go before the earliest data date
     const dataStartDate = new Date(2024, 6, 1);
     if (startOfThreeMonths < dataStartDate) {
       startOfThreeMonths.setTime(dataStartDate.getTime());
     }
     
+    // Make sure we don't go after the latest data date
     const dataEndDate = new Date(2025, 6, 31);
     if (endOfThreeMonths > dataEndDate) {
       endOfThreeMonths.setTime(dataEndDate.getTime());
@@ -119,8 +122,6 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     goToNext,
     getDateRange,
     getThreeMonthRange,
-    getCurrentMonthYear,
-    getCurrentWeekDisplay,
     getThreeMonthDisplay,
     getFormattedDateRange
   };

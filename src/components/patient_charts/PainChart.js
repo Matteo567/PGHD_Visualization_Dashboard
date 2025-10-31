@@ -1,18 +1,10 @@
 /**
  PainChart.js - Pain Assessment and Visualization Component
  
- This component provides comprehensive pain monitoring:
- - Anatomical body mapping for pain location
- - Pain intensity scale (0-10) with color coding
- - Daily pain tracking and trend analysis
- - Interactive body diagram for pain location selection
- - Pain level input and editing capabilities
- - Navigation controls for time periods
- 
- Critical for pain management and treatment monitoring.
+ This component provides pain monitoring with anatomical body mapping for pain location. It includes a pain intensity scale from 0 to 10 with color coding and provides daily pain tracking and trend analysis. It includes an interactive body diagram for pain location selection and supports pain level input and editing capabilities. It includes navigation controls for time periods. This component is used for pain management and treatment monitoring.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 
@@ -21,12 +13,34 @@ import './PainChart.css';
 
 import BodySVG from './BodySvg';
 
-const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { painData, isLoading: loading, error } = usePatientData(patientId, 'pain');
-  const [useLineChart, setUseLineChart] = useState(false); // Toggle state for chart view
+const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+  const { painData, loading, error } = usePatientData(patientId);
+  // For Patient access, force List View (remove Line Chart access).
+  // For Physician access, force Line Chart (remove List View access).
+  // Admin can toggle between both.
+  const shouldForceListView = accessType === 'Patient';
+  const shouldForceLineChart = accessType === 'Physician';
+  
+  // Determine initial state based on accessType
+  let initialUseLineChart = false;
+  if (shouldForceListView) {
+    initialUseLineChart = false;
+  } else if (shouldForceLineChart) {
+    initialUseLineChart = true;
+  }
+  
+  const [useLineChart, setUseLineChart] = useState(initialUseLineChart);
+  
+  // Update state when accessType changes
+  useEffect(() => {
+    if (shouldForceListView) {
+      setUseLineChart(false);
+    } else if (shouldForceLineChart) {
+      setUseLineChart(true);
+    }
+  }, [accessType, shouldForceListView, shouldForceLineChart]);
   
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('pain');
   const nav = navigation || internalNavigation;
 
@@ -247,11 +261,6 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
     };
   }
 
-  const formatDateRange = (start, end) => {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} to ${endStr}`;
-  };
 
   // Line Chart Component for Pain Ratings
   const PainLineChart = ({ data, isExpanded, extendedData }) => {
@@ -416,106 +425,30 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
     );
   };
 
-  if (viewMode === 'patient') {
-    return (
-      <div className="pain-chart-container">
-        <div className="pain-chart-header">
-          <h3 className="chart-title">Pain</h3>
-          <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
-          
-          {/* View Toggle */}
-          <div className="view-toggle">
-            <button 
-              className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(false)}
-            >
-              List View
-            </button>
-            <button 
-              className={`toggle-btn ${useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(true)}
-            >
-              Line Chart
-            </button>
-          </div>
-        </div>
-        
-        {/* Conditional Chart Rendering */}
-        {useLineChart ? (
-          <div className="pain-line-chart-container">
-            <PainLineChart 
-              data={chartData} 
-              isExpanded={isExpanded} 
-              extendedData={extendedChartData}
-            />
-            <div className="pain-legend-wrapper">
-              <Legend title="Pain Intensity Scale (0-10)" items={painLegendItems} hide={screenshotMode} />
-            </div>
-          </div>
-        ) : (
-          <div className="pain-content-wrapper">
-            <div className="pain-list">
-              {weekPainData.length > 0 ? (
-                weekPainData.map((item, index) => (
-                  <div key={index} className="pain-list-item">
-                    <div className="pain-item-info">
-                      <div className="pain-item-date">
-                        {new Date(item.date).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </div>
-                      <div className="pain-item-details">
-                        <div className="pain-level">
-                          <strong>Pain Level:</strong> {item.level}/10
-                        </div>
-                        <div className="pain-location">
-                          <strong>Location:</strong> {item.location}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pain-item-body">
-                      <Body location={item.location} level={item.level} />
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-pain-data">No pain data available for this week</div>
-              )}
-            </div>
-            
-            <div className="pain-legend-wrapper">
-              <Legend title="Pain Intensity Scale (0-10)" items={painLegendItems} hide={screenshotMode} />
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Physician/Unified view
+  // Unified view
   return (
       <div className="physician-pain-chart-container">
         <div className="pain-chart-header">
           <h3 className="chart-title">Pain</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle */}
-          <div className="view-toggle">
-            <button 
-              className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(false)}
-            >
-              List View
-            </button>
-            <button 
-              className={`toggle-btn ${useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(true)}
-            >
-              Line Chart
-            </button>
-          </div>
+          {/* View Toggle - Hide for Patient and Physician (single view only), show both for Admin */}
+          {accessType === 'Admin' && (
+            <div className="view-toggle">
+              <button 
+                className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
+                onClick={() => setUseLineChart(false)}
+              >
+                List View
+              </button>
+              <button 
+                className={`toggle-btn ${useLineChart ? 'active' : ''}`}
+                onClick={() => setUseLineChart(true)}
+              >
+                Line Chart
+              </button>
+            </div>
+          )}
         </div>
         
         {/* Conditional Chart Rendering */}
@@ -587,9 +520,8 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patien
           </div>
         )}
 
-        {/* Show summaries for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && (
-          <div className="summary-container">
+        {/* Show summaries for unified view */}
+        <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>
               <div className="summary-stats">

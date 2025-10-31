@@ -12,7 +12,7 @@ import './PatientSelector.css';
 const PatientSelector = ({ patients, value, onChange }) => (
   <div className="patient-selector-container">
     <label htmlFor="patient-select" className="patient-selector-label">
-      Patient ID #:
+      Patient ID:
     </label>
     <select
       id="patient-select"
@@ -20,9 +20,8 @@ const PatientSelector = ({ patients, value, onChange }) => (
       onChange={e => onChange(e.target.value)}
       className="patient-selector-select"
     >
-      <option value="">-- Select Patient --</option>
-      {patients.map(pid => (
-        <option key={pid} value={pid}>{pid}</option>
+      {patients.map(patientId => (
+        <option key={patientId} value={patientId}>{patientId}</option>
       ))}
     </select>
   </div>

@@ -1,15 +1,7 @@
 /**
  MoodCalendar.js - Mood Tracking Calendar Visualization
  
- This component provides comprehensive mood monitoring:
- - Daily mood tracking in calendar format
- - Color-coded mood states (happy, sad, angry)
- - Monthly navigation and trend analysis
- - Interactive mood selection and editing
- - Calendar layout
- - Integration with patient data and navigation
- 
- Essential for mental health monitoring and emotional well-being tracking.
+ This component provides mood monitoring with daily mood tracking in calendar format. It uses color-coded mood states including happy, sad, and angry. It includes monthly navigation and trend analysis with an interactive calendar layout. It integrates with patient data and navigation. This component is used for mental health monitoring and emotional well-being tracking.
  */
 
 import React, { useState, useRef } from 'react';
@@ -168,11 +160,10 @@ const Calendar = ({ isExpanded, moodByDate, currentMonth, monthDisplay }) => {
 };
 
 // --- Main Component ---
-const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { moodData, isLoading: loading, error } = usePatientData(patientId, 'mood');
+const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+  const { moodData, loading, error } = usePatientData(patientId);
   
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('mood');
   const nav = navigation || internalNavigation;
   
@@ -240,10 +231,13 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
     });
 
     // Days in current month
-    const daysInMonth = (() => {
-      const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-      return !isNaN(lastDay.getTime()) ? lastDay.getDate() : 30;
-    })();
+    // Gets the number of days in a given month (year and month 0-11)
+    function getDaysInMonth(year, month) {
+      const lastDay = new Date(year, month + 1, 0);
+      return lastDay.getDate();
+    }
+    
+    const daysInMonth = getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth());
     const daysWithMood = new Set(currentMonthData.map(d => d.date.getDate())).size;
 
     // Calculate mood score (happy=3, sad=1, angry=1)
@@ -321,7 +315,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
       </div>
 
       {/* Show summary for physician/unified view */}
-      {(viewMode === 'physician' || viewMode === 'unified') && monthSummary && (
+      {monthSummary && (
         <div className="summary-container">
           <div className="chart-summary">
             <h4>Month Summary</h4>

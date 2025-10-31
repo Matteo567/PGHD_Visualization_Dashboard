@@ -1,11 +1,7 @@
 /**
  DashboardGrid.js - Chart Grid Layout Component
  
- This component provides a flexible grid layout system for organizing charts by rendering all 
- available visualizations in a grid, handling expanded/collapsed chart states, integrating chart 
- navigation controls, and providing placeholder states for empty data scenarios.
- 
- Acts as the main container for organizing multiple health metric visualizations.
+ This component provides a flexible grid layout system for organizing charts. It renders all available visualizations in a grid and handles expanded and collapsed chart states. It integrates chart navigation controls and provides placeholder states for empty data scenarios. This component acts as the main container for organizing multiple health metric visualizations.
  */
 
 import React from 'react';
@@ -14,68 +10,39 @@ import Placeholder from './ui/Placeholder';
 import './DashboardGrid.css';
 
 /*
- Shared component for rendering dashboard grids with visualization wrappers
- Shows all available visualizations instead of using dropdown selectors
- 
- @param {Object} props - Component props
- @param {string} props.viewMode - 'patient' or 'physician'
- @param {Object} props.selectedVisualizations - Currently selected visualizations
- @param {Object} props.availableVisualizations - Available visualizations
- @param {Object} props.allVisualizations - All visualization configurations
- @param {Function} props.onVisualizationChange - Handler for visualization changes
- @param {Function} props.onExpand - Handler for expand/collapse
- @param {string|null} props.expandedItem - Currently expanded item ID
- @param {Function} props.renderVisualization - Function to render visualizations
- @param {boolean} props.disabled - Whether the grid is disabled
- @param {string} props.placeholderText - Text to show when no data is available
- @param {Object} props.chartNavigation - Navigation objects for each chart type
- @param {boolean} props.screenshotMode - Whether in screenshot mode
- @returns {JSX.Element} The dashboard grid component
+ Shared component for rendering dashboard grids with visualization wrappers. Shows all available visualizations instead of using dropdown selectors. The component handles view mode which currently only supports 'unified'. It manages available visualizations and all visualization configurations. It provides handlers for expand and collapse operations and tracks the currently expanded item ID. It includes a function to render visualizations and displays placeholder text when no data is available. It integrates navigation objects for each chart type and supports screenshot mode.
  */
 const DashboardGrid = ({
-  viewMode, // 'patient' or 'physician'
-  selectedVisualizations,
+  viewMode = 'unified', // View mode (defaults to 'unified')
   availableVisualizations,
   allVisualizations,
-  onVisualizationChange,
   onExpand,
   expandedItem,
   renderVisualization,
-  disabled = false,
   placeholderText = "No data available for this patient.",
   // Navigation props
   chartNavigation = {},
   // Screenshot mode
   screenshotMode = false
 }) => {
-  // Configuration for different view modes
+  // Configuration for view mode (only 'unified' is currently used)
   const gridConfig = {
-    patient: {
-      className: 'dashboard-grid',
-      chartClassNames: ['visualization-box']
-    },
-    physician: {
-      className: 'physician-charts-grid',
-      chartClassNames: ['physician-chart-container']
-    },
     unified: {
       className: 'dashboard-grid',
       chartClassNames: ['visualization-box']
     }
   };
 
-  const config = gridConfig[viewMode];
+  const config = gridConfig[viewMode] || gridConfig.unified; // Fallback to unified if unknown mode
 
   // Get all available visualization types
   const availableVizTypes = Object.keys(availableVisualizations);
 
-  // If there's an expanded item, show only that
+  // If there's an expanded item, show only that chart in expanded view
   if (expandedItem) {
-    // Extract the visualization type from the chart ID
-    // Chart IDs are formatted as "${viewMode}-chart-${index}"
+    // Extract the chart index from the chart ID (format: "viewMode-chart-index")
     const chartIdParts = expandedItem.split('-');
     const chartIndex = parseInt(chartIdParts[chartIdParts.length - 1]);
-    const availableVizTypes = Object.keys(availableVisualizations);
     const selectedViz = availableVizTypes[chartIndex];
     
     if (!selectedViz) {
@@ -88,25 +55,23 @@ const DashboardGrid = ({
     
     const navigation = chartNavigation[selectedViz];
     
-    const wrapperProps = {
-      id: expandedItem,
-      className: `${config.chartClassNames[0]} expanded-view`,
-      selectedViz: selectedViz,
-      availableVisualizations: availableVisualizations,
-      allVisualizations: allVisualizations,
-      onVisualizationChange: onVisualizationChange,
-      onExpand: onExpand,
-      isExpanded: true,
-      renderVisualization: renderVisualization,
-      disabled: disabled,
-      placeholderText: placeholderText,
-      onPrev: navigation?.goToPrevious,
-      onNext: navigation?.goToNext,
-      navigationLabel: navigation?.navigationLabel || 'Week',
-      screenshotMode: screenshotMode
-    };
-
-    return <VisualizationWrapper {...wrapperProps} />;
+    return (
+      <VisualizationWrapper
+        id={expandedItem}
+        className={`${config.chartClassNames[0]} expanded-view`}
+        selectedViz={selectedViz}
+        availableVisualizations={availableVisualizations}
+        allVisualizations={allVisualizations}
+        onExpand={onExpand}
+        isExpanded={true}
+        renderVisualization={renderVisualization}
+        placeholderText={placeholderText}
+        onPrev={navigation?.goToPrevious}
+        onNext={navigation?.goToNext}
+        navigationLabel={navigation?.navigationLabel || 'Week'}
+        screenshotMode={screenshotMode}
+      />
+    );
   }
 
   // If no visualizations available, show placeholder
@@ -132,11 +97,9 @@ const DashboardGrid = ({
           selectedViz: vizType,
           availableVisualizations: availableVisualizations,
           allVisualizations: allVisualizations,
-          onVisualizationChange: onVisualizationChange,
           onExpand: onExpand,
           isExpanded: expandedItem === chartId,
           renderVisualization: renderVisualization,
-          disabled: disabled,
           placeholderText: placeholderText,
           onPrev: navigation?.goToPrevious,
           onNext: navigation?.goToNext,

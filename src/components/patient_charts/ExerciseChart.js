@@ -1,49 +1,10 @@
 /**
  ExerciseChart.js - Exercise Activity Tracking Visualization
  
- This component provides comprehensive exercise monitoring:
- - Activity type breakdown (walking, swimming, running, biking, muscle-strengthening, balance)
- - Duration tracking and weekly summaries
- - Color-coded activity categorization
- - Interactive tooltips with exercise details
- - Navigation controls for time periods
- - Integration with patient data and chart navigation
- 
- Architecture:
- - Uses custom SVG for stacked bar chart visualization
- - Implements activity categorization system with emoji indicators
- - Provides color-coded activity types for easy identification
- - Supports expandable views
- - Implements time-based navigation and data filtering
- 
- Visualization Features:
- - Stacked bar chart showing daily activity breakdown
- - Color-coded activity types with emoji indicators
- - Interactive tooltips with detailed exercise information
- - Design adapting to container size
- - Dynamic Y-axis scaling based on data range
- 
- Activity Categories:
- - Walking: Low-impact cardiovascular exercise
- - Swimming: Full-body cardiovascular workout
- - Running: High-impact cardiovascular exercise
- - Biking: Low-impact cardiovascular exercise
- - Muscle-Strengthening: Strength training activities
- - Balance: Balance and stability training
- - Other: Miscellaneous physical activities
- 
- Component Structure:
- - Chart Container: Main SVG container with sizing
- - Y-Axis: Duration scale with dynamic labeling
- - X-Axis: Day-of-week labels with date information
- - Data Bars: Stacked activity bars with color coding
- - Legend: Activity type explanations with emojis
- - Tooltip: Detailed exercise information on hover
- 
- Essential for physical activity monitoring and fitness tracking.
+ This component provides exercise monitoring with activity type breakdown including walking, swimming, running, biking, muscle-strengthening, and balance activities. It tracks duration and provides weekly summaries with color-coded activity categorization. It includes interactive tooltips with exercise details and navigation controls for time periods. It integrates with patient data and chart navigation. The component uses custom SVG for stacked bar chart visualization and implements an activity categorization system with emoji indicators. It provides color-coded activity types for identification and supports expandable views. It implements time-based navigation and data filtering. Visualization features include a stacked bar chart showing daily activity breakdown, color-coded activity types with emoji indicators, interactive tooltips with detailed exercise information, design that adapts to container size, and dynamic Y-axis scaling based on data range. Activity categories include walking as low-impact cardiovascular exercise, swimming as full-body cardiovascular workout, running as high-impact cardiovascular exercise, biking as low-impact cardiovascular exercise, muscle-strengthening as strength training activities, balance as balance and stability training, and other as miscellaneous physical activities. Component structure includes a main SVG container with sizing for the chart container, duration scale with dynamic labeling on the Y-axis, day-of-week labels with date information on the X-axis, stacked activity bars with color coding for data bars, activity type explanations with emojis in the legend, and detailed exercise information on hover in tooltips. This component is used for physical activity monitoring and fitness tracking.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
@@ -64,18 +25,37 @@ const exerciseLegendItems = exerciseTypes.map(({ label, color, emoji }) => ({
   color,
 }));
 
-const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { exerciseData, loading, error } = usePatientData(patientId, 'exercise');
+const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+  const { exerciseData, loading, error } = usePatientData(patientId);
+  
+  // For Physician access, force Weekly Goals view (hide Activity Breakdown).
+  // For Patient and Admin, allow toggling between both views.
+  const shouldForceWeeklyGoals = accessType === 'Physician';
+  
+  // Determine initial view state
+  let initialShowWeeklyGoals = false;
+  if (shouldForceWeeklyGoals) {
+    initialShowWeeklyGoals = true;
+  }
   
   // State for toggling between activity breakdown and weekly goals view
-  const [showWeeklyGoals, setShowWeeklyGoals] = useState(false);
+  const [showWeeklyGoals, setShowWeeklyGoals] = useState(initialShowWeeklyGoals);
+  
+  // Update state when accessType changes
+  useEffect(() => {
+    if (shouldForceWeeklyGoals) {
+      setShowWeeklyGoals(true);
+    } else {
+      // Patient and Admin default to Activity Breakdown
+      setShowWeeklyGoals(false);
+    }
+  }, [accessType, shouldForceWeeklyGoals]);
   
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('exercise');
   const nav = navigation || internalNavigation;
 
-  // Simple inline config - no factory pattern needed
+  // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
         width: 700,
@@ -328,14 +308,9 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
     };
   }
 
-  const formatDateRange = (start, end) => {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} to ${endStr}`;
-  };
 
-  // Physician/Unified view - simplified bar chart or weekly goals
-  if (viewMode === 'physician' || (viewMode === 'unified' && showWeeklyGoals)) {
+  // Weekly goals view (when showWeeklyGoals is true)
+  if (showWeeklyGoals) {
     const categories = [
       { 
         name: 'Aerobic', 
@@ -369,8 +344,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
           <h3 className="chart-title">Exercise Goals Progress</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle - Always show for unified mode */}
-          {viewMode === 'unified' && (
+          {/* View Toggle - Hide for Physician (single view only), show for Patient and Admin */}
+          {accessType !== 'Physician' && (
             <div className="view-toggle">
               <button 
                 className={`toggle-btn ${!showWeeklyGoals ? 'active' : ''}`}
@@ -450,8 +425,8 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
           <h3 className="chart-title">Activity Breakdown by Type</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle */}
-          {viewMode === 'unified' && (
+          {/* View Toggle - Hide for Physician (single view only), show for Patient and Admin */}
+          {accessType !== 'Physician' && (
             <div className="view-toggle">
               <button 
                 className={`toggle-btn ${!showWeeklyGoals ? 'active' : ''}`}
@@ -569,7 +544,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pa
         />
 
         {/* Show summary for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
+        {weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>

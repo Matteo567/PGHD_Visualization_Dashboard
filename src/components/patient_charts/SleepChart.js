@@ -1,50 +1,7 @@
 /*
  SleepChart.js - Sleep Pattern Monitoring Visualization
  
- This component provides comprehensive sleep tracking:
- - Sleep duration and quality rating visualization
- - Weekly sleep pattern analysis
- - Color-coded sleep quality indicators
- - Interactive tooltips with sleep details
- - Navigation controls for time periods
- - Integration with patient data and chart navigation
- 
- Architecture:
- - Uses custom SVG for bar chart visualization
- - Implements sleep quality categorization system
- - Provides color-coded quality indicators for easy interpretation
- - Supports expandable views
- - Implements time-based navigation and data filtering
- 
- Visualizatoin Features:
- - Bar chart showing daily sleep duration
- - Color-coded quality indicators (Very good, Fairly good, Fairly bad, Very bad)
- - Interactive tooltips with detailed sleep information
- - Design adapting to container size
- - Dynamic Y-axis scaling based on sleep duration range
- 
- Sleep Quality Categories:
- - Very good: Optimal sleep quality (green)
- - Fairly good: Good sleep quality (blue)
- - Fairly bad: Poor sleep quality (light green)
- - Very bad: Very poor sleep quality (dark green)
- 
- Clinical Features:
- - Sleep duration tracking with recommended ranges
- - Quality assessment based on subjective ratings
- - Sleep consistency analysis
- - Summary statistics for physician view
- - Trend analysis over time periods
- 
- Component Structure:
- - Chart Container: Main SVG container with sizing
- - Y-Axis: Duration scale with hour-based labeling
- - X-Axis: Day-of-week labels with date information
- - Data Bars: Sleep duration bars with quality color coding
- - Legend: Sleep quality explanations
- - Tooltip: Detailed sleep information on hover
- 
- Essential for sleep hygiene monitoring and sleep disorder assessment.
+ This component provides sleep tracking with sleep duration and quality rating visualization. It includes weekly sleep pattern analysis with color-coded sleep quality indicators. It provides interactive tooltips with sleep details and includes navigation controls for time periods. It integrates with patient data and chart navigation. The component uses custom SVG for bar chart visualization and implements a sleep quality categorization system. It provides color-coded quality indicators for interpretation and supports expandable views. It implements time-based navigation and data filtering. Visualization features include a bar chart showing daily sleep duration, color-coded quality indicators for Very good, Fairly good, Fairly bad, and Very bad sleep quality, interactive tooltips with detailed sleep information, design that adapts to container size, and dynamic Y-axis scaling based on sleep duration range. Sleep quality categories include Very good for optimal sleep quality, Fairly good for good sleep quality, Fairly bad for poor sleep quality, and Very bad for very poor sleep quality. Clinical features include sleep duration tracking with recommended ranges, quality assessment based on subjective ratings, sleep consistency analysis, summary statistics for physician view, and trend analysis over time periods. Component structure includes a main SVG container with sizing for the chart container, duration scale with hour-based labeling on the Y-axis, day-of-week labels with date information on the X-axis, sleep duration bars with quality color coding for data bars, sleep quality explanations in the legend, and detailed sleep information on hover in tooltips. This component is used for sleep hygiene monitoring and sleep disorder assessment.
  */
 
 import React, { useState, useRef } from 'react';
@@ -55,12 +12,25 @@ import Legend from '../Legend';
 import './SleepChart.css';
 
 
-const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { sleepData, loading, error } = usePatientData(patientId, 'sleep');
-  const [useLineChart, setUseLineChart] = useState(false); // Toggle state for chart view
+const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+  const { sleepData, loading, error } = usePatientData(patientId);
+  // For Patient access, force Bar Chart (remove Line Chart access).
+  // For Physician access, force Line Chart (remove Bar Chart access).
+  // Admin can toggle between both.
+  const shouldForceBarChart = accessType === 'Patient';
+  const shouldForceLineChart = accessType === 'Physician';
+  
+  // Determine initial chart view based on access type
+  let initialUseLineChart = false;
+  if (shouldForceBarChart) {
+    initialUseLineChart = false;
+  } else if (shouldForceLineChart) {
+    initialUseLineChart = true;
+  }
+  
+  const [useLineChart, setUseLineChart] = useState(initialUseLineChart); // Toggle state for chart view
   
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('sleep');
   const nav = navigation || internalNavigation;
 
@@ -84,13 +54,6 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
   // Get 3-month data
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = sleepData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
-
-  const formatDateRange = (data) => {
-    if (!data || data.length === 0) return '';
-    const startDate = new Date(data[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endDate = new Date(data[data.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startDate} to ${endDate}`;
-  };
 
   const qualityLevels = {
     'Very good': 'var(--chart-color-sleep-very-good)',
@@ -123,9 +86,10 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
     // Generate chart data for all 21 days (3 weeks)
     const data = [];
     const weekLabels = ['Prev Week', 'Current Week', 'Next Week'];
+    const weekStarts = [prevWeekStart, startOfWeek, nextWeekStart];
     
     for (let week = 0; week < 3; week++) {
-      const weekStart = week === 0 ? prevWeekStart : week === 1 ? startOfWeek : nextWeekStart;
+      const weekStart = weekStarts[week];
       
       for (let day = 0; day < 7; day++) {
         const date = new Date(weekStart);
@@ -376,21 +340,23 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
           <h3 className="chart-title">Sleep Quality & Duration</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle */}
-          <div className="view-toggle">
-            <button 
-              className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(false)}
-            >
-              Bar Chart
-            </button>
-            <button 
-              className={`toggle-btn ${useLineChart ? 'active' : ''}`}
-              onClick={() => setUseLineChart(true)}
-            >
-              Line Chart
-            </button>
-          </div>
+          {/* View Toggle - Hide for Patient and Physician, show both for Admin */}
+          {accessType === 'Admin' && (
+            <div className="view-toggle">
+              <button 
+                className={`toggle-btn ${!useLineChart ? 'active' : ''}`}
+                onClick={() => setUseLineChart(false)}
+              >
+                Bar Chart
+              </button>
+              <button 
+                className={`toggle-btn ${useLineChart ? 'active' : ''}`}
+                onClick={() => setUseLineChart(true)}
+              >
+                Line Chart
+              </button>
+            </div>
+          )}
         </div>
         
         {/* Conditional Chart Rendering */}
@@ -452,7 +418,7 @@ const SleepChart = ({ patientId, isExpanded, onExpand, viewMode = 'patient', nav
         <Legend title="Sleep Quality" items={legendItems} hide={screenshotMode} />
 
         {/* Show summary for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
+        {weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>

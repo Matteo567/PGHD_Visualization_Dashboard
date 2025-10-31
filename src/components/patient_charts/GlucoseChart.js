@@ -1,21 +1,12 @@
 /*
  GlucoseChart.js - Blood Glucose Monitoring Visualization
  
- This component provides comprehensive blood glucose tracking:
- - Time-based glucose readings with meal context (pre/post meal)
- - Range-based color coding (below, in range, above target)
- - Daily and weekly trend visualization
- - Interactive tooltips with detailed glucose information
- - Navigation controls for time periods
- - Integration with patient data and chart navigation
- 
- Essential for diabetes management and glucose trend analysis.
+ This component provides blood glucose tracking with time-based glucose readings that include meal context for pre and post meal readings. It uses range-based color coding to indicate whether readings are below, in, or above target range. It provides daily and weekly trend visualization with interactive tooltips that show detailed glucose information. It includes navigation controls for time periods and integrates with patient data and chart navigation. This component is used for diabetes management and glucose trend analysis.
  */
 
 import React, { useState, useRef } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
-
 import Legend from '../Legend';
 import InfoBox from '../InfoBox';
 import Tooltip from '../ui/Tooltip';
@@ -29,8 +20,6 @@ const RANGE_COLORS = {
   'in range': 'var(--chart-color-good)', // Green
   'above range': 'var(--chart-color-blue)', // Orange (despite the name, this is actually orange)
 };
-const TIME_LABELS = ['12am', '12pm', '12am'];
-const DEFAULT_WEEK = new Date(2025, 4, 1);
 
 // --- Helper Functions ---
 const getPointColor = (range) => RANGE_COLORS[range.toLowerCase()] || RANGE_COLORS['in range'];
@@ -197,7 +186,7 @@ const DataPoints = ({ weekData, config, onBarHover, onBarLeave }) => {
 };
 
 const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, monthLabel }) => {
-  // Simple inline config - no factory pattern needed
+  // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
         width: 700,
@@ -247,7 +236,7 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
 };
 
 // --- Main Component ---
-const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const healthRangeLegendItems = [
     { label: 'Above range', color: RANGE_COLORS['above range'] },
     { label: 'In range', color: RANGE_COLORS['in range'] },
@@ -268,13 +257,12 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
       description: 'Blood glucose measurements taken after meals'
     },
   ];
-  const { glucoseData, loading, error } = usePatientData(patientId, 'glucose');
+  const { glucoseData, loading, error } = usePatientData(patientId);
   const [tooltipData, setTooltipData] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('glucose');
   const nav = navigation || internalNavigation;
 
@@ -287,29 +275,39 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = glucoseData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
-  // Calculate summary statistics for physician view
+  // Calculate summary statistics for week period
+  // This calculates averages, range percentages, and reading counts
   let weekSummary = null;
   if (weekData.length > 0) {
+    // Filter to get only valid readings (value > 0)
     const readings = weekData.filter(d => d.value && d.value > 0);
+    
+    // Separate readings by meal timing (pre-meal vs post-meal)
     const preMealReadings = readings.filter(d => d.measurementType === 'Pre meal');
     const postMealReadings = readings.filter(d => d.measurementType === 'Post meal');
 
+    // Calculate average glucose: sum all values, divide by count, round to 1 decimal
     const avgGlucose = readings.length > 0 ? 
       (readings.reduce((sum, val) => sum + val.value, 0) / readings.length).toFixed(1) : 0;
     
+    // Calculate average for pre-meal readings only
     const avgPreMeal = preMealReadings.length > 0 ? 
       (preMealReadings.reduce((sum, val) => sum + val.value, 0) / preMealReadings.length).toFixed(1) : 0;
     
+    // Calculate average for post-meal readings only
     const avgPostMeal = postMealReadings.length > 0 ? 
       (postMealReadings.reduce((sum, val) => sum + val.value, 0) / postMealReadings.length).toFixed(1) : 0;
 
+    // Count readings in each range category
     const highReadings = readings.filter(d => d.range.toLowerCase() === 'above range').length;
     const lowReadings = readings.filter(d => d.range.toLowerCase() === 'below range').length;
     const inRangeReadings = readings.filter(d => d.range.toLowerCase() === 'in range').length;
 
+    // Calculate what percentage of readings were in the target range
     const rangePercentage = readings.length > 0 ? 
       ((inRangeReadings / readings.length) * 100).toFixed(0) : 0;
 
+    // Count unique days that had readings
     const daysWithReadings = new Set(weekData.map(d => d.date.toDateString())).size;
 
     weekSummary = {
@@ -325,10 +323,9 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
     };
   }
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate 3-month summary (same logic as week summary, just different data)
   let threeMonthSummary = null;
   if (threeMonthData.length > 0) {
-
     const readings = threeMonthData.filter(d => d.value && d.value > 0);
     const preMealReadings = readings.filter(d => d.measurementType === 'Pre meal');
     const postMealReadings = readings.filter(d => d.measurementType === 'Post meal');
@@ -364,11 +361,6 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
     };
   }
 
-  const formatDateRange = (start, end) => {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} to ${endStr}`;
-  };
 
   const handleBarHover = (data) => {
     setTooltipData(data);
@@ -397,13 +389,17 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
           <Legend title="Prandial State" items={mealTimeLegendItems} hide={screenshotMode} />
         </div>
         
-        {/* Show InfoBox for patient view, summary for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary ? (
+        {/* Show InfoBox and summary for unified view - Hide InfoBox for Physician but keep summaries */}
+        {weekSummary ? (
           <>
-            <InfoBox 
-              title="Blood Glucose Information"
-              content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range (Diabetes Canada)."
-            />
+            {/* Hide InfoBox for Physician */}
+            {accessType !== 'Physician' && (
+              <InfoBox 
+                title="Blood Glucose Information"
+                content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range (Diabetes Canada)."
+              />
+            )}
+            {/* Always show summaries for physician/unified view */}
             <div className="summary-container">
               <div className="chart-summary">
                 <h4>Week Summary</h4>
@@ -471,10 +467,12 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'pat
             </div>
           </>
         ) : (
-          <InfoBox 
-            title="Blood Glucose Information"
-            content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range."
-          />
+          accessType !== 'Physician' && (
+            <InfoBox 
+              title="Blood Glucose Information"
+              content="For pre-prandial (before meals) blood sugar, the target range is 4.0 to 7.0 mmol/L. A reading within this range is considered in range. A reading below 4.0 mmol/L is below range, while a reading above 7.0 mmol/L is out of range. For 2-hour post-prandial (after eating) blood sugar, the target range is 5.0 to 10.0 mmol/L. A reading within this range is considered in range. A reading below 5.0 mmol/L is below range, while a reading above 10.0 mmol/L is out of range."
+            />
+          )
         )}
       </div>
       

@@ -17,8 +17,7 @@ import './Tooltip.css';
 const Tooltip = ({ 
   isVisible, 
   content, 
-  position = { x: 0, y: 0 }, 
-  containerRef = null 
+  position = { x: 0, y: 0 }
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 

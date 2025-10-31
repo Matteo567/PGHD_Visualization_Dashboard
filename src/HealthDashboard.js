@@ -1,42 +1,7 @@
 /*
  HealthDashboard.js - Unified Health Dashboard Component
  
- This component provides a unified health dashboard that combines the best features
- from both patient and physician dashboards. It's designed to be used by both
- patients and healthcare providers with a clean, accessible interface.
- 
- Features:
- - Patient information display with QR code access
- - Week summaries always visible for better health tracking
- - Toggle for 3-month summaries for long-term trend analysis
- - Exercise visualization with both activity breakdown and weekly goals
- - Clean, patient-friendly design with professional functionality
- - Screenshot mode support for documentation
- 
- Architecture:
- - Uses custom hooks for data management, visualization handling, and navigation
- - Implements expandable chart views
- - Provides educational information for patients
- - Handles loading and error states gracefully
- - Includes summary statistics for comprehensive health monitoring
- 
- Custom Hooks Used:
- - usePatientData: Manages patient data fetching and caching
- - useVisualizations: Handles visualization configuration and availability
- - useChartNavigation: Manages time-based navigation for each chart type
- 
- Component Structure:
- - PatientInfoCard: Displays patient demographics and medication information
- - QR Code Section: Provides access to patient dashboard
- - Summary Toggle: Controls visibility of 3-month summaries
- - DashboardGrid: Renders the chart grid with navigation and expansion controls
- - Individual chart components for each health metric
- 
- State Management:
- - Uses custom hooks for centralized state management
- - Handles chart expansion state
- - Manages navigation state for each chart type independently
- - Controls summary visibility with toggle state
+ This component provides a unified health dashboard designed for use by both patients and healthcare providers. It displays patient information with QR code access and shows week summaries for health tracking. It includes a toggle for 3-month summaries for long-term trend analysis. Exercise visualization includes both activity breakdown and weekly goals. The component uses custom hooks for data management, visualization handling, and navigation. It implements expandable chart views and provides educational information for patients. It handles loading and error states and includes summary statistics for health monitoring. The component displays patient demographics and medication information through PatientInfoCard. The QR code section provides access to the patient dashboard. The summary toggle controls visibility of 3-month summaries. DashboardGrid renders the chart grid with navigation and expansion controls. Individual chart components handle each health metric. State management uses custom hooks for centralized state, handles chart expansion state, manages navigation state for each chart type independently, and controls summary visibility with toggle state.
  */
 
 import React from 'react';
@@ -50,16 +15,22 @@ import Placeholder from './components/ui/Placeholder';
 import Switch from './components/ui/Switch';
 import './HealthDashboard.css';
 
-const HealthDashboard = ({ patientId, screenshotMode = false }) => {
+const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = false }) => {
   const { data, loading, error } = usePatientData(patientId);
   const { 
     allVisualizations, 
-    availableVisualizations, 
-    selectedVisualizations, 
-    handleVisualizationChange 
-  } = useVisualizations('patient', data);
+    availableVisualizations: allAvailableVisualizations
+  } = useVisualizations(data);
   
-  // Use custom dashboard state hook
+  // Filter visualizations based on access type
+  // Physicians do not see meal contents chart
+  let availableVisualizations = { ...allAvailableVisualizations };
+  if (accessType === 'Physician') {
+    const { mealContents, ...rest } = availableVisualizations;
+    availableVisualizations = rest;
+  }
+  
+  // Use dashboard state for chart expansion and summary toggles
   const {
     expandedChart,
     showThreeMonthSummaries,
@@ -67,17 +38,19 @@ const HealthDashboard = ({ patientId, screenshotMode = false }) => {
     toggleThreeMonthSummaries
   } = useDashboardState();
 
-  // Navigation for all charts
-  const sharedNavigation = useChartNavigation('glucose'); // Default to 'week' navigation
-
+  // Create navigation for each chart type
+  // Most charts use week navigation while mood uses month navigation
+  const weekNavigation = useChartNavigation('glucose'); // Week-based
+  const monthNavigation = useChartNavigation('mood');   // Month-based
+  
   const chartNavigation = {
-    glucose: sharedNavigation,
-    bloodPressure: sharedNavigation,
-    exercise: sharedNavigation,
-    sleep: sharedNavigation,
-    pain: sharedNavigation,
-    mood: sharedNavigation, // Now use shared weekly navigation
-    mealContents: sharedNavigation
+    glucose: weekNavigation,
+    bloodPressure: weekNavigation,
+    exercise: weekNavigation,
+    sleep: weekNavigation,
+    pain: weekNavigation,
+    mood: monthNavigation,      // Mood uses month navigation
+    mealContents: weekNavigation
   };
 
   // Render visualization with unified view mode
@@ -99,7 +72,7 @@ const HealthDashboard = ({ patientId, screenshotMode = false }) => {
       patientId={patientId} 
       isExpanded={isExpanded} 
       onExpand={() => toggleChart(boxId)}
-      viewMode="unified" // New unified view mode
+      accessType={accessType}
       navigation={navigation}
       screenshotMode={screenshotMode}
       showThreeMonthSummaries={showThreeMonthSummaries} // Pass summary toggle state
@@ -154,10 +127,8 @@ const HealthDashboard = ({ patientId, screenshotMode = false }) => {
 
           <DashboardGrid
             viewMode="unified"
-            selectedVisualizations={selectedVisualizations}
             availableVisualizations={availableVisualizations}
             allVisualizations={allVisualizations}
-            onVisualizationChange={handleVisualizationChange}
             onExpand={toggleChart}
             expandedItem={expandedChart}
             renderVisualization={renderVisualizationWithMode}

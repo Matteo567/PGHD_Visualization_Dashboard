@@ -1,42 +1,7 @@
 /*
  BloodPressureChart.js - Blood Pressure Monitoring Visualization
  
- This component provides comprehensive blood pressure tracking:
- - Systolic and diastolic pressure visualization
- - Risk categorization with color coding
- - Daily and weekly trend analysis
- - Multiple daily measurements display
- - Interactive tooltips with BP details
- - Navigation controls for time periods
- 
- ARCHITECTURE:
- - Uses custom SVG for precise blood pressure visualization
- - Implements dual-axis system for systolic and diastolic values
- - Provides risk-based color coding for clinical interpretation
- - Supports multiple daily readings with time-based positioning
- - Implements configurable layouts
- 
- Visualization Features:
- - Dual-line chart showing systolic and diastolic trends
- - Color-coded risk categories (normal, elevated, high, crisis)
- - Time-based positioning for multiple daily readings
- - Interactive tooltips with detailed BP information
- - Grid system with proper axis scaling
- 
- Clinical Features:
- - Risk categorization based on medical guidelines
- - Summary statistics for physician view
- - Trend analysis over time periods
- - Educational information for patient view
- 
- Component Structure:
- - Y-Axis: Dual-axis system for systolic and diastolic values
- - X-Axis: Time-based axis with day and time labels
- - DataPoints: Interactive blood pressure readings
- - Legend: Risk category explanations
- - Tooltip: Detailed reading information
- 
- Critical for cardiovascular health monitoring and hypertension management.
+ This component provides blood pressure tracking with systolic and diastolic pressure visualization. It includes risk categorization with color coding and provides daily and weekly trend analysis. It supports display of multiple daily measurements and includes interactive tooltips with blood pressure details. It includes navigation controls for time periods. The component uses custom SVG for blood pressure visualization and implements a dual-axis system for systolic and diastolic values. It provides risk-based color coding for clinical interpretation and supports multiple daily readings with time-based positioning. The component implements configurable layouts. Visualization features include a dual-line chart showing systolic and diastolic trends, color-coded risk categories including normal, elevated, high, and crisis, time-based positioning for multiple daily readings, interactive tooltips with detailed blood pressure information, and a grid system with axis scaling. Clinical features include risk categorization based on medical guidelines, summary statistics for physician view, trend analysis over time periods, and educational information for patient view. The component structure includes a dual-axis system for systolic and diastolic values on the Y-axis, a time-based axis with day and time labels on the X-axis, interactive blood pressure readings as data points, risk category explanations in the legend, and detailed reading information in tooltips. This component is used for cardiovascular health monitoring and hypertension management.
  */
 
 import React, { useState, useRef, useLayoutEffect } from 'react';
@@ -48,16 +13,7 @@ import Tooltip from '../ui/Tooltip';
 import './BloodPressureChart.css';
 
 // Constants
-const TIME_LABELS = ['12a', '12p', '12a'];
-const TIME_HOURS = [0, 12, 24];
-
 // Helper Functions
-const getWeekStart = (date) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day;
-  return new Date(d.setDate(diff));
-};
 
 const formatDayLabel = (date) => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -118,28 +74,28 @@ const BPRangeBackground = ({ config }) => {
       name: 'High', 
       systolic: [140, 200], 
       diastolic: [90, 120], 
-      color: 'var(--chart-color-orange)', 
+      color: 'var(--chart-color-bp-high)', 
       opacity: 0.1 
     },
     { 
       name: 'Pre-high', 
       systolic: [120, 140], 
       diastolic: [80, 90], 
-      color: 'var(--chart-color-yellow)', 
+      color: 'var(--chart-color-bp-pre-high)', 
       opacity: 0.1 
     },
     { 
       name: 'Ideal', 
       systolic: [90, 120], 
       diastolic: [60, 80], 
-      color: 'var(--chart-color-blue)', 
+      color: 'var(--chart-color-bp-ideal)', 
       opacity: 0.1 
     },
     { 
       name: 'Low', 
       systolic: [0, 90], 
       diastolic: [0, 60], 
-      color: 'var(--chart-color-danger)', 
+      color: 'var(--chart-color-bp-low)', 
       opacity: 0.1 
     }
   ];
@@ -189,7 +145,7 @@ const BPRangeBackground = ({ config }) => {
   );
 };
 
-// New Dual Y-Axis Component for Combined Chart
+// Dual Y-Axis Component for Combined Chart
 const DualYAxis = ({ config }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
   const systolicLabels = config.yAxisLabels.systolic;
@@ -446,7 +402,7 @@ const DataBars = ({ readings, type, config, onBarHover, onBarLeave }) => {
   );
 };
 
-// New Combined I-Bar Chart Component
+// Combined I-Bar Chart Component
 const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
   const systolicRange = config.yAxisRange.systolic;
@@ -473,10 +429,10 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
         
         // Determine overall risk color based on both values
         const getCombinedRiskColor = (systolic, diastolic) => {
-          if (systolic >= 140 || diastolic >= 90) return 'var(--chart-color-orange)'; // High
-          if (systolic >= 120 || diastolic >= 80) return 'var(--chart-color-yellow)'; // Pre-high
-          if (systolic < 90 || diastolic < 60) return 'var(--chart-color-danger)'; // Low
-          return 'var(--chart-color-blue)'; // Ideal
+          if (systolic >= 140 || diastolic >= 90) return 'var(--chart-color-bp-high)'; // High
+          if (systolic >= 120 || diastolic >= 80) return 'var(--chart-color-bp-pre-high)'; // Pre-high
+          if (systolic < 90 || diastolic < 60) return 'var(--chart-color-bp-low)'; // Low
+          return 'var(--chart-color-bp-ideal)'; // Ideal
         };
         
         const riskColor = getCombinedRiskColor(systolicValue, diastolicValue);
@@ -540,7 +496,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
 };
 
 const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHover, onBarLeave }) => {
-  // Simple inline config - no factory pattern needed
+  // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
         width: 700,
@@ -607,9 +563,9 @@ const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHove
   );
 };
 
-// New Combined Chart Component
+// Combined Chart Component
 const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHover, onBarLeave }) => {
-  // Simple inline config - no factory pattern needed
+  // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
         width: 700,
@@ -680,39 +636,49 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
 };
 
 const getSystolicColor = (value) => {
-  if (value < 90) return 'var(--chart-color-danger)';
-  if (value < 120) return 'var(--chart-color-blue)';
-  if (value < 140) return 'var(--chart-color-yellow)';
-  return 'var(--chart-color-orange)';
+  if (value < 90) return 'var(--chart-color-bp-low)';
+  if (value < 120) return 'var(--chart-color-bp-ideal)';
+  if (value < 140) return 'var(--chart-color-bp-pre-high)';
+  return 'var(--chart-color-bp-high)';
 };
 
 const getDiastolicColor = (value) => {
-  if (value < 60) return 'var(--chart-color-danger)';
-  if (value < 80) return 'var(--chart-color-blue)';
-  if (value < 90) return 'var(--chart-color-yellow)';
-  return 'var(--chart-color-orange)';
+  if (value < 60) return 'var(--chart-color-bp-low)';
+  if (value < 80) return 'var(--chart-color-bp-ideal)';
+  if (value < 90) return 'var(--chart-color-bp-pre-high)';
+  return 'var(--chart-color-bp-high)';
 };
 
 const bloodPressureLegendItems = [
-  { color: 'var(--chart-color-danger)', label: 'Low', description: 'Blood pressure below normal range' },
-  { color: 'var(--chart-color-blue)', label: 'Ideal', description: 'Blood pressure within ideal range' },
-  { color: 'var(--chart-color-yellow)', label: 'Pre-high', description: 'Blood pressure elevated but not yet high' },
-  { color: 'var(--chart-color-orange)', label: 'High', description: 'Blood pressure high - requires attention' },
+  { color: 'var(--chart-color-bp-low)', label: 'Low', description: 'Blood pressure below normal range' },
+  { color: 'var(--chart-color-bp-ideal)', label: 'Ideal', description: 'Blood pressure within ideal range' },
+  { color: 'var(--chart-color-bp-pre-high)', label: 'Pre-high', description: 'Blood pressure elevated but not yet high' },
+  { color: 'var(--chart-color-bp-high)', label: 'High', description: 'Blood pressure high - requires attention' },
 ];
 
 
 
 // --- Main Component ---
-const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { bloodPressureData, loading, error } = usePatientData(patientId, 'bloodPressure');
+const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+  const { bloodPressureData, loading, error } = usePatientData(patientId);
   const [containerWidth, setContainerWidth] = useState(400);
   const [tooltipData, setTooltipData] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [useCombinedView, setUseCombinedView] = useState(true); // New state for view toggle
+  // For Patient access, force Combined View (remove Separate Charts access).
+  // For Physician access, force Combined View (remove Separate Charts access).
+  // Admin can toggle between both.
+  const shouldForceCombinedView = accessType === 'Patient' || accessType === 'Physician';
+  
+  // Determine initial view state
+  let initialUseCombinedView = false;
+  if (shouldForceCombinedView) {
+    initialUseCombinedView = true;
+  }
+  
+  const [useCombinedView, setUseCombinedView] = useState(initialUseCombinedView); // State for view toggle
   const containerRef = useRef(null);
 
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('bloodPressure');
   const nav = navigation || internalNavigation;
 
@@ -760,11 +726,6 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
 
 
 
-  const formatDateRange = (start, end) => {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} to ${endStr}`;
-  };
 
   const handleBarHover = (data) => {
     setTooltipData(data);
@@ -775,20 +736,25 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
     setTooltipData(null);
   };
 
-  // Calculate summary statistics for physician view
+  // Calculate summary statistics for week and 3-month periods
+  // This calculates average, max, risk categories, and reading counts
   let weekSummary = null;
   if (weekData.length > 0) {
+    // Get all valid readings (where both systolic and diastolic are > 0)
     const systolicReadings = weekData.filter(d => d.systolic && d.systolic > 0).map(d => d.systolic);
     const diastolicReadings = weekData.filter(d => d.diastolic && d.diastolic > 0).map(d => d.diastolic);
 
+    // Calculate averages (sum all values, divide by count, round to whole number)
     const avgSystolic = systolicReadings.length > 0 ? 
       (systolicReadings.reduce((sum, val) => sum + val, 0) / systolicReadings.length).toFixed(0) : 0;
     const avgDiastolic = diastolicReadings.length > 0 ? 
       (diastolicReadings.reduce((sum, val) => sum + val, 0) / diastolicReadings.length).toFixed(0) : 0;
 
+    // Find maximum values
     const maxSystolic = systolicReadings.length > 0 ? Math.max(...systolicReadings) : 0;
     const maxDiastolic = diastolicReadings.length > 0 ? Math.max(...diastolicReadings) : 0;
 
+    // Determine risk category based on average values
     const getRiskCategory = (systolic, diastolic) => {
       if (systolic >= 135 || diastolic >= 85) return 'High Risk';
       if (systolic >= 121 || diastolic >= 80) return 'Medium Risk';
@@ -796,6 +762,8 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
     };
 
     const avgRisk = getRiskCategory(parseFloat(avgSystolic), parseFloat(avgDiastolic));
+    
+    // Count unique days with readings
     const daysWithReadings = new Set(weekData.map(d => d.date.toDateString())).size;
 
     weekSummary = {
@@ -809,10 +777,9 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
     };
   }
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate 3-month summary (same logic as week summary, just different data)
   let threeMonthSummary = null;
   if (threeMonthData.length > 0) {
-
     const systolicReadings = threeMonthData.filter(d => d.systolic && d.systolic > 0).map(d => d.systolic);
     const diastolicReadings = threeMonthData.filter(d => d.diastolic && d.diastolic > 0).map(d => d.diastolic);
 
@@ -851,21 +818,23 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
           <h3 className="bp-main-title">Blood Pressure</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle */}
-          <div className="view-toggle">
-            <button 
-              className={`toggle-btn ${!useCombinedView ? 'active' : ''}`}
-              onClick={() => setUseCombinedView(false)}
-            >
-              Separate Charts
-            </button>
-            <button 
-              className={`toggle-btn ${useCombinedView ? 'active' : ''}`}
-              onClick={() => setUseCombinedView(true)}
-            >
-              Combined View
-            </button>
-          </div>
+          {/* View Toggle - Hide for Patient and Physician, show both for Admin */}
+          {accessType === 'Admin' && (
+            <div className="view-toggle">
+              <button 
+                className={`toggle-btn ${!useCombinedView ? 'active' : ''}`}
+                onClick={() => setUseCombinedView(false)}
+              >
+                Separate Charts
+              </button>
+              <button 
+                className={`toggle-btn ${useCombinedView ? 'active' : ''}`}
+                onClick={() => setUseCombinedView(true)}
+              >
+                Combined View
+              </button>
+            </div>
+          )}
         </div>
         
         <div className="bp-charts-wrapper">
@@ -904,13 +873,17 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
         
         <Legend title="Blood Pressure Category:" items={bloodPressureLegendItems} hide={screenshotMode} />
         
-        {/* Show InfoBox for patient view, summary for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary ? (
+        {/* Show InfoBox for patient view, summary for physician/unified view - Hide InfoBox for Physician but keep summaries */}
+        {weekSummary ? (
           <>
-            <InfoBox 
-              title="Blood Pressure Information" 
-              content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
-            />
+            {/* Hide InfoBox for Physician */}
+            {accessType !== 'Physician' && (
+              <InfoBox 
+                title="Blood Pressure Information" 
+                content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
+              />
+            )}
+            {/* Always show summaries for physician/unified view */}
             <div className="summary-container">
               <div className="chart-summary">
                 <h4>Week Summary</h4>
@@ -971,10 +944,12 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, viewMode 
             </div>
           </>
         ) : (
-          <InfoBox 
-            title="Blood Pressure Information" 
-            content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
-          />
+          accessType !== 'Physician' && (
+            <InfoBox 
+              title="Blood Pressure Information" 
+              content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
+            />
+          )
         )}
       </div>
       

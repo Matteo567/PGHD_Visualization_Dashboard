@@ -1,15 +1,7 @@
 /*
  MealContentsChart.js - Nutritional Tracking Visualization
  
- This component provides comprehensive meal and nutrition monitoring:
- - Meal timing and content breakdown
- - Nutritional component tracking
- - Daily and weekly dietary pattern analysis
- - Interactive tooltips with meal details
- - Navigation controls for time periods
- - Integration with patient data and chart navigation
- 
- Essential for dietary monitoring and nutritional assessment.
+ This component provides meal and nutrition monitoring with meal timing and content breakdown. It tracks nutritional components and provides daily and weekly dietary pattern analysis. It includes interactive tooltips with meal details and navigation controls for time periods. It integrates with patient data and chart navigation. This component is used for dietary monitoring and nutritional assessment.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -25,8 +17,6 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Late Night Snack'];
 const FOOD_CATEGORIES = ['Protein', 'Carbohydrates', 'Vegetables', 'Fruit', 'Alcohol'];
 const SUGAR_CATEGORIES = ['', '1-20g', '20-40g', '40-60g', '60g+'];
-const DEFAULT_WEEK = new Date(2025, 4, 1);
-
 // Emoji mappings for food categories
 const CATEGORY_EMOJIS = {
   'Protein': '🥩',
@@ -47,13 +37,6 @@ const SUGAR_EMOJIS = {
 
 
 // --- Helper Functions ---
-const getWeekStart = (date) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day;
-  return new Date(d.setDate(diff));
-};
-
 const formatDayLabel = (date) => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[date.getDay()];
@@ -318,17 +301,16 @@ const MealGrid = ({ config, weekDays, patientData, isExpanded }) => {
 
 
 // --- Main Component ---
-const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode = 'patient', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { mealData: patientData, loading, error } = usePatientData(patientId);
   
   // Use navigation from parent or fallback to internal navigation
-  const useInternalNavigation = !navigation;
   const internalNavigation = useChartNavigation('mealContents');
   const nav = navigation || internalNavigation;
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(500);
 
-  // Simple inline config - no factory pattern needed
+  // Inline configuration for chart dimensions and styling
   const mealHeight = isExpanded ? 90 : 70;
   const dayWidth = isExpanded ? 100 : 70;
   const leftPadding = 140;
@@ -374,12 +356,6 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode =
     const dataDate = new Date(d.Date);
     return dataDate >= startOfThreeMonths && dataDate <= endOfThreeMonths;
   });
-
-  const formatDateRange = (start, end) => {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return `${startStr} to ${endStr}`;
-  };
 
   // Calculate summary statistics for physician view
   let weekSummary = null;
@@ -561,7 +537,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, viewMode =
         </div>
 
         {/* Show summary for physician/unified view */}
-        {(viewMode === 'physician' || viewMode === 'unified') && weekSummary && (
+        {weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>

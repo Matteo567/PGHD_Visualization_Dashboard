@@ -198,22 +198,22 @@
 }
 
 .bp-range-high {
-  fill: var(--chart-color-orange);
+  fill: var(--chart-color-bp-high);
   opacity: 0.08;
 }
 
 .bp-range-pre-high {
-  fill: var(--chart-color-yellow);
+  fill: var(--chart-color-bp-pre-high);
   opacity: 0.08;
 }
 
 .bp-range-ideal {
-  fill: var(--chart-color-blue);
+  fill: var(--chart-color-bp-ideal);
   opacity: 0.08;
 }
 
 .bp-range-low {
-  fill: var(--chart-color-danger);
+  fill: var(--chart-color-bp-low);
   opacity: 0.08;
 }
 

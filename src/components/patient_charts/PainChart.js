@@ -564,7 +564,6 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
               </div>
             )}
           </div>
-        )}
       </div>
   );
 };

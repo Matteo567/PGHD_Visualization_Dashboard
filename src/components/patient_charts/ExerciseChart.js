@@ -248,6 +248,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
 
   // Calculate 3-month summary statistics for physician view
   let threeMonthSummary = null;
+  let threeMonthWeeklyGoalsSummary = null;
   if (threeMonthData.length > 0) {
 
     // Group 3-month data by day
@@ -305,6 +306,70 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
       mostCommonExerciseMinutes: mostCommonExercise[1],
       totalSessions,
       avgSessionLength
+    };
+
+    // Calculate weekly goals met in 3-month period
+    // Split 3-month data into weeks and check goal achievement for each week
+    const weeklyGoalsData = [];
+    let currentWeekStart = new Date(startOfThreeMonths);
+    currentWeekStart.setHours(0, 0, 0, 0);
+    
+    // Adjust to start of week (Sunday)
+    const dayOfWeek = currentWeekStart.getDay();
+    currentWeekStart.setDate(currentWeekStart.getDate() - dayOfWeek);
+
+    while (currentWeekStart <= endOfThreeMonths) {
+      const weekEnd = new Date(currentWeekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      weekEnd.setHours(23, 59, 59, 999);
+
+      // Get data for this week
+      const weekDataForAnalysis = threeMonthData.filter(d => {
+        if (!d.date) return false;
+        const itemDate = new Date(d.date);
+        return itemDate >= currentWeekStart && itemDate <= weekEnd;
+      });
+
+      if (weekDataForAnalysis.length > 0) {
+        // Process week data similar to weekly calculation
+        const weekGroupedData = processExerciseData(weekDataForAnalysis);
+        
+        const weekAerobic = Object.values(weekGroupedData).reduce((sum, day) => 
+          sum + day.walking + day.swimming + day.running + day.biking, 0);
+        const weekStrengthSessions = Object.values(weekGroupedData).filter(day => day['muscle-strengthening'] > 0).length;
+        const weekFlexibilitySessions = Object.values(weekGroupedData).filter(day => day.balance > 0).length;
+
+        // Check if goals are met
+        const aerobicGoalMet = weekAerobic >= 150;
+        const strengthGoalMet = weekStrengthSessions >= 2;
+        const flexibilityGoalMet = weekFlexibilitySessions >= 1;
+        const allGoalsMet = aerobicGoalMet && strengthGoalMet && flexibilityGoalMet;
+
+        weeklyGoalsData.push({
+          aerobicGoalMet,
+          strengthGoalMet,
+          flexibilityGoalMet,
+          allGoalsMet
+        });
+      }
+
+      // Move to next week
+      currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    }
+
+    // Count weeks that met goals
+    const weeksMetAerobicGoal = weeklyGoalsData.filter(w => w.aerobicGoalMet).length;
+    const weeksMetStrengthGoal = weeklyGoalsData.filter(w => w.strengthGoalMet).length;
+    const weeksMetFlexibilityGoal = weeklyGoalsData.filter(w => w.flexibilityGoalMet).length;
+    const weeksMetAllGoals = weeklyGoalsData.filter(w => w.allGoalsMet).length;
+    const totalWeeks = weeklyGoalsData.length;
+
+    threeMonthWeeklyGoalsSummary = {
+      totalWeeks,
+      weeksMetAerobicGoal,
+      weeksMetStrengthGoal,
+      weeksMetFlexibilityGoal,
+      weeksMetAllGoals
     };
   }
 
@@ -414,6 +479,44 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
               </div>
             </div>
           </div>
+          
+          {showThreeMonthSummaries && threeMonthWeeklyGoalsSummary && (
+            <div className="chart-summary">
+              <h4>3-Month Summary</h4>
+              <div className="summary-stats">
+                <div className="stat-item">
+                  <span className="stat-label">Weeks Analyzed:</span>
+                  <span className="stat-value">
+                    {threeMonthWeeklyGoalsSummary.totalWeeks} weeks
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Weekly Goals Met:</span>
+                  <span className="stat-value">
+                    {threeMonthWeeklyGoalsSummary.weeksMetAllGoals} out of {threeMonthWeeklyGoalsSummary.totalWeeks} weeks
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Aerobic Goal Met:</span>
+                  <span className="stat-value">
+                    {threeMonthWeeklyGoalsSummary.weeksMetAerobicGoal} weeks
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Strength Goal Met:</span>
+                  <span className="stat-value">
+                    {threeMonthWeeklyGoalsSummary.weeksMetStrengthGoal} weeks
+                  </span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Balance Goal Met:</span>
+                  <span className="stat-value">
+                    {threeMonthWeeklyGoalsSummary.weeksMetFlexibilityGoal} weeks
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

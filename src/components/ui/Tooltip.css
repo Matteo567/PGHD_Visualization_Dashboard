@@ -49,6 +49,12 @@
   font-size: 11px;
 }
 
+.custom-tooltip .tooltip-category {
+  margin-bottom: 2px;
+  font-weight: 500;
+  font-size: 11px;
+}
+
 .custom-tooltip .tooltip-range.in-range {
   color: #27ae60;
 }
@@ -58,5 +64,5 @@
 }
 
 .custom-tooltip .tooltip-range.below-range {
-  color: #f39c12;
+  color: var(--chart-color-secondary);
 }

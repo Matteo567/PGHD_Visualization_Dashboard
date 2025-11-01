@@ -427,7 +427,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
         const systolicY = config.height - config.padding.bottom - systolicBarHeight;
         const diastolicY = config.height - config.padding.bottom - diastolicBarHeight;
         
-        // Determine overall risk color based on both values
+        // Determine overall risk color and category based on both values
         const getCombinedRiskColor = (systolic, diastolic) => {
           if (systolic >= 140 || diastolic >= 90) return 'var(--chart-color-bp-high)'; // High
           if (systolic >= 120 || diastolic >= 80) return 'var(--chart-color-bp-pre-high)'; // Pre-high
@@ -435,7 +435,15 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
           return 'var(--chart-color-bp-ideal)'; // Ideal
         };
         
+        const getCombinedRiskCategory = (systolic, diastolic) => {
+          if (systolic >= 140 || diastolic >= 90) return { name: 'High', color: 'var(--chart-color-bp-high)' };
+          if (systolic >= 120 || diastolic >= 80) return { name: 'Pre-High', color: 'var(--chart-color-bp-pre-high)' };
+          if (systolic < 90 || diastolic < 60) return { name: 'Low', color: 'var(--chart-color-bp-low)' };
+          return { name: 'Ideal', color: 'var(--chart-color-bp-ideal)' };
+        };
+        
         const riskColor = getCombinedRiskColor(systolicValue, diastolicValue);
+        const riskCategory = getCombinedRiskCategory(systolicValue, diastolicValue);
 
         const handleMouseEnter = (event) => {
           const tooltipData = {
@@ -443,6 +451,8 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
             systolic: systolicValue,
             diastolic: diastolicValue,
             unit: 'mmHg',
+            category: riskCategory.name,
+            categoryColor: riskCategory.color,
             time: readingDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
             date: readingDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
             position: { x: event.clientX, y: event.clientY }
@@ -958,13 +968,18 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
         isVisible={!!tooltipData}
         content={tooltipData && (
           <div>
-            <div className="tooltip-title">{tooltipData.type} Blood Pressure</div>
+            <div className="tooltip-title">{tooltipData.type === 'Blood Pressure' ? 'Blood Pressure' : `${tooltipData.type} Blood Pressure`}</div>
             {tooltipData.systolic && tooltipData.diastolic ? (
               <div className="tooltip-value">
                 {tooltipData.systolic}/{tooltipData.diastolic} {tooltipData.unit}
               </div>
             ) : (
               <div className="tooltip-value">{tooltipData.value} {tooltipData.unit}</div>
+            )}
+            {tooltipData.category && (
+              <div className="tooltip-category" style={{ color: tooltipData.categoryColor }}>
+                {tooltipData.category}
+              </div>
             )}
             <div className="tooltip-time">{tooltipData.time}</div>
             <div className="tooltip-date">{tooltipData.date}</div>

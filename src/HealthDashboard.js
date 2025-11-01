@@ -11,8 +11,8 @@ import useChartNavigation from './hooks/useChartNavigation';
 import useDashboardState from './hooks/useDashboardState';
 import PatientInfoCard from './components/PatientInfoCard';
 import DashboardGrid from './components/DashboardGrid';
-import Placeholder from './components/ui/Placeholder';
 import Switch from './components/ui/Switch';
+import Placeholder from './components/ui/Placeholder';
 import './HealthDashboard.css';
 
 const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = false }) => {

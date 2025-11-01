@@ -8,6 +8,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
+import Tooltip from '../ui/Tooltip';
 import './ExerciseChart.css';
 
 const exerciseTypes = [
@@ -41,6 +42,9 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
   // State for toggling between activity breakdown and weekly goals view
   const [showWeeklyGoals, setShowWeeklyGoals] = useState(initialShowWeeklyGoals);
   
+  // Tooltip state
+  const [tooltipData, setTooltipData] = useState(null);
+  
   // Update state when accessType changes
   useEffect(() => {
     if (shouldForceWeeklyGoals) {
@@ -70,7 +74,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
           dateLabel: 14,
           emoji: 12,
         },
-        barWidth: 12,
+        barWidth: 18,
       }
     : {
         width: 450,
@@ -85,7 +89,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
           dateLabel: 12,
           emoji: 10,
         },
-        barWidth: 8,
+        barWidth: 12,
       };
   
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
@@ -373,6 +377,14 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     };
   }
 
+  // Tooltip handlers
+  const handleBarHover = (data) => {
+    setTooltipData(data);
+  };
+
+  const handleBarLeave = () => {
+    setTooltipData(null);
+  };
 
   // Weekly goals view (when showWeeklyGoals is true)
   if (showWeeklyGoals) {
@@ -591,6 +603,10 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
               const dayData = groupedData[day];
               const x = config.padding.left + dayIndex * config.dayWidth + config.dayWidth / 2;
               let currentY = config.height - config.padding.bottom;
+              
+              // Calculate date for this day
+              const date = new Date(startOfWeek);
+              date.setDate(date.getDate() + dayIndex);
 
               return (
                 <g key={day}>
@@ -601,6 +617,22 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
                     const segmentHeight = (minutes / maxDuration) * chartHeight;
                     const segmentY = currentY - segmentHeight;
 
+                    const handleMouseEnter = (event) => {
+                      const tooltipData = {
+                        type: type.label,
+                        value: Math.round(minutes),
+                        unit: 'min',
+                        emoji: type.emoji,
+                        date: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                        position: { x: event.clientX, y: event.clientY }
+                      };
+                      handleBarHover(tooltipData);
+                    };
+
+                    const handleMouseLeave = () => {
+                      handleBarLeave();
+                    };
+
                     const segment = (
                       <g key={type.key}>
                         <rect
@@ -610,9 +642,10 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
                           height={segmentHeight}
                           fill={type.color}
                           className="data-bar"
-                        >
-                          <title>{`${type.label}: ${Math.round(minutes)} min`}</title>
-                        </rect>
+                          style={{ cursor: 'pointer' }}
+                          onMouseEnter={handleMouseEnter}
+                          onMouseLeave={handleMouseLeave}
+                        />
                         {/* Duration label inside the segment */}
                         {segmentHeight >= 12 && (
                           <text
@@ -726,6 +759,20 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
             )}
           </div>
         )}
+      
+      {/* Custom Tooltip */}
+      <Tooltip
+        isVisible={!!tooltipData}
+        content={tooltipData && (
+          <div>
+            <div className="tooltip-title">Exercise</div>
+            <div className="tooltip-value">{tooltipData.value} {tooltipData.unit}</div>
+            <div className="tooltip-range">{tooltipData.emoji} {tooltipData.type}</div>
+            <div className="tooltip-date">{tooltipData.date}</div>
+          </div>
+        )}
+        position={tooltipData ? tooltipData.position : { x: 0, y: 0 }}
+      />
       </div>
   );
 };

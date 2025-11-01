@@ -41,7 +41,6 @@ const formatDayLabel = (date) => {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[date.getDay()];
 };
-const formatDateLabel = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
 const getMealTime = (data, mealType) => {
   // Convert meal type to the correct column name format (with underscores)

@@ -285,7 +285,7 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
           })}
           
           {/* Line path */}
-          <path d={pathData} fill="none" stroke="#cccccc" strokeWidth="3" />
+          <path d={pathData} fill="none" stroke="#cccccc" strokeWidth="2" />
           
           {/* Data points */}
           {chartData.map((day, index) => {
@@ -299,9 +299,9 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
                 <circle 
                   cx={x} 
                   cy={y} 
-                  r="6" 
+                  r="5" 
                   fill={getQualityColor(day.quality)}
-                  stroke="#fff"
+                  stroke="#cccccc"
                   strokeWidth="2"
                 />
                 <text x={x} y={y - 15} fontSize="10" fill="#333" textAnchor="middle">

@@ -30,17 +30,16 @@
   font-size: 18px;
   font-weight: 400;
   color: #000000;
-  margin: 0 0 12px 0;
+  margin: 0 0 4px 0;
   text-align: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0;
 }
 
 .bp-chart-container.expanded .bp-main-title {
   font-size: 20px;
   font-weight: 400;
-  margin-bottom: 16px;
-  padding: 12px 0;
+  margin-bottom: 4px;
+  padding: 0;
 }
 
 .bp-charts-wrapper {
@@ -68,7 +67,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
   margin-bottom: 20px;
 }
 
@@ -134,20 +133,16 @@
   opacity: 0.8;
 }
 
-.combined-data-bars .bp-reading-group line {
-  transition: stroke-width 0.2s ease;
-}
-
-.combined-data-bars .bp-reading-group:hover line {
-  stroke-width: 4;
-}
-
 .combined-data-bars .bp-reading-group circle {
-  transition: r 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.combined-data-bars .bp-reading-group:hover circle {
-  r: 5;
+.combined-data-bars .bp-reading-group:hover .systolic-dot {
+  r: 6;
+}
+
+.combined-data-bars .bp-reading-group:hover .diastolic-dot {
+  r: 6;
 }
 
 /* Dual Y-Axis Styles */
@@ -199,22 +194,22 @@
 
 .bp-range-high {
   fill: var(--chart-color-bp-high);
-  opacity: 0.08;
+  /* Opacity is set inline in JavaScript for combined chart */
 }
 
 .bp-range-pre-high {
   fill: var(--chart-color-bp-pre-high);
-  opacity: 0.08;
+  /* Opacity is set inline in JavaScript for combined chart */
 }
 
 .bp-range-ideal {
   fill: var(--chart-color-bp-ideal);
-  opacity: 0.08;
+  /* Opacity is set inline in JavaScript for combined chart */
 }
 
 .bp-range-low {
   fill: var(--chart-color-bp-low);
-  opacity: 0.08;
+  /* Opacity is set inline in JavaScript for combined chart */
 }
 
 /* Subtle border for range boundaries */

@@ -370,7 +370,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           <path 
             d={linePath} 
             stroke="#cccccc" 
-            strokeWidth="3" 
+            strokeWidth="2" 
             fill="none"
           />
 
@@ -383,7 +383,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
                 key={index}
                 cx={x} 
                 cy={y} 
-                r="4" 
+                r="5" 
                 fill={point.color} 
                 stroke="#cccccc" 
                 strokeWidth="2"

@@ -582,7 +582,6 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
       className={className}
       preserveAspectRatio="xMidYMid meet"
       style={{
-        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))', // Add subtle shadow for better visual depth
         transition: 'all 0.2s ease' // Smooth transitions for scaling
       }}
     >

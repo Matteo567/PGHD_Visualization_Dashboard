@@ -1,10 +1,10 @@
 /*
  BloodPressureChart.js - Blood Pressure Monitoring Visualization
  
- This component provides blood pressure tracking with systolic and diastolic pressure visualization. It includes risk categorization with color coding and provides daily and weekly trend analysis. It supports display of multiple daily measurements and includes interactive tooltips with blood pressure details. It includes navigation controls for time periods. The component uses custom SVG for blood pressure visualization and implements a dual-axis system for systolic and diastolic values. It provides risk-based color coding for clinical interpretation and supports multiple daily readings with time-based positioning. The component implements configurable layouts. Visualization features include a dual-line chart showing systolic and diastolic trends, color-coded risk categories including normal, elevated, high, and crisis, time-based positioning for multiple daily readings, interactive tooltips with detailed blood pressure information, and a grid system with axis scaling. Clinical features include risk categorization based on medical guidelines, summary statistics for physician view, trend analysis over time periods, and educational information for patient view. The component structure includes a dual-axis system for systolic and diastolic values on the Y-axis, a time-based axis with day and time labels on the X-axis, interactive blood pressure readings as data points, risk category explanations in the legend, and detailed reading information in tooltips. This component is used for cardiovascular health monitoring and hypertension management.
+ This component provides blood pressure tracking with systolic and diastolic pressure visualization. It includes risk categorization with color coding and provides daily and weekly trend analysis. It supports display of multiple daily measurements and includes interactive tooltips with blood pressure details. It includes navigation controls for time periods. The component uses custom SVG for blood pressure visualization and implements a dual-axis system for systolic and diastolic values. It provides risk-based color coding for clinical interpretation and supports multiple daily readings with time-based positioning. The component implements configurable layouts. Visualization features include color-coded risk categories including normal, elevated, high, and crisis, time-based positioning for multiple daily readings, interactive tooltips with detailed blood pressure information, and a grid system with axis scaling. Clinical features include risk categorization based on medical guidelines, summary statistics for physician view, trend analysis over time periods, and educational information for patient view. The component structure includes a dual-axis system for systolic and diastolic values on the Y-axis, a time-based axis with day and time labels on the X-axis, interactive blood pressure readings as data points, risk category explanations in the legend, and detailed reading information in tooltips. This component is used for cardiovascular health monitoring and hypertension management.
  */
 
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
@@ -61,88 +61,133 @@ const YAxis = ({ config, type }) => {
 };
 
 // Blood Pressure Range Background Component
-const BPRangeBackground = ({ config }) => {
+const BPRangeBackground = ({ config, isCombined = false }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
-  const systolicRange = config.yAxisRange.systolic;
-  const diastolicRange = config.yAxisRange.diastolic;
-  const systolicOffset = config.yAxisOffset.systolic;
-  const diastolicOffset = config.yAxisOffset.diastolic;
+  
+  if (isCombined) {
+    // For combined chart with single axis (0-200), show only ideal ranges as green bars
+    // This avoids conflicts with dot colors which use combined risk assessment
+    const valueRange = config.yAxisRange;
+    const yOffset = config.yAxisOffset;
+    
+    // Ideal ranges: Systolic 90-120, Diastolic 60-80
+    const idealRanges = [
+      { 
+        name: 'Systolic Ideal', 
+        min: 90, 
+        max: 120, 
+        color: 'var(--chart-color-bp-ideal)', 
+        opacity: 0.15 
+      },
+      { 
+        name: 'Diastolic Ideal', 
+        min: 60, 
+        max: 80, 
+        color: 'var(--chart-color-bp-ideal)', 
+        opacity: 0.15 
+      }
+    ];
 
-  // Define BP ranges (systolic/diastolic)
-  const ranges = [
-    { 
-      name: 'High', 
-      systolic: [140, 200], 
-      diastolic: [90, 120], 
-      color: 'var(--chart-color-bp-high)', 
-      opacity: 0.1 
-    },
-    { 
-      name: 'Pre-high', 
-      systolic: [120, 140], 
-      diastolic: [80, 90], 
-      color: 'var(--chart-color-bp-pre-high)', 
-      opacity: 0.1 
-    },
-    { 
-      name: 'Ideal', 
-      systolic: [90, 120], 
-      diastolic: [60, 80], 
-      color: 'var(--chart-color-bp-ideal)', 
-      opacity: 0.1 
-    },
-    { 
-      name: 'Low', 
-      systolic: [0, 90], 
-      diastolic: [0, 60], 
-      color: 'var(--chart-color-bp-low)', 
-      opacity: 0.1 
-    }
-  ];
+    return (
+      <g className="bp-range-background">
+        {idealRanges.map((range) => {
+          const topY = config.height - config.padding.bottom - 
+            ((range.max - yOffset) / valueRange) * chartHeight;
+          const bottomY = config.height - config.padding.bottom - 
+            ((range.min - yOffset) / valueRange) * chartHeight;
 
-  return (
-    <g className="bp-range-background">
-      {ranges.map((range, index) => {
-        // Calculate Y positions for systolic range
-        const systolicTopY = config.height - config.padding.bottom - 
-          ((range.systolic[1] - systolicOffset) / systolicRange) * chartHeight;
-        const systolicBottomY = config.height - config.padding.bottom - 
-          ((range.systolic[0] - systolicOffset) / systolicRange) * chartHeight;
-        
-        // Calculate Y positions for diastolic range  
-        const diastolicTopY = config.height - config.padding.bottom - 
-          ((range.diastolic[1] - diastolicOffset) / diastolicRange) * chartHeight;
-        const diastolicBottomY = config.height - config.padding.bottom - 
-          ((range.diastolic[0] - diastolicOffset) / diastolicRange) * chartHeight;
-
-        // Create overlapping rectangles for the range
-        return (
-          <g key={range.name}>
-            {/* Systolic range background */}
+          return (
             <rect
+              key={range.name}
               x={config.padding.left}
-              y={Math.min(systolicTopY, systolicBottomY)}
+              y={Math.min(topY, bottomY)}
               width={config.width - config.padding.left - config.padding.right}
-              height={Math.abs(systolicBottomY - systolicTopY)}
+              height={Math.abs(bottomY - topY)}
               fill={range.color}
               opacity={range.opacity}
-              className={`bp-range-${range.name.toLowerCase()}`}
+              className="bp-range-ideal"
             />
-            {/* Diastolic range background */}
-            <rect
-              x={config.padding.left}
-              y={Math.min(diastolicTopY, diastolicBottomY)}
-              width={config.width - config.padding.left - config.padding.right}
-              height={Math.abs(diastolicBottomY - diastolicTopY)}
-              fill={range.color}
-              opacity={range.opacity}
-              className={`bp-range-${range.name.toLowerCase()}`}
-            />
-          </g>
-        );
-      })}
-    </g>
-  );
+          );
+        })}
+      </g>
+    );
+  } else {
+    // For separate charts, use dual-axis ranges
+    const systolicRange = config.yAxisRange.systolic;
+    const diastolicRange = config.yAxisRange.diastolic;
+    const systolicOffset = config.yAxisOffset.systolic;
+    const diastolicOffset = config.yAxisOffset.diastolic;
+
+    const ranges = [
+      { 
+        name: 'High', 
+        systolic: [140, 200], 
+        diastolic: [90, 120], 
+        color: 'var(--chart-color-bp-high)', 
+        opacity: 0.1 
+      },
+      { 
+        name: 'Pre-high', 
+        systolic: [120, 140], 
+        diastolic: [80, 90], 
+        color: 'var(--chart-color-bp-pre-high)', 
+        opacity: 0.1 
+      },
+      { 
+        name: 'Ideal', 
+        systolic: [90, 120], 
+        diastolic: [60, 80], 
+        color: 'var(--chart-color-bp-ideal)', 
+        opacity: 0.1 
+      },
+      { 
+        name: 'Low', 
+        systolic: [0, 90], 
+        diastolic: [0, 60], 
+        color: 'var(--chart-color-bp-low)', 
+        opacity: 0.1 
+      }
+    ];
+
+    return (
+      <g className="bp-range-background">
+        {ranges.map((range) => {
+          const systolicTopY = config.height - config.padding.bottom - 
+            ((range.systolic[1] - systolicOffset) / systolicRange) * chartHeight;
+          const systolicBottomY = config.height - config.padding.bottom - 
+            ((range.systolic[0] - systolicOffset) / systolicRange) * chartHeight;
+          
+          const diastolicTopY = config.height - config.padding.bottom - 
+            ((range.diastolic[1] - diastolicOffset) / diastolicRange) * chartHeight;
+          const diastolicBottomY = config.height - config.padding.bottom - 
+            ((range.diastolic[0] - diastolicOffset) / diastolicRange) * chartHeight;
+
+          return (
+            <g key={range.name}>
+              <rect
+                x={config.padding.left}
+                y={Math.min(systolicTopY, systolicBottomY)}
+                width={config.width - config.padding.left - config.padding.right}
+                height={Math.abs(systolicBottomY - systolicTopY)}
+                fill={range.color}
+                opacity={range.opacity}
+                className={`bp-range-${range.name.toLowerCase()}`}
+              />
+              <rect
+                x={config.padding.left}
+                y={Math.min(diastolicTopY, diastolicBottomY)}
+                width={config.width - config.padding.left - config.padding.right}
+                height={Math.abs(diastolicBottomY - diastolicTopY)}
+                fill={range.color}
+                opacity={range.opacity}
+                className={`bp-range-${range.name.toLowerCase()}`}
+              />
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
 };
 
 // Dual Y-Axis Component for Combined Chart
@@ -402,48 +447,156 @@ const DataBars = ({ readings, type, config, onBarHover, onBarLeave }) => {
   );
 };
 
+const getSystolicColor = (value) => {
+  if (value < 90) return 'var(--chart-color-bp-low)';
+  if (value < 120) return 'var(--chart-color-bp-ideal)';
+  if (value < 140) return 'var(--chart-color-bp-pre-high)';
+  return 'var(--chart-color-bp-high)';
+};
+
+const getDiastolicColor = (value) => {
+  if (value < 60) return 'var(--chart-color-bp-low)';
+  if (value < 80) return 'var(--chart-color-bp-ideal)';
+  if (value < 90) return 'var(--chart-color-bp-pre-high)';
+  return 'var(--chart-color-bp-high)';
+};
+
 // Combined I-Bar Chart Component
 const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
-  const systolicRange = config.yAxisRange.systolic;
-  const diastolicRange = config.yAxisRange.diastolic;
-  const systolicOffset = config.yAxisOffset.systolic;
-  const diastolicOffset = config.yAxisOffset.diastolic;
+  // Use single range for both systolic and diastolic (0-200 covers both)
+  const valueRange = config.yAxisRange;
+  const yOffset = config.yAxisOffset;
+
+  // Determine overall risk color and category based on both values
+  // Based on Blood_pressure_range_description.txt:
+  // Low: systolic < 90 AND diastolic < 60
+  // Ideal: systolic 90-120 AND diastolic 60-80
+  // Pre-high: systolic 120-140 OR diastolic 80-90
+  // High: systolic >= 140 OR diastolic >= 90
+  // This simplified function combines both color and category into one return value
+  function getCombinedRisk(systolic, diastolic) {
+    // High: systolic >= 140 OR diastolic >= 90
+    if (systolic >= 140 || diastolic >= 90) {
+      return {
+        name: 'High',
+        color: 'var(--chart-color-bp-high)'
+      };
+    }
+    
+    // Pre-high: systolic 120-140 OR diastolic 80-90 (but not already high)
+    if ((systolic >= 120 && systolic < 140) || (diastolic >= 80 && diastolic < 90)) {
+      return {
+        name: 'Pre-High',
+        color: 'var(--chart-color-bp-pre-high)'
+      };
+    }
+    
+    // Low: systolic < 90 AND diastolic < 60 (both must be low)
+    if (systolic < 90 && diastolic < 60) {
+      return {
+        name: 'Low',
+        color: 'var(--chart-color-bp-low)'
+      };
+    }
+    
+    // Ideal: systolic 90-120 AND diastolic 60-80 (default for remaining cases)
+    return {
+      name: 'Ideal',
+      color: 'var(--chart-color-bp-ideal)'
+    };
+  }
+
+  // Sort readings by date/time for proper line connection
+  const sortedReadings = [...readings].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA - dateB;
+  });
+
+  // Build path string for trend lines - simpler version using basic loops
+  function buildPath(points) {
+    if (points.length === 0) {
+      return '';
+    }
+    
+    let pathString = '';
+    for (let i = 0; i < points.length; i++) {
+      if (i === 0) {
+        // First point: use 'M' (move to)
+        pathString = pathString + 'M ' + points[i].x + ' ' + points[i].y;
+      } else {
+        // Other points: use 'L' (line to)
+        pathString = pathString + ' L ' + points[i].x + ' ' + points[i].y;
+      }
+    }
+    
+    return pathString;
+  }
+
+  // Calculate all point positions
+  const points = sortedReadings.map((reading) => {
+    const readingDate = new Date(reading.date);
+    const dayIndex = readingDate.getDay();
+    const x = getTimePosition(readingDate, dayIndex, config);
+    
+    const systolicValue = reading.systolic;
+    const diastolicValue = reading.diastolic;
+    
+    const systolicBarHeight = ((systolicValue - yOffset) / valueRange) * chartHeight;
+    const diastolicBarHeight = ((diastolicValue - yOffset) / valueRange) * chartHeight;
+    
+    const systolicY = config.height - config.padding.bottom - systolicBarHeight;
+    const diastolicY = config.height - config.padding.bottom - diastolicBarHeight;
+    
+    return {
+      x,
+      systolicY,
+      diastolicY,
+      reading,
+      readingDate,
+      systolicValue,
+      diastolicValue
+    };
+  });
+
+  // Build paths for both lines
+  const systolicPath = buildPath(points.map(p => ({ x: p.x, y: p.systolicY })));
+  const diastolicPath = buildPath(points.map(p => ({ x: p.x, y: p.diastolicY })));
 
   return (
     <g className="combined-data-bars">
-      {readings.map((reading, index) => {
-        const readingDate = new Date(reading.date);
-        const dayIndex = readingDate.getDay();
-        const x = getTimePosition(readingDate, dayIndex, config);
+      {/* Trend lines - draw before dots so dots appear on top */}
+      {systolicPath && points.length > 1 && (
+        <path
+          d={systolicPath}
+          fill="none"
+          stroke="#cccccc"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="systolic-trend-line"
+        />
+      )}
+      {diastolicPath && points.length > 1 && (
+        <path
+          d={diastolicPath}
+          fill="none"
+          stroke="#cccccc"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="diastolic-trend-line"
+        />
+      )}
+      
+      {/* Individual data points */}
+      {points.map((point, index) => {
+        const { reading, readingDate, x, systolicY, diastolicY, systolicValue, diastolicValue } = point;
         
-        // Calculate positions for both systolic and diastolic
-        const systolicValue = reading.systolic;
-        const diastolicValue = reading.diastolic;
-        
-        const systolicBarHeight = (systolicValue / systolicRange) * chartHeight;
-        const diastolicBarHeight = (diastolicValue / diastolicRange) * chartHeight;
-        
-        const systolicY = config.height - config.padding.bottom - systolicBarHeight;
-        const diastolicY = config.height - config.padding.bottom - diastolicBarHeight;
-        
-        // Determine overall risk color and category based on both values
-        const getCombinedRiskColor = (systolic, diastolic) => {
-          if (systolic >= 140 || diastolic >= 90) return 'var(--chart-color-bp-high)'; // High
-          if (systolic >= 120 || diastolic >= 80) return 'var(--chart-color-bp-pre-high)'; // Pre-high
-          if (systolic < 90 || diastolic < 60) return 'var(--chart-color-bp-low)'; // Low
-          return 'var(--chart-color-bp-ideal)'; // Ideal
-        };
-        
-        const getCombinedRiskCategory = (systolic, diastolic) => {
-          if (systolic >= 140 || diastolic >= 90) return { name: 'High', color: 'var(--chart-color-bp-high)' };
-          if (systolic >= 120 || diastolic >= 80) return { name: 'Pre-High', color: 'var(--chart-color-bp-pre-high)' };
-          if (systolic < 90 || diastolic < 60) return { name: 'Low', color: 'var(--chart-color-bp-low)' };
-          return { name: 'Ideal', color: 'var(--chart-color-bp-ideal)' };
-        };
-        
-        const riskColor = getCombinedRiskColor(systolicValue, diastolicValue);
-        const riskCategory = getCombinedRiskCategory(systolicValue, diastolicValue);
+        const risk = getCombinedRisk(systolicValue, diastolicValue);
+        const combinedRiskColor = risk.color;
+        const riskCategory = risk;
 
         const handleMouseEnter = (event) => {
           const tooltipData = {
@@ -466,35 +619,29 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
 
         return (
           <g key={index} className="bp-reading-group">
-            {/* I-Bar: Vertical line connecting systolic and diastolic */}
-            <line
-              x1={x}
-              y1={systolicY}
-              x2={x}
-              y2={diastolicY}
-              stroke={riskColor}
-              strokeWidth="3"
-              style={{ cursor: 'pointer' }}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            />
-            {/* Systolic point */}
+            {/* Systolic point - standardized styling */}
             <circle
               cx={x}
               cy={systolicY}
-              r="4"
-              fill={riskColor}
+              r="5"
+              fill={combinedRiskColor}
+              stroke="#cccccc"
+              strokeWidth="2"
               style={{ cursor: 'pointer' }}
+              className="systolic-dot"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             />
-            {/* Diastolic point */}
+            {/* Diastolic point - standardized styling */}
             <circle
               cx={x}
               cy={diastolicY}
-              r="4"
-              fill={riskColor}
+              r="5"
+              fill={combinedRiskColor}
+              stroke="#cccccc"
+              strokeWidth="2"
               style={{ cursor: 'pointer' }}
+              className="diastolic-dot"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             />
@@ -505,7 +652,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
   );
 };
 
-const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHover, onBarLeave }) => {
+const Chart = ({ type, weekData, isExpanded, weekDays, onBarHover, onBarLeave }) => {
   // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
@@ -573,8 +720,48 @@ const Chart = ({ type, weekData, isExpanded, weekDays, containerWidth, onBarHove
   );
 };
 
+// Combined Y-Axis Component for Combined Chart (single axis)
+const CombinedYAxis = ({ config }) => {
+  const chartHeight = config.height - config.padding.top - config.padding.bottom;
+  const yAxisLabels = config.yAxisLabels;
+  const valueRange = config.yAxisRange;
+  const yOffset = config.yAxisOffset;
+
+  return (
+    <g className="y-axis">
+      <text
+        x={config.padding.left / 3}
+        y={config.padding.top + chartHeight / 2}
+        fontSize={config.fontSize.yAxisTitle}
+        textAnchor="middle"
+        className="y-axis-title"
+        transform={`rotate(-90, ${config.padding.left / 3}, ${config.padding.top + chartHeight / 2})`}
+      >
+        Millimeters of mercury (mmHg)
+      </text>
+      {yAxisLabels.map(value => {
+        const y = config.height - config.padding.bottom - ((value - yOffset) / valueRange) * chartHeight;
+        return (
+          <g key={value} className="y-axis-grid-group">
+            <line className="chart-grid-line-horizontal" x1={config.padding.left} y1={y} x2={config.width - config.padding.right} y2={y} />
+            <text 
+              x={config.padding.left - 10} 
+              y={y + 3} 
+              fontSize={config.fontSize.yAxis} 
+              textAnchor="end" 
+              className="chart-tick-label"
+            >
+              {value}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
 // Combined Chart Component
-const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHover, onBarLeave }) => {
+const CombinedChart = ({ weekData, isExpanded, weekDays, onBarHover, onBarLeave }) => {
   // Inline configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
@@ -590,12 +777,9 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
           dateLabel: 22,
         },
         barWidth: 12,
-        yAxisRange: { systolic: 200, diastolic: 120 },
-        yAxisOffset: { systolic: 0, diastolic: 0 },
-        yAxisLabels: {
-          systolic: [0, 40, 80, 120, 160, 200],
-          diastolic: [0, 20, 40, 60, 80, 100, 120],
-        },
+        yAxisRange: 200,  // Single range for both systolic and diastolic
+        yAxisOffset: 0,
+        yAxisLabels: [0, 40, 80, 120, 160, 200],
         dayPadding: 10,
       }
     : {
@@ -611,16 +795,18 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
           dateLabel: 19,
         },
         barWidth: 8,
-        yAxisRange: { systolic: 200, diastolic: 120 },
-        yAxisOffset: { systolic: 0, diastolic: 0 },
-        yAxisLabels: {
-          systolic: [0, 100, 200],
-          diastolic: [0, 60, 120],
-        },
+        yAxisRange: 200,  // Single range for both systolic and diastolic
+        yAxisOffset: 0,
+        yAxisLabels: [0, 50, 100, 150, 200],
         dayPadding: 6,
       };
   
-  const readings = weekData.filter(d => d.systolic && d.diastolic && d.systolic > 0 && d.diastolic > 0);
+  // Filter readings and validate that systolic > diastolic (medically required)
+  const readings = weekData.filter(d => 
+    d.systolic && d.diastolic && 
+    d.systolic > 0 && d.diastolic > 0 &&
+    d.systolic > d.diastolic  // Ensure systolic is always greater than diastolic
+  );
 
   return (
     <div className={`chart-section combined-chart ${isExpanded ? 'expanded' : ''}`}>
@@ -633,30 +819,16 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, containerWidth, onBarHo
           className="chart-svg"
         >
           {/* Blood pressure range background */}
-          <BPRangeBackground config={config} />
+          <BPRangeBackground config={config} isCombined={true} />
           <GridLines config={config} weekDays={weekDays} />
-          {/* Dual Y-axis for both systolic and diastolic */}
-          <DualYAxis config={config} />
+          {/* Single Y-axis for combined chart */}
+          <CombinedYAxis config={config} />
           <XAxis config={config} weekDays={weekDays} />
           <CombinedDataBars readings={readings} config={config} onBarHover={onBarHover} onBarLeave={onBarLeave} />
         </svg>
       </div>
     </div>
   );
-};
-
-const getSystolicColor = (value) => {
-  if (value < 90) return 'var(--chart-color-bp-low)';
-  if (value < 120) return 'var(--chart-color-bp-ideal)';
-  if (value < 140) return 'var(--chart-color-bp-pre-high)';
-  return 'var(--chart-color-bp-high)';
-};
-
-const getDiastolicColor = (value) => {
-  if (value < 60) return 'var(--chart-color-bp-low)';
-  if (value < 80) return 'var(--chart-color-bp-ideal)';
-  if (value < 90) return 'var(--chart-color-bp-pre-high)';
-  return 'var(--chart-color-bp-high)';
 };
 
 const bloodPressureLegendItems = [
@@ -671,9 +843,7 @@ const bloodPressureLegendItems = [
 // --- Main Component ---
 const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const { bloodPressureData, loading, error } = usePatientData(patientId);
-  const [containerWidth, setContainerWidth] = useState(400);
   const [tooltipData, setTooltipData] = useState(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   // For Patient access, force Combined View (remove Separate Charts access).
   // For Physician access, force Combined View (remove Separate Charts access).
   // Admin can toggle between both.
@@ -686,33 +856,14 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
   }
   
   const [useCombinedView, setUseCombinedView] = useState(initialUseCombinedView); // State for view toggle
+  
+  // Enforce combined view for Patient and Physician - override state if needed
+  const effectiveUseCombinedView = shouldForceCombinedView ? true : useCombinedView;
   const containerRef = useRef(null);
 
   // Use navigation from parent or fallback to internal navigation
   const internalNavigation = useChartNavigation('bloodPressure');
   const nav = navigation || internalNavigation;
-
-
-
-  // Resize observer to track container width changes
-  useLayoutEffect(() => {
-    const observeContainer = () => {
-      if (containerRef.current) {
-        const resizeObserver = new ResizeObserver(entries => {
-          for (let entry of entries) {
-            const { width } = entry.contentRect;
-            setContainerWidth(width);
-          }
-        });
-
-        resizeObserver.observe(containerRef.current);
-        return () => resizeObserver.disconnect();
-      }
-    };
-
-    const cleanup = observeContainer();
-    return cleanup;
-  }, []);
 
   const { start: weekStart, end: weekEnd } = nav.getDateRange();
 
@@ -739,87 +890,99 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
 
   const handleBarHover = (data) => {
     setTooltipData(data);
-    setTooltipPosition(data.position);
   };
 
   const handleBarLeave = () => {
     setTooltipData(null);
   };
 
-  // Calculate summary statistics for week and 3-month periods
-  // This calculates average, max, risk categories, and reading counts
-  let weekSummary = null;
-  if (weekData.length > 0) {
-    // Get all valid readings (where both systolic and diastolic are > 0)
-    const systolicReadings = weekData.filter(d => d.systolic && d.systolic > 0).map(d => d.systolic);
-    const diastolicReadings = weekData.filter(d => d.diastolic && d.diastolic > 0).map(d => d.diastolic);
+  // Helper function to calculate blood pressure summary statistics
+  // This function calculates average, max, risk categories, and reading counts for any data period
+  function calculateBPSummary(data) {
+    if (!data || data.length === 0) {
+      return null;
+    }
 
-    // Calculate averages (sum all values, divide by count, round to whole number)
+    // Get all valid readings (where both systolic and diastolic are > 0)
+    const systolicReadings = [];
+    const diastolicReadings = [];
+    
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].systolic && data[i].systolic > 0) {
+        systolicReadings.push(data[i].systolic);
+      }
+      if (data[i].diastolic && data[i].diastolic > 0) {
+        diastolicReadings.push(data[i].diastolic);
+      }
+    }
+
+    // Calculate averages
+    let systolicSum = 0;
+    for (let i = 0; i < systolicReadings.length; i++) {
+      systolicSum = systolicSum + systolicReadings[i];
+    }
     const avgSystolic = systolicReadings.length > 0 ? 
-      (systolicReadings.reduce((sum, val) => sum + val, 0) / systolicReadings.length).toFixed(0) : 0;
+      (systolicSum / systolicReadings.length).toFixed(0) : 0;
+    
+    let diastolicSum = 0;
+    for (let i = 0; i < diastolicReadings.length; i++) {
+      diastolicSum = diastolicSum + diastolicReadings[i];
+    }
     const avgDiastolic = diastolicReadings.length > 0 ? 
-      (diastolicReadings.reduce((sum, val) => sum + val, 0) / diastolicReadings.length).toFixed(0) : 0;
+      (diastolicSum / diastolicReadings.length).toFixed(0) : 0;
 
     // Find maximum values
-    const maxSystolic = systolicReadings.length > 0 ? Math.max(...systolicReadings) : 0;
-    const maxDiastolic = diastolicReadings.length > 0 ? Math.max(...diastolicReadings) : 0;
+    let maxSystolic = 0;
+    for (let i = 0; i < systolicReadings.length; i++) {
+      if (systolicReadings[i] > maxSystolic) {
+        maxSystolic = systolicReadings[i];
+      }
+    }
+    
+    let maxDiastolic = 0;
+    for (let i = 0; i < diastolicReadings.length; i++) {
+      if (diastolicReadings[i] > maxDiastolic) {
+        maxDiastolic = diastolicReadings[i];
+      }
+    }
 
     // Determine risk category based on average values
-    const getRiskCategory = (systolic, diastolic) => {
-      if (systolic >= 135 || diastolic >= 85) return 'High Risk';
-      if (systolic >= 121 || diastolic >= 80) return 'Medium Risk';
-      return 'Low Risk';
-    };
-
-    const avgRisk = getRiskCategory(parseFloat(avgSystolic), parseFloat(avgDiastolic));
+    const systolic = parseFloat(avgSystolic);
+    const diastolic = parseFloat(avgDiastolic);
+    let avgRisk;
+    
+    if (systolic >= 135 || diastolic >= 85) {
+      avgRisk = 'High Risk';
+    } else if (systolic >= 121 || diastolic >= 80) {
+      avgRisk = 'Medium Risk';
+    } else {
+      avgRisk = 'Low Risk';
+    }
     
     // Count unique days with readings
-    const daysWithReadings = new Set(weekData.map(d => d.date.toDateString())).size;
+    const daysSet = new Set();
+    for (let i = 0; i < data.length; i++) {
+      const dateString = data[i].date.toDateString();
+      daysSet.add(dateString);
+    }
+    const daysWithReadings = daysSet.size;
 
-    weekSummary = {
+    return {
       avgSystolic,
       avgDiastolic,
       maxSystolic,
       maxDiastolic,
       avgRisk,
       daysWithReadings,
-      totalReadings: weekData.length
+      totalReadings: data.length
     };
   }
 
-  // Calculate 3-month summary (same logic as week summary, just different data)
-  let threeMonthSummary = null;
-  if (threeMonthData.length > 0) {
-    const systolicReadings = threeMonthData.filter(d => d.systolic && d.systolic > 0).map(d => d.systolic);
-    const diastolicReadings = threeMonthData.filter(d => d.diastolic && d.diastolic > 0).map(d => d.diastolic);
+  // Calculate summary statistics for week period
+  const weekSummary = calculateBPSummary(weekData);
 
-    const avgSystolic = systolicReadings.length > 0 ? 
-      (systolicReadings.reduce((sum, val) => sum + val, 0) / systolicReadings.length).toFixed(0) : 0;
-    const avgDiastolic = diastolicReadings.length > 0 ? 
-      (diastolicReadings.reduce((sum, val) => sum + val, 0) / diastolicReadings.length).toFixed(0) : 0;
-
-    const maxSystolic = systolicReadings.length > 0 ? Math.max(...systolicReadings) : 0;
-    const maxDiastolic = diastolicReadings.length > 0 ? Math.max(...diastolicReadings) : 0;
-
-    const getRiskCategory = (systolic, diastolic) => {
-      if (systolic >= 135 || diastolic >= 85) return 'High Risk';
-      if (systolic >= 121 || diastolic >= 80) return 'Medium Risk';
-      return 'Low Risk';
-    };
-
-    const avgRisk = getRiskCategory(parseFloat(avgSystolic), parseFloat(avgDiastolic));
-    const daysWithReadings = new Set(threeMonthData.map(d => d.date.toDateString())).size;
-
-    threeMonthSummary = {
-      avgSystolic,
-      avgDiastolic,
-      maxSystolic,
-      maxDiastolic,
-      avgRisk,
-      daysWithReadings,
-      totalReadings: threeMonthData.length
-    };
-  }
+  // Calculate 3-month summary using the same helper function
+  const threeMonthSummary = calculateBPSummary(threeMonthData);
 
   return (
     <>
@@ -832,13 +995,13 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
           {accessType === 'Admin' && (
             <div className="view-toggle">
               <button 
-                className={`toggle-btn ${!useCombinedView ? 'active' : ''}`}
+                className={`toggle-btn ${!effectiveUseCombinedView ? 'active' : ''}`}
                 onClick={() => setUseCombinedView(false)}
               >
                 Separate Charts
               </button>
               <button 
-                className={`toggle-btn ${useCombinedView ? 'active' : ''}`}
+                className={`toggle-btn ${effectiveUseCombinedView ? 'active' : ''}`}
                 onClick={() => setUseCombinedView(true)}
               >
                 Combined View
@@ -848,12 +1011,11 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
         </div>
         
         <div className="bp-charts-wrapper">
-          {useCombinedView ? (
+          {effectiveUseCombinedView ? (
             <CombinedChart 
               weekData={weekData} 
               isExpanded={isExpanded} 
               weekDays={weekDays} 
-              containerWidth={containerWidth}
               onBarHover={handleBarHover}
               onBarLeave={handleBarLeave}
             />
@@ -864,7 +1026,6 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
                 weekData={weekData} 
                 isExpanded={isExpanded} 
                 weekDays={weekDays} 
-                containerWidth={containerWidth}
                 onBarHover={handleBarHover}
                 onBarLeave={handleBarLeave}
               />
@@ -873,7 +1034,6 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
                 weekData={weekData} 
                 isExpanded={isExpanded} 
                 weekDays={weekDays} 
-                containerWidth={containerWidth}
                 onBarHover={handleBarHover}
                 onBarLeave={handleBarLeave}
               />
@@ -890,7 +1050,7 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
             {accessType !== 'Physician' && (
               <InfoBox 
                 title="Blood Pressure Information" 
-                content="Blood pressure is measured by two numbers: systolic and diastolic. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg. Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80 mmHg. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher (Blood Pressure UK)."
+                content="Blood pressure readings include a measurement of both systolic and diastolic blood pressure measured in millimeters of mercury (mmHg). Ideal blood pressure is a systolic reading between 90 and 120 mmHg and a diastolic reading between 60 and 80. High blood pressure is a systolic reading of 140 mmHg or higher or a diastolic reading of 90 mmHg or higher. Pre-high blood pressure is a systolic reading between 120 and 140 mmHg or a diastolic reading between 80 and 90 mmHg. Low blood pressure is a systolic reading below 90 mmHg and a diastolic reading below 60 mmHg (Blood Pressure UK)."
               />
             )}
             {/* Always show summaries for physician/unified view */}
@@ -985,7 +1145,7 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
             <div className="tooltip-date">{tooltipData.date}</div>
           </div>
         )}
-        position={tooltipPosition}
+        position={tooltipData ? tooltipData.position : { x: 0, y: 0 }}
       />
     </>
   );

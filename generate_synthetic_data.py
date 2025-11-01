@@ -508,8 +508,18 @@ def generate_blood_pressure_readings(has_condition):
     for i in range(4):
         if i < num_readings:
             # Generate blood pressure using normal distribution
+            # Systolic must always be higher than diastolic (medically required)
             systolic = int(random.normalvariate(130, 15))
+            
+            # Generate diastolic, ensuring it's at least 10 mmHg below systolic
+            max_diastolic = systolic - 10
             diastolic = int(random.normalvariate(85, 10))
+            diastolic = min(diastolic, max_diastolic)
+            
+            # Final validation: ensure systolic > diastolic (should always be true, but safety check)
+            if diastolic >= systolic:
+                diastolic = max(40, systolic - 10)
+            
             systolic_type, diastolic_type = get_bp_type(systolic, diastolic)
         else:
             systolic = 0

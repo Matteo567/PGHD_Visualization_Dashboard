@@ -138,10 +138,9 @@
   font-size: var(--chart-font-size-xl);
   font-weight: var(--chart-font-weight);
   color: var(--chart-color-text-primary);
-  margin: 0 0 var(--chart-spacing-md) 0;
+  margin: 0 0 var(--chart-spacing-xs) 0;
   text-align: center;
-  padding: var(--chart-spacing-sm) 0;
-  border-bottom: 1px solid var(--chart-color-border);
+  padding: 0;
 }
 
 .chart-svg {
@@ -259,7 +258,7 @@
   font-weight: var(--chart-font-weight);
   color: var(--chart-color-text-primary);
   text-align: center;
-  margin: 0 0 var(--chart-spacing-sm) 0;
+  margin: 0 0 var(--chart-spacing-xs) 0;
 }
 
 /* --- Summary Statistics Styles --- */
@@ -1061,7 +1060,7 @@
 }
 
 .visualization-wrapper.expanded .chart-subtitle {
-  margin-bottom: var(--chart-spacing-sm); /* Reduced margin */
+  margin-bottom: var(--chart-spacing-xs); /* Reduced margin */
 }
 
 /* Optimize pain list spacing in expanded mode */
@@ -1079,11 +1078,7 @@
 }
 
 /* Additional improvements for pain visualization */
-.pain-list-item:hover {
-  background: var(--chart-color-background-hover, #f0f0f0);
-  border-color: var(--chart-color-primary);
-  transition: all 0.2s ease-in-out;
-}
+/* Hover effects removed - no background change or border color change on hover */
 
 .pain-item-details .pain-level,
 .pain-item-details .pain-location {

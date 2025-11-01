@@ -51,7 +51,6 @@ const usePatientData = (patientId) => {
     data,
     loading,
     error,
-    patientInfo: data?.patientInfo || null,
     glucoseData: data?.glucoseData || [],
     bloodPressureData: data?.bloodPressureData || [],
     exerciseData: data?.exerciseData || [],

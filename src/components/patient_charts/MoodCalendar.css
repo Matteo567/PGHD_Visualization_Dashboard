@@ -92,12 +92,12 @@
 
 /* Optimize calendar title spacing in expanded mode */
 .visualization-wrapper.expanded .mood-calendar-svg-container .chart-title {
-  margin-bottom: var(--chart-spacing-sm); /* Reduce margin below title */
+  margin-bottom: var(--chart-spacing-xs); /* Reduce margin below title */
   font-size: var(--chart-font-size-xl); /* Ensure consistent title size */
 }
 
 .visualization-wrapper.expanded .mood-calendar-svg-container .chart-subtitle {
-  margin-bottom: var(--chart-spacing-md); /* Reduce margin below subtitle */
+  margin-bottom: var(--chart-spacing-xs); /* Reduce margin below subtitle */
   font-size: var(--chart-font-size-lg); /* Ensure consistent subtitle size */
 }
 

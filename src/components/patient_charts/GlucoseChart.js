@@ -259,7 +259,6 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
   ];
   const { glucoseData, loading, error } = usePatientData(patientId);
   const [tooltipData, setTooltipData] = useState(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
   // Use navigation from parent or fallback to internal navigation
@@ -275,42 +274,87 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = glucoseData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
-  // Calculate summary statistics for week period
-  // This calculates averages, range percentages, and reading counts
-  let weekSummary = null;
-  if (weekData.length > 0) {
+  // Helper function to calculate glucose summary statistics
+  // This function calculates averages, range percentages, and reading counts for any data period
+  function calculateGlucoseSummary(data) {
+    if (!data || data.length === 0) {
+      return null;
+    }
+
     // Filter to get only valid readings (value > 0)
-    const readings = weekData.filter(d => d.value && d.value > 0);
+    const readings = [];
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].value && data[i].value > 0) {
+        readings.push(data[i]);
+      }
+    }
     
+    if (readings.length === 0) {
+      return null;
+    }
+
     // Separate readings by meal timing (pre-meal vs post-meal)
-    const preMealReadings = readings.filter(d => d.measurementType === 'Pre meal');
-    const postMealReadings = readings.filter(d => d.measurementType === 'Post meal');
+    const preMealReadings = [];
+    const postMealReadings = [];
+    
+    for (let i = 0; i < readings.length; i++) {
+      if (readings[i].measurementType === 'Pre meal') {
+        preMealReadings.push(readings[i]);
+      } else if (readings[i].measurementType === 'Post meal') {
+        postMealReadings.push(readings[i]);
+      }
+    }
 
     // Calculate average glucose: sum all values, divide by count, round to 1 decimal
-    const avgGlucose = readings.length > 0 ? 
-      (readings.reduce((sum, val) => sum + val.value, 0) / readings.length).toFixed(1) : 0;
+    let sum = 0;
+    for (let i = 0; i < readings.length; i++) {
+      sum = sum + readings[i].value;
+    }
+    const avgGlucose = (sum / readings.length).toFixed(1);
     
     // Calculate average for pre-meal readings only
-    const avgPreMeal = preMealReadings.length > 0 ? 
-      (preMealReadings.reduce((sum, val) => sum + val.value, 0) / preMealReadings.length).toFixed(1) : 0;
+    let preMealSum = 0;
+    for (let i = 0; i < preMealReadings.length; i++) {
+      preMealSum = preMealSum + preMealReadings[i].value;
+    }
+    const avgPreMeal = preMealReadings.length > 0 ? (preMealSum / preMealReadings.length).toFixed(1) : 0;
     
     // Calculate average for post-meal readings only
-    const avgPostMeal = postMealReadings.length > 0 ? 
-      (postMealReadings.reduce((sum, val) => sum + val.value, 0) / postMealReadings.length).toFixed(1) : 0;
+    let postMealSum = 0;
+    for (let i = 0; i < postMealReadings.length; i++) {
+      postMealSum = postMealSum + postMealReadings[i].value;
+    }
+    const avgPostMeal = postMealReadings.length > 0 ? (postMealSum / postMealReadings.length).toFixed(1) : 0;
 
     // Count readings in each range category
-    const highReadings = readings.filter(d => d.range.toLowerCase() === 'above range').length;
-    const lowReadings = readings.filter(d => d.range.toLowerCase() === 'below range').length;
-    const inRangeReadings = readings.filter(d => d.range.toLowerCase() === 'in range').length;
+    let highReadings = 0;
+    let lowReadings = 0;
+    let inRangeReadings = 0;
+    
+    for (let i = 0; i < readings.length; i++) {
+      const range = readings[i].range.toLowerCase();
+      if (range === 'above range') {
+        highReadings = highReadings + 1;
+      } else if (range === 'below range') {
+        lowReadings = lowReadings + 1;
+      } else if (range === 'in range') {
+        inRangeReadings = inRangeReadings + 1;
+      }
+    }
 
     // Calculate what percentage of readings were in the target range
     const rangePercentage = readings.length > 0 ? 
       ((inRangeReadings / readings.length) * 100).toFixed(0) : 0;
 
     // Count unique days that had readings
-    const daysWithReadings = new Set(weekData.map(d => d.date.toDateString())).size;
+    const daysSet = new Set();
+    for (let i = 0; i < data.length; i++) {
+      const dateString = data[i].date.toDateString();
+      daysSet.add(dateString);
+    }
+    const daysWithReadings = daysSet.size;
 
-    weekSummary = {
+    return {
       avgGlucose,
       avgPreMeal,
       avgPostMeal,
@@ -323,48 +367,15 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
     };
   }
 
-  // Calculate 3-month summary (same logic as week summary, just different data)
-  let threeMonthSummary = null;
-  if (threeMonthData.length > 0) {
-    const readings = threeMonthData.filter(d => d.value && d.value > 0);
-    const preMealReadings = readings.filter(d => d.measurementType === 'Pre meal');
-    const postMealReadings = readings.filter(d => d.measurementType === 'Post meal');
+  // Calculate summary statistics for week period
+  const weekSummary = calculateGlucoseSummary(weekData);
 
-    const avgGlucose = readings.length > 0 ? 
-      (readings.reduce((sum, val) => sum + val.value, 0) / readings.length).toFixed(1) : 0;
-    
-    const avgPreMeal = preMealReadings.length > 0 ? 
-      (preMealReadings.reduce((sum, val) => sum + val.value, 0) / preMealReadings.length).toFixed(1) : 0;
-    
-    const avgPostMeal = postMealReadings.length > 0 ? 
-      (postMealReadings.reduce((sum, val) => sum + val.value, 0) / postMealReadings.length).toFixed(1) : 0;
-
-    const highReadings = readings.filter(d => d.range.toLowerCase() === 'above range').length;
-    const lowReadings = readings.filter(d => d.range.toLowerCase() === 'below range').length;
-    const inRangeReadings = readings.filter(d => d.range.toLowerCase() === 'in range').length;
-
-    const rangePercentage = readings.length > 0 ? 
-      ((inRangeReadings / readings.length) * 100).toFixed(0) : 0;
-
-    const daysWithReadings = new Set(threeMonthData.map(d => d.date.toDateString())).size;
-
-    threeMonthSummary = {
-      avgGlucose,
-      avgPreMeal,
-      avgPostMeal,
-      highReadings,
-      lowReadings,
-      inRangeReadings,
-      rangePercentage,
-      daysWithReadings,
-      totalReadings: readings.length
-    };
-  }
+  // Calculate 3-month summary using the same helper function
+  const threeMonthSummary = calculateGlucoseSummary(threeMonthData);
 
 
   const handleBarHover = (data) => {
     setTooltipData(data);
-    setTooltipPosition(data.position);
   };
 
   const handleBarLeave = () => {
@@ -490,7 +501,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
             <div className="tooltip-date">{tooltipData.date}</div>
           </div>
         )}
-        position={tooltipPosition}
+        position={tooltipData ? tooltipData.position : { x: 0, y: 0 }}
       />
     </>
   );

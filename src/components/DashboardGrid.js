@@ -23,7 +23,9 @@ const DashboardGrid = ({
   // Navigation props
   chartNavigation = {},
   // Screenshot mode
-  screenshotMode = false
+  screenshotMode = false,
+  // Condensed view mode
+  condensedView = false
 }) => {
   // Configuration for view mode (only 'unified' is currently used)
   const gridConfig = {
@@ -70,6 +72,7 @@ const DashboardGrid = ({
         onNext={navigation?.goToNext}
         navigationLabel={navigation?.navigationLabel || 'Week'}
         screenshotMode={screenshotMode}
+        condensedView={condensedView}
       />
     );
   }
@@ -104,7 +107,8 @@ const DashboardGrid = ({
           onPrev: navigation?.goToPrevious,
           onNext: navigation?.goToNext,
           navigationLabel: navigation?.navigationLabel || 'Week',
-          screenshotMode: screenshotMode
+          screenshotMode: screenshotMode,
+          condensedView: condensedView
         };
 
         return <VisualizationWrapper {...wrapperProps} />;

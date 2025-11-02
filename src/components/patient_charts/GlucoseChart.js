@@ -312,6 +312,15 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
     }
     const avgGlucose = (sum / readings.length).toFixed(1);
     
+    // Find maximum glucose value (peak glucose)
+    let maxGlucose = 0;
+    for (let i = 0; i < readings.length; i++) {
+      if (readings[i].value > maxGlucose) {
+        maxGlucose = readings[i].value;
+      }
+    }
+    const peakGlucose = maxGlucose.toFixed(1);
+    
     // Calculate average for pre-meal readings only
     let preMealSum = 0;
     for (let i = 0; i < preMealReadings.length; i++) {
@@ -356,6 +365,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
 
     return {
       avgGlucose,
+      peakGlucose,
       avgPreMeal,
       avgPostMeal,
       highReadings,
@@ -396,7 +406,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
         />
         </div>
         <div className="glucose-legends-wrapper">
-          <Legend title="Health Range" items={healthRangeLegendItems} hide={screenshotMode} />
+          <Legend title="Blood Glucose Range" items={healthRangeLegendItems} hide={screenshotMode} />
           <Legend title="Prandial State" items={mealTimeLegendItems} hide={screenshotMode} />
         </div>
         
@@ -416,28 +426,33 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
                 <h4>Week Summary</h4>
                 <div className="summary-stats">
                   <div className="stat-item">
-                    <span className="stat-label">Average Glucose:</span>
+                    <span className="stat-label">Average Blood Glucose:</span>
                     <span className="stat-value">
                       {weekSummary.avgGlucose} mmol/L
                     </span>
                   </div>
-
                   <div className="stat-item">
-                    <span className="stat-label">Readings In Range:</span>
+                    <span className="stat-label">Peak Blood Glucose:</span>
                     <span className="stat-value">
-                      {weekSummary.rangePercentage}% ({weekSummary.inRangeReadings}/{weekSummary.totalReadings})
-                    </span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">High/Low Readings:</span>
-                    <span className="stat-value">
-                      {weekSummary.highReadings} high, {weekSummary.lowReadings} low
+                      {weekSummary.peakGlucose} mmol/L
                     </span>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Reading Days:</span>
                     <span className="stat-value">
                       {weekSummary.daysWithReadings}/7 days
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Total Readings in Range:</span>
+                    <span className="stat-value">
+                      {weekSummary.inRangeReadings}
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Total Readings:</span>
+                    <span className="stat-value">
+                      {weekSummary.totalReadings}
                     </span>
                   </div>
                 </div>
@@ -448,28 +463,33 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
                   <h4>3-Month Summary</h4>
                   <div className="summary-stats">
                     <div className="stat-item">
-                      <span className="stat-label">Average Glucose:</span>
+                      <span className="stat-label">Average Blood Glucose:</span>
                       <span className="stat-value">
                         {threeMonthSummary.avgGlucose} mmol/L
                       </span>
                     </div>
-
                     <div className="stat-item">
-                      <span className="stat-label">Readings In Range:</span>
+                      <span className="stat-label">Peak Blood Glucose:</span>
                       <span className="stat-value">
-                        {threeMonthSummary.rangePercentage}% ({threeMonthSummary.inRangeReadings}/{threeMonthSummary.totalReadings})
-                      </span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">High/Low Readings:</span>
-                      <span className="stat-value">
-                        {threeMonthSummary.highReadings} high, {threeMonthSummary.lowReadings} low
+                        {threeMonthSummary.peakGlucose} mmol/L
                       </span>
                     </div>
                     <div className="stat-item">
                       <span className="stat-label">Reading Days:</span>
                       <span className="stat-value">
                         {threeMonthSummary.daysWithReadings} days
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Total Readings in Range:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.inRangeReadings}
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Total Readings:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.totalReadings}
                       </span>
                     </div>
                   </div>

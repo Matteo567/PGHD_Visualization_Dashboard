@@ -4,7 +4,7 @@
  This component provides sleep tracking with sleep duration and quality rating visualization. It includes weekly sleep pattern analysis with color-coded sleep quality indicators. It provides interactive tooltips with sleep details and includes navigation controls for time periods. It integrates with patient data and chart navigation. The component uses custom SVG for bar chart visualization and implements a sleep quality categorization system. It provides color-coded quality indicators for interpretation and supports expandable views. It implements time-based navigation and data filtering. Visualization features include a bar chart showing daily sleep duration, color-coded quality indicators for Very good, Fairly good, Fairly bad, and Very bad sleep quality, interactive tooltips with detailed sleep information, design that adapts to container size, and dynamic Y-axis scaling based on sleep duration range. Sleep quality categories include Very good for optimal sleep quality, Fairly good for good sleep quality, Fairly bad for poor sleep quality, and Very bad for very poor sleep quality. Clinical features include sleep duration tracking with recommended ranges, quality assessment based on subjective ratings, sleep consistency analysis, summary statistics for physician view, and trend analysis over time periods. Component structure includes a main SVG container with sizing for the chart container, duration scale with hour-based labeling on the Y-axis, day-of-week labels with date information on the X-axis, sleep duration bars with quality color coding for data bars, sleep quality explanations in the legend, and detailed sleep information on hover in tooltips. This component is used for sleep hygiene monitoring and sleep disorder assessment.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
@@ -139,15 +139,28 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
     const hourVariations = weekData.map(day => Math.abs(day.hours - parseFloat(avgHours)));
     const avgVariation = (hourVariations.reduce((sum, v) => sum + v, 0) / hourVariations.length).toFixed(1);
 
-    // Sleep quality score (Very good=4, Fairly good=3, Fairly bad=2, Very bad=1)
+    // Calculate average quality score using existing qualityCode from CSV data (0-3, where 0=Very good, 3=Very bad)
+    // Fallback to quality string mapping if qualityCode is not available
     const qualityScores = {
-      'Very good': 4,
-      'Fairly good': 3,
+      'Very good': 0,
+      'Fairly good': 1,
       'Fairly bad': 2,
-      'Very bad': 1
+      'Very bad': 3
     };
-    const avgQualityScore = weekData.reduce((sum, day) => sum + (qualityScores[day.quality] || 0), 0) / weekData.length;
-    const qualityAssessment = avgQualityScore >= 3.5 ? 'Good' : avgQualityScore >= 2.5 ? 'Fair' : 'Poor';
+    const avgQualityScore = weekData.reduce((sum, day) => {
+      const code = day.qualityCode !== undefined ? day.qualityCode : (qualityScores[day.quality] || 0);
+      return sum + code;
+    }, 0) / weekData.length;
+    const qualityAssessment = avgQualityScore <= 0.5 ? 'Good' : avgQualityScore <= 1.5 ? 'Fair' : 'Poor';
+    
+    // Map average score back to quality category (round to nearest) - lower scores are better
+    const getQualityFromScore = (score) => {
+      if (score <= 0.5) return 'Very good';
+      if (score <= 1.5) return 'Fairly good';
+      if (score <= 2.5) return 'Fairly bad';
+      return 'Very bad';
+    };
+    const averageQuality = getQualityFromScore(avgQualityScore);
 
     // Count nights with adequate sleep (7+ hours)
     const adequateSleepNights = weekData.filter(day => day.hours >= 7).length;
@@ -160,7 +173,9 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
       avgVariation,
       qualityAssessment,
       adequateSleepNights,
-      daysTracked: weekData.length
+      daysTracked: weekData.length,
+      avgQualityScore: avgQualityScore.toFixed(2),
+      averageQuality
     };
   }
 
@@ -191,13 +206,37 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
     const hourVariations = threeMonthData.map(day => Math.abs(day.hours - parseFloat(avgHours)));
     const avgVariation = (hourVariations.reduce((sum, v) => sum + v, 0) / hourVariations.length).toFixed(1);
 
+    // Calculate average quality score using existing qualityCode from CSV data (0-3, where 0=Very good, 3=Very bad)
+    // Fallback to quality string mapping if qualityCode is not available
+    const qualityScores = {
+      'Very good': 0,
+      'Fairly good': 1,
+      'Fairly bad': 2,
+      'Very bad': 3
+    };
+    const avgQualityScore = threeMonthData.reduce((sum, day) => {
+      const code = day.qualityCode !== undefined ? day.qualityCode : (qualityScores[day.quality] || 0);
+      return sum + code;
+    }, 0) / threeMonthData.length;
+    
+    // Map average score back to quality category (round to nearest) - lower scores are better
+    const getQualityFromScore = (score) => {
+      if (score <= 0.5) return 'Very good';
+      if (score <= 1.5) return 'Fairly good';
+      if (score <= 2.5) return 'Fairly bad';
+      return 'Very bad';
+    };
+    const averageQuality = getQualityFromScore(avgQualityScore);
+
     threeMonthSummary = {
       totalHours: totalHours.toFixed(1),
       avgHours,
       mostCommonQuality: mostCommonQuality[0],
       mostCommonQualityCount: mostCommonQuality[1],
       avgVariation,
-      daysTracked: threeMonthData.length
+      daysTracked: threeMonthData.length,
+      avgQualityScore: avgQualityScore.toFixed(2),
+      averageQuality
     };
   }
 
@@ -443,9 +482,9 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
                 </div>
 
                 <div className="stat-item">
-                  <span className="stat-label">Common Quality:</span>
+                  <span className="stat-label">Average Quality:</span>
                   <span className="stat-value">
-                    {weekSummary.mostCommonQuality} ({weekSummary.mostCommonQualityCount}x)
+                    {weekSummary.averageQuality}
                   </span>
                 </div>
 
@@ -476,9 +515,9 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
                   </div>
 
                   <div className="stat-item">
-                    <span className="stat-label">Common Quality:</span>
+                    <span className="stat-label">Average Quality:</span>
                     <span className="stat-value">
-                      {threeMonthSummary.mostCommonQuality} ({threeMonthSummary.mostCommonQualityCount}x)
+                      {threeMonthSummary.averageQuality}
                     </span>
                   </div>
 

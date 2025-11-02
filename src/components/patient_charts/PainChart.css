@@ -132,6 +132,13 @@
   color: #000000;
 }
 
+.pain-level-number {
+  display: inline-block;
+  background-color: #e0e0e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 .pain-item-body {
   margin-left: var(--chart-spacing-md);
   flex-shrink: 0;

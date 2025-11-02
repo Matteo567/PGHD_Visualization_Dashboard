@@ -4,7 +4,7 @@
  This component provides mood monitoring with daily mood tracking in calendar format. It uses color-coded mood states including happy, sad, and angry. It includes monthly navigation and trend analysis with an interactive calendar layout. It integrates with patient data and navigation. This component is used for mental health monitoring and emotional well-being tracking.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';

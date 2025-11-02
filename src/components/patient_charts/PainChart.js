@@ -4,7 +4,7 @@
  This component provides pain monitoring with anatomical body mapping for pain location. It includes a pain intensity scale from 0 to 10 with color coding and provides daily pain tracking and trend analysis. It includes an interactive body diagram for pain location selection and supports pain level input and editing capabilities. It includes navigation controls for time periods. This component is used for pain management and treatment monitoring.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import usePatientData from '../../hooks/usePatientData';
 import useChartNavigation from '../../hooks/useChartNavigation';
 
@@ -492,7 +492,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
                       </div>
                       <div className="pain-item-details">
                         <div className="pain-level">
-                          Pain Level: <span style={{ color: getPainColor(item.level) }}>
+                          Pain Level: <span className="pain-level-number" style={{ color: getPainColor(item.level) }}>
                             {item.level}/10
                           </span>
                         </div>

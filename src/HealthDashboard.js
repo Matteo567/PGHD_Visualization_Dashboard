@@ -4,7 +4,7 @@
  This component provides a unified health dashboard designed for use by both patients and healthcare providers. It displays patient information with QR code access and shows week summaries for health tracking. It includes a toggle for 3-month summaries for long-term trend analysis. Exercise visualization includes both activity breakdown and weekly goals. The component uses custom hooks for data management, visualization handling, and navigation. It implements expandable chart views and provides educational information for patients. It handles loading and error states and includes summary statistics for health monitoring. The component displays patient demographics and medication information through PatientInfoCard. The QR code section provides access to the patient dashboard. The summary toggle controls visibility of 3-month summaries. DashboardGrid renders the chart grid with navigation and expansion controls. Individual chart components handle each health metric. State management uses custom hooks for centralized state, handles chart expansion state, manages navigation state for each chart type independently, and controls summary visibility with toggle state.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import usePatientData from './hooks/usePatientData';
 import useVisualizations from './hooks/useVisualizations';
 import useChartNavigation from './hooks/useChartNavigation';
@@ -16,6 +16,7 @@ import Placeholder from './components/ui/Placeholder';
 import './HealthDashboard.css';
 
 const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = false }) => {
+  const [condensedView, setCondensedView] = useState(false);
   const { data, loading, error } = usePatientData(patientId);
   const { 
     allVisualizations, 
@@ -86,7 +87,7 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
 
   return (
     <div className="health-dashboard">
-      {!screenshotMode && (
+      {!screenshotMode && !condensedView && (
         <div className="dashboard-header">
           <PatientInfoCard 
             patientInfo={patientInfo}
@@ -125,16 +126,29 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
         </div>
       )}
 
-          <DashboardGrid
-            viewMode="unified"
-            availableVisualizations={availableVisualizations}
-            allVisualizations={allVisualizations}
-            onExpand={toggleChart}
-            expandedItem={expandedChart}
-            renderVisualization={renderVisualizationWithMode}
-            chartNavigation={chartNavigation}
-            screenshotMode={screenshotMode}
-          />
+      {!screenshotMode && (
+        <div className="condensed-view-control">
+          <button
+            onClick={() => setCondensedView(!condensedView)}
+            className="condensed-view-button"
+            aria-label={condensedView ? 'Show full view' : 'Enable condensed view'}
+          >
+            {condensedView ? 'Show Full View' : 'Condensed View'}
+          </button>
+        </div>
+      )}
+
+      <DashboardGrid
+        viewMode="unified"
+        availableVisualizations={availableVisualizations}
+        allVisualizations={allVisualizations}
+        onExpand={toggleChart}
+        expandedItem={expandedChart}
+        renderVisualization={renderVisualizationWithMode}
+        chartNavigation={chartNavigation}
+        screenshotMode={screenshotMode}
+        condensedView={condensedView}
+      />
     </div>
   );
 };

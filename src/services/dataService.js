@@ -90,7 +90,7 @@ export async function getPatientData(patientId) {
 /**
  * Processes raw CSV data into structured patient information and health metrics. Returns structured patient data object. Throws error if data structure is invalid or processing fails.
  */
-export function processPatientData(rows, patientId) {
+function processPatientData(rows, patientId) {
   if (!Array.isArray(rows) || rows.length === 0) {
     throw new Error(`Invalid data structure for patient ${patientId}`);
   }

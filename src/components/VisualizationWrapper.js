@@ -26,13 +26,15 @@ const VisualizationWrapper = ({
   onNext,
   navigationLabel = 'Week',
   // Screenshot mode
-  screenshotMode = false
+  screenshotMode = false,
+  // Condensed view mode
+  condensedView = false
 }) => {
   const viz = allVisualizations[selectedViz];
   
   return (
-    <div className={`visualization-wrapper ${isExpanded ? 'expanded' : ''} ${className} ${screenshotMode ? 'screenshot-mode' : ''}`}>
-      {!screenshotMode && (
+    <div className={`visualization-wrapper ${isExpanded ? 'expanded' : ''} ${className} ${screenshotMode ? 'screenshot-mode' : ''} ${condensedView ? 'condensed-view' : ''}`}>
+      {!screenshotMode && !condensedView && (
         <div className="visualization-header">
           <div className="visualization-title-group">
             <h3 className="visualization-title">

@@ -967,6 +967,17 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
     }
     const daysWithReadings = daysSet.size;
 
+    // Count readings in ideal category (systolic 90-120 AND diastolic 60-80)
+    let idealReadingsCount = 0;
+    for (let i = 0; i < data.length; i++) {
+      const systolic = data[i].systolic;
+      const diastolic = data[i].diastolic;
+      if (systolic && systolic >= 90 && systolic < 120 &&
+          diastolic && diastolic >= 60 && diastolic < 80) {
+        idealReadingsCount++;
+      }
+    }
+
     return {
       avgSystolic,
       avgDiastolic,
@@ -974,7 +985,8 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
       maxDiastolic,
       avgRisk,
       daysWithReadings,
-      totalReadings: data.length
+      totalReadings: data.length,
+      idealReadingsCount
     };
   }
 
@@ -1059,13 +1071,13 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
                 <h4>Week Summary</h4>
                 <div className="summary-stats">
                   <div className="stat-item">
-                    <span className="stat-label">Average BP:</span>
+                    <span className="stat-label">Average Blood Pressure:</span>
                     <span className="stat-value">
                       {weekSummary.avgSystolic}/{weekSummary.avgDiastolic} mmHg
                     </span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Peak BP:</span>
+                    <span className="stat-label">Peak Blood Pressure:</span>
                     <span className="stat-value">
                       {weekSummary.maxSystolic}/{weekSummary.maxDiastolic} mmHg
                     </span>
@@ -1075,6 +1087,12 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
                     <span className="stat-label">Reading Days:</span>
                     <span className="stat-value">
                       {weekSummary.daysWithReadings}/7 days
+                    </span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Total Readings in Ideal Category:</span>
+                    <span className="stat-value">
+                      {weekSummary.idealReadingsCount}
                     </span>
                   </div>
                   <div className="stat-item">
@@ -1091,15 +1109,27 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
                   <h4>3-Month Summary</h4>
                   <div className="summary-stats">
                     <div className="stat-item">
-                      <span className="stat-label">Average BP:</span>
+                      <span className="stat-label">Average Blood Pressure:</span>
                       <span className="stat-value">
                         {threeMonthSummary.avgSystolic}/{threeMonthSummary.avgDiastolic} mmHg
                       </span>
                     </div>
                     <div className="stat-item">
-                      <span className="stat-label">Peak BP:</span>
+                      <span className="stat-label">Peak Blood Pressure:</span>
                       <span className="stat-value">
                         {threeMonthSummary.maxSystolic}/{threeMonthSummary.maxDiastolic} mmHg
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Reading Days:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.daysWithReadings} days
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-label">Total Readings in Ideal Category:</span>
+                      <span className="stat-value">
+                        {threeMonthSummary.idealReadingsCount}
                       </span>
                     </div>
                     <div className="stat-item">

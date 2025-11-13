@@ -80,7 +80,7 @@
   
   /* Neutral Colors */
   --chart-color-neutral: #6c757d;
-  --chart-color-border: #dee2e6;
+  --chart-color-border: #000000;
   --chart-color-background: #f8f9fa;
   --chart-color-text-primary: #000000;
   --chart-color-text-secondary: #000000;
@@ -110,10 +110,7 @@
   --chart-border-radius-lg: 12px;
   --chart-border-radius-round: 50%;
   
-  /* Shadows */
-  --chart-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --chart-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --chart-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+  /* Shadows - removed */
   
   /* Pain-specific spacing */
   --pain-spacing-compact: 8px;
@@ -199,7 +196,7 @@
 
 .chart-grid-line-horizontal,
 .chart-grid-line-vertical {
-  stroke: #e0e0e0;
+  stroke: #000000;
   stroke-width: 1;
 }
 
@@ -208,7 +205,7 @@
 }
 
 .chart-grid-line-vertical-time {
-  stroke: #f0f0f0;
+  stroke: #000000;
   stroke-width: 0.5;
 }
 
@@ -348,19 +345,13 @@
   align-items: center;
   padding: var(--chart-spacing-sm) 0;
   border-bottom: 1px solid var(--chart-color-border);
-  transition: background-color 0.2s ease;
 }
 
 .stat-item:last-child {
   border-bottom: none;
 }
 
-.stat-item:hover {
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: var(--chart-border-radius-sm);
-  margin: 0 calc(-1 * var(--chart-spacing-sm));
-  padding: var(--chart-spacing-sm);
-}
+/* Hover effects removed - no shading on summary items */
 
 .stat-label {
   font-weight: var(--chart-font-weight);
@@ -444,14 +435,12 @@
   padding: var(--chart-spacing-sm) var(--chart-spacing-md);
   background: white;
   border-radius: var(--chart-border-radius-round);
-  box-shadow: var(--chart-shadow-sm);
   transition: all 0.2s ease;
   flex-shrink: 0; /* Prevent items from shrinking */
 }
 
 .legend-item:hover {
   transform: translateY(-1px);
-  box-shadow: var(--chart-shadow-md);
 }
 
 .legend-color {
@@ -496,7 +485,6 @@
   border-radius: var(--chart-border-radius-round);
   flex-shrink: 0;
   border: 2px solid white;
-  box-shadow: 0 0 0 1px var(--chart-color-border);
 }
 
 /* --- Legend Shape Styles --- */
@@ -603,8 +591,7 @@
 .meal-contents-chart-container:hover,
 .pain-chart-container:hover,
 .physician-pain-chart-container:hover {
-  border-color: #adb5bd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #000000;
 }
 
 /* Expanded view styling for all containers */
@@ -753,9 +740,8 @@
 }
 
 .toggle-btn.active {
-  background: #007bff;
+  background: #4A90E2;
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
 }
 
 /* --- Pain Chart Base Styles --- */
@@ -809,7 +795,7 @@
   min-width: 32px;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #000000;
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -825,7 +811,7 @@
 
 .nav-button:hover {
   background: #f8f9fa;
-  border-color: #adb5bd;
+  border-color: #000000;
 }
 
 .nav-button:active {
@@ -879,7 +865,6 @@
 .summary-textarea:focus {
   outline: none;
   border-color: var(--chart-color-info);
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
 }
 
 .summary-textarea::placeholder {

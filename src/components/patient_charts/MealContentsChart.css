@@ -45,12 +45,10 @@
 }
 
 .meal-cell {
-  transition: opacity 0.2s ease;
+  /* Transition removed - no hover effects */
 }
 
-.meal-cell:hover {
-  opacity: 0.8;
-}
+/* Hover effects removed - no opacity change on meal cells */
 
 /* Ensure emojis render properly and don't overflow */
 .meal-cell text {
@@ -136,11 +134,7 @@
   fill: #DC143C;
 }
 
-/* Hover effects for interactive elements */
-.meal-cell rect:hover {
-  stroke-width: 2;
-  stroke: #333;
-}
+/* Hover effects removed - no stroke changes on meal visualization */
 
 /* Text styling for better readability */
 .meal-chart text {

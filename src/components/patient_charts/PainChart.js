@@ -1,37 +1,28 @@
 /**
  PainChart.js - Pain Assessment and Visualization Component
  
- This component provides pain monitoring with anatomical body mapping for pain location. It includes a pain intensity scale from 0 to 10 with color coding and provides daily pain tracking and trend analysis. It includes an interactive body diagram for pain location selection and supports pain level input and editing capabilities. It includes navigation controls for time periods. This component is used for pain management and treatment monitoring.
+ This component monitors pain with anatomical body mapping for pain location. It includes a pain intensity scale from 0 to 10 with color coding and provides daily pain tracking and trend analysis. It includes an interactive body diagram for pain location selection and supports pain level input and editing capabilities. It includes navigation controls for time periods. This component is used for pain management and treatment monitoring.
  */
 
 import React, { useState, useEffect } from 'react';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
-
 import Legend from '../Legend';
 import './PainChart.css';
-
 import BodySVG from './BodySvg';
 
 const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { painData, loading, error } = usePatientData(patientId);
-  // For Patient access, force List View (remove Line Chart access).
-  // For Physician access, force Line Chart (remove List View access).
-  // Admin can toggle between both.
+  const { painData } = usePatientData(patientId);
+  // For Patient access, force List View and remove Line Chart access
+  // For Physician access, force Line Chart and remove List View access
+  // Admin can toggle between both
   const shouldForceListView = accessType === 'Patient';
   const shouldForceLineChart = accessType === 'Physician';
   
-  // Determine initial state based on accessType
-  let initialUseLineChart = false;
-  if (shouldForceListView) {
-    initialUseLineChart = false;
-  } else if (shouldForceLineChart) {
-    initialUseLineChart = true;
-  }
-  
+  // Determine initial state based on access type
+  const initialUseLineChart = shouldForceLineChart;
   const [useLineChart, setUseLineChart] = useState(initialUseLineChart);
   
-  // Update state when accessType changes
+  // Update state when access type changes
   useEffect(() => {
     if (shouldForceListView) {
       setUseLineChart(false);
@@ -40,9 +31,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     }
   }, [accessType, shouldForceListView, shouldForceLineChart]);
   
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('pain');
-  const nav = navigation || internalNavigation;
+  const nav = navigation;
 
   const getPainColor = (level) => {
     // 11-class color scheme from light to dark
@@ -68,9 +57,12 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     label: `${level}`,
   }));
 
+  // Array of day names for date formatting
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   const { start: startOfWeek, end: endOfWeek } = nav.getDateRange();
 
-  // Calculate previous and next week ranges
+  // Calculate date ranges for previous and next week
   const prevWeekStart = new Date(startOfWeek);
   prevWeekStart.setDate(prevWeekStart.getDate() - 7);
   const prevWeekEnd = new Date(prevWeekStart);
@@ -88,11 +80,11 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
   const prevWeekPainData = painData.filter(d => d.date >= prevWeekStart && d.date <= prevWeekEnd);
   const nextWeekPainData = painData.filter(d => d.date >= nextWeekStart && d.date <= nextWeekEnd);
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthPainData = painData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
-  // Helper functions for data processing
+  // Functions for processing pain data
   const processPainData = (painData) => {
     const dateMap = {};
     const locationCounts = {};
@@ -124,7 +116,6 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
 
   const createWeekChartData = (dateMap, startOfWeek) => {
     const data = [];
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
@@ -149,7 +140,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     return totalPain / painData.length;
   };
 
-  // Process data for chart
+  // Process data for the chart display
   let chartData = [];
   let mostCommonLocation = null;
   let averagePainLevel = 0;
@@ -173,7 +164,6 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     const data = [];
     const weekLabels = ['Prev Week', 'Current Week', 'Next Week'];
     const weekStarts = [prevWeekStart, startOfWeek, nextWeekStart];
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
     for (let week = 0; week < 3; week++) {
       const weekStart = weekStarts[week];
@@ -198,14 +188,14 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     return data;
   };
 
-  // Process data for extended chart (3 weeks)
+  // Process data for extended chart showing three weeks
   const extendedChartData = isExpanded ? createExtendedChartData() : [];
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate three month summary statistics for physician view
   let threeMonthSummary = null;
   if (threeMonthPainData.length > 0) {
 
-    // Create a map of dates to pain levels for 3-month period
+    // Create a map of dates to pain levels for three month period
     const dateMap = new Map();
     const locationCounts = new Map();
 
@@ -231,7 +221,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
     const totalPain = threeMonthPainData.reduce((sum, item) => sum + item.level, 0);
     const avgPain = threeMonthPainData.length > 0 ? (totalPain / threeMonthPainData.length) : 0;
 
-    // Calculate actual days in the 3-month period
+    // Calculate actual days in the three month period
     const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
     const daysInThreeMonths = Math.ceil((endOfThreeMonths - startOfThreeMonths) / (1000 * 60 * 60 * 24)) + 1;
     const daysWithPain = new Set(threeMonthPainData.map(d => d.date.toDateString())).size;
@@ -262,7 +252,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
   }
 
 
-  // Line Chart Component for Pain Ratings
+  // Line chart component for pain ratings
   const PainLineChart = ({ data, isExpanded, extendedData }) => {
     const isExtendedView = isExpanded && extendedData && extendedData.length > 0;
     const chartData = isExtendedView ? extendedData : data;
@@ -302,7 +292,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
                   y1={y} 
                   x2={config.width - config.padding.right} 
                   y2={y} 
-                  stroke="#e0e0e0" 
+                  stroke="#000000" 
                   strokeWidth="1" 
                   strokeDasharray="2,2"
                 />
@@ -329,7 +319,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
                 y1={config.padding.top} 
                 x2={x} 
                 y2={config.height - config.padding.bottom} 
-                stroke="#ccc" 
+                stroke="#000000" 
                 strokeWidth="2" 
                 strokeDasharray="5,5"
               />
@@ -369,7 +359,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           {/* Line */}
           <path 
             d={linePath} 
-            stroke="#cccccc" 
+            stroke="#000000" 
             strokeWidth="2" 
             fill="none"
           />
@@ -385,8 +375,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
                 cy={y} 
                 r="5" 
                 fill={point.color} 
-                stroke="#cccccc" 
-                strokeWidth="2"
+                stroke="none"
               />
             );
           })}
@@ -432,7 +421,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           <h3 className="chart-title">Pain</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle - Hide for Patient and Physician (single view only), show both for Admin */}
+          {/* View toggle that hides for Patient and Physician with single view only and shows both for Admin */}
           {accessType === 'Admin' && (
             <div className="view-toggle">
               <button 
@@ -451,7 +440,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           )}
         </div>
         
-        {/* Conditional Chart Rendering */}
+        {/* Conditionally render chart based on selected view type */}
         {useLineChart ? (
           <div className="pain-line-chart-container">
             <PainLineChart 
@@ -468,7 +457,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           </div>
         ) : (
           <div className="pain-content-wrapper">
-            {/* Main Body SVG showing most common pain location and average level */}
+            {/* Main body SVG showing most common pain location and average level */}
             {mostCommonLocation && (
               <div className="main-pain-visualization">
                 <h4>Most Common Pain Location: {mostCommonLocation}</h4>
@@ -520,7 +509,7 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
           </div>
         )}
 
-        {/* Show summaries for unified view */}
+        {/* Show summaries for the unified view */}
         <div className="summary-container">
             <div className="chart-summary">
               <h4>Week Summary</h4>

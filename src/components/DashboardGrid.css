@@ -35,7 +35,7 @@
 .physician-chart-container {
   background: white;
   border-radius: 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #000000;
   overflow: hidden;
   transition: all 0.2s ease;
   min-height: 480px; /* Reduced from 500px for better space usage */
@@ -51,8 +51,7 @@
 
 .visualization-box:hover,
 .physician-chart-container:hover {
-  border-color: #adb5bd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #000000;
 }
 
 /* Visualization Header Styles - Universal */
@@ -80,7 +79,7 @@
 
 .visualization-header select {
   padding: 8px 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #000000;
   border-radius: 6px;
   background: white;
   font-size: 14px;
@@ -96,7 +95,7 @@
 
 .expand-button {
   padding: 8px 16px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #000000;
   border-radius: 6px;
   background: white;
   cursor: pointer;
@@ -108,7 +107,7 @@
 
 .expand-button:hover {
   background: #f8f9fa;
-  border-color: #adb5bd;
+  border-color: #000000;
 }
 
 /* Visualization Content - Universal dimensions */

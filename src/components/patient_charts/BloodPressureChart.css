@@ -10,7 +10,7 @@
   padding: 16px;
   background: white;
   border-radius: 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   overflow: hidden;
   transition: all 0.2s ease;
   min-height: 500px;
@@ -20,8 +20,7 @@
 .bp-chart-container:hover,
 .visualization-box:hover .bp-chart-container,
 .visualization-wrapper:hover .bp-chart-container {
-  border-color: #adb5bd;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #000000;
 }
 
 .bp-chart-container.expanded {
@@ -177,7 +176,7 @@
 
 /* Grid lines for dual axis */
 .dual-y-axis .chart-grid-line-horizontal {
-  stroke: #e0e0e0;
+  stroke: #000000;
   stroke-width: 1;
   stroke-dasharray: 2,2;
 }

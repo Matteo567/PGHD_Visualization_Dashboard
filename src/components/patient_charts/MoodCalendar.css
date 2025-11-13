@@ -110,7 +110,7 @@
 
 /* Day Cell */
 .day-cell-bg {
-  stroke: #e0e0e0;
+  stroke: #000000;
   stroke-width: 1;
   transition: fill 0.3s ease;
 }

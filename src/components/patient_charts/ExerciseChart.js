@@ -1,12 +1,11 @@
 /**
  ExerciseChart.js - Exercise Activity Tracking Visualization
  
- This component provides exercise monitoring with activity type breakdown including walking, swimming, running, biking, muscle-strengthening, and balance activities. It tracks duration and provides weekly summaries with color-coded activity categorization. It includes interactive tooltips with exercise details and navigation controls for time periods. It integrates with patient data and chart navigation. The component uses custom SVG for stacked bar chart visualization and implements an activity categorization system with emoji indicators. It provides color-coded activity types for identification and supports expandable views. It implements time-based navigation and data filtering. Visualization features include a stacked bar chart showing daily activity breakdown, color-coded activity types with emoji indicators, interactive tooltips with detailed exercise information, design that adapts to container size, and dynamic Y-axis scaling based on data range. Activity categories include walking as low-impact cardiovascular exercise, swimming as full-body cardiovascular workout, running as high-impact cardiovascular exercise, biking as low-impact cardiovascular exercise, muscle-strengthening as strength training activities, balance as balance and stability training, and other as miscellaneous physical activities. Component structure includes a main SVG container with sizing for the chart container, duration scale with dynamic labeling on the Y-axis, day-of-week labels with date information on the X-axis, stacked activity bars with color coding for data bars, activity type explanations with emojis in the legend, and detailed exercise information on hover in tooltips. This component is used for physical activity monitoring and fitness tracking.
+ This component monitors exercise with activity type breakdown including walking, swimming, running, biking, muscle strengthening, and balance activities. It tracks duration and provides weekly summaries with color coded activity categorization. It includes interactive tooltips with exercise details and navigation controls for time periods. It integrates with patient data and chart navigation. The component uses custom SVG for stacked bar chart visualization and implements an activity categorization system with emoji indicators. It provides color coded activity types for identification and supports expandable views. It implements time based navigation and data filtering. Visualization features include a stacked bar chart showing daily activity breakdown, color coded activity types with emoji indicators, interactive tooltips with detailed exercise information, design that adapts to container size, and dynamic Y axis scaling based on data range. Activity categories include walking as low impact cardiovascular exercise, swimming as full body cardiovascular workout, running as high impact cardiovascular exercise, biking as low impact cardiovascular exercise, muscle strengthening as strength training activities, balance as balance and stability training, and other as miscellaneous physical activities. Component structure includes a main SVG container with sizing for the chart container, duration scale with dynamic labeling on the Y axis, day of week labels with date information on the X axis, stacked activity bars with color coding for data bars, activity type explanations with emojis in the legend, and detailed exercise information on hover in tooltips. This component is used for physical activity monitoring and fitness tracking.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
 import Tooltip from '../ui/Tooltip';
 import './ExerciseChart.css';
@@ -27,39 +26,22 @@ const exerciseLegendItems = exerciseTypes.map(({ label, color, emoji }) => ({
 }));
 
 const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { exerciseData, loading, error } = usePatientData(patientId);
+  const { exerciseData } = usePatientData(patientId);
   
-  // For Physician access, force Weekly Goals view (hide Activity Breakdown).
-  // For Patient and Admin, allow toggling between both views.
+  // Array of day names for date formatting
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  // For Physician access, force Weekly Goals view and hide Activity Breakdown
+  // For Patient and Admin, allow toggling between both views
   const shouldForceWeeklyGoals = accessType === 'Physician';
-  
-  // Determine initial view state
-  let initialShowWeeklyGoals = false;
-  if (shouldForceWeeklyGoals) {
-    initialShowWeeklyGoals = true;
-  }
-  
-  // State for toggling between activity breakdown and weekly goals view
-  const [showWeeklyGoals, setShowWeeklyGoals] = useState(initialShowWeeklyGoals);
+  const [showWeeklyGoals, setShowWeeklyGoals] = useState(shouldForceWeeklyGoals);
   
   // Tooltip state
   const [tooltipData, setTooltipData] = useState(null);
   
-  // Update state when accessType changes
-  useEffect(() => {
-    if (shouldForceWeeklyGoals) {
-      setShowWeeklyGoals(true);
-    } else {
-      // Patient and Admin default to Activity Breakdown
-      setShowWeeklyGoals(false);
-    }
-  }, [accessType, shouldForceWeeklyGoals]);
-  
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('exercise');
-  const nav = navigation || internalNavigation;
+  const nav = navigation;
 
-  // Inline configuration for chart dimensions and styling
+  // Configuration for chart dimensions and styling
   const config = isExpanded 
     ? {
         width: 700,
@@ -102,7 +84,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     return itemDate >= startOfWeek && itemDate <= endOfWeek;
   });
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = exerciseData.filter(d => {
     if (!d.date) return false;
@@ -110,8 +92,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     return itemDate >= startOfThreeMonths && itemDate <= endOfThreeMonths;
   });
 
-  // Helper functions for exercise data processing
-  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Functions for processing exercise data
   
   const initializeDayData = () => ({
     walking: 0,
@@ -161,7 +142,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
 
   const groupedData = processExerciseData(weekData);
 
-  // Calculate weekly exercise categories for physician view
+  // Calculate weekly exercise categories for the physician view
   const aerobic = Object.values(groupedData).reduce((sum, day) => 
     sum + day.walking + day.swimming + day.running + day.biking, 0);
   const strength = Object.values(groupedData).reduce((sum, day) => 
@@ -180,7 +161,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     flexibilitySessions
   };
 
-  // Calculate percentages for physician view
+  // Calculate percentages for the physician view
   const aerobicGoal = 150;
   const strengthGoal = 2;
   const flexibilityGoal = 1;
@@ -207,7 +188,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
 
   const yAxisLabels = generateYAxisLabels(maxDuration);
 
-  // Calculate summary statistics for physician view
+  // Calculate summary statistics for the physician view
   let weekSummary = null;
   if (weekData.length > 0) {
 
@@ -250,12 +231,12 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     };
   }
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate three month summary statistics for physician view
   let threeMonthSummary = null;
   let threeMonthWeeklyGoalsSummary = null;
   if (threeMonthData.length > 0) {
 
-    // Group 3-month data by day
+    // Group three month data by day
     const threeMonthGroupedData = {};
     threeMonthData.forEach(item => {
       if (!item.date) return;
@@ -276,7 +257,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
 
     const totalMinutes = Object.values(threeMonthGroupedData).reduce((sum, day) => sum + day.totalMinutes, 0);
     
-    // Calculate actual days in the 3-month period
+    // Calculate actual days in the three month period
     const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
     const daysInThreeMonths = Math.ceil((endOfThreeMonths - startOfThreeMonths) / (1000 * 60 * 60 * 24)) + 1;
     const avgMinutesPerDay = (totalMinutes / daysInThreeMonths).toFixed(0);
@@ -312,13 +293,13 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
       avgSessionLength
     };
 
-    // Calculate weekly goals met in 3-month period
-    // Split 3-month data into weeks and check goal achievement for each week
+    // Calculate weekly goals met in three month period
+    // Split three month data into weeks and check goal achievement for each week
     const weeklyGoalsData = [];
     let currentWeekStart = new Date(startOfThreeMonths);
     currentWeekStart.setHours(0, 0, 0, 0);
     
-    // Adjust to start of week (Sunday)
+    // Adjust to start of week on Sunday
     const dayOfWeek = currentWeekStart.getDay();
     currentWeekStart.setDate(currentWeekStart.getDate() - dayOfWeek);
 
@@ -361,7 +342,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
       currentWeekStart.setDate(currentWeekStart.getDate() + 7);
     }
 
-    // Count weeks that met goals
+    // Count how many weeks met each goal
     const weeksMetAerobicGoal = weeklyGoalsData.filter(w => w.aerobicGoalMet).length;
     const weeksMetStrengthGoal = weeklyGoalsData.filter(w => w.strengthGoalMet).length;
     const weeksMetFlexibilityGoal = weeklyGoalsData.filter(w => w.flexibilityGoalMet).length;
@@ -377,7 +358,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     };
   }
 
-  // Tooltip handlers
+  // Functions that handle tooltip display
   const handleBarHover = (data) => {
     setTooltipData(data);
   };
@@ -386,7 +367,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
     setTooltipData(null);
   };
 
-  // Weekly goals view (when showWeeklyGoals is true)
+  // Weekly goals view when showWeeklyGoals is true
   if (showWeeklyGoals) {
     const categories = [
       { 
@@ -421,7 +402,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
           <h3 className="chart-title">Exercise Goals Progress</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle - Hide for Physician (single view only), show for Patient and Admin */}
+          {/* View toggle that hides for Physician with single view only and shows for Patient and Admin */}
           {accessType !== 'Physician' && (
             <div className="view-toggle">
               <button 
@@ -540,7 +521,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
           <h3 className="chart-title">Activity Breakdown by Type</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle - Hide for Physician (single view only), show for Patient and Admin */}
+          {/* View toggle that hides for Physician with single view only and shows for Patient and Admin */}
           {accessType !== 'Physician' && (
             <div className="view-toggle">
               <button 
@@ -679,7 +660,7 @@ const ExerciseChart = ({ patientId, isExpanded = false, onExpand, accessType = '
           hide={screenshotMode}
         />
 
-        {/* Show summary for physician/unified view */}
+        {/* Show summary for physician or unified view */}
         {weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">

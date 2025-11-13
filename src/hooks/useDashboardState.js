@@ -1,11 +1,11 @@
-// Hook for managing dashboard state including chart expansion and summary toggles
+// Hook that manages dashboard state including chart expansion and summary toggles
 import { useState } from 'react';
 
 function useDashboardState() {
   const [expandedChart, setExpandedChart] = useState(null);
   const [showThreeMonthSummaries, setShowThreeMonthSummaries] = useState(false);
   
-  // Chart expansion functions
+  // Functions for chart expansion
   const toggleChart = (chartId) => {
     if (expandedChart === chartId) {
       setExpandedChart(null);
@@ -14,7 +14,7 @@ function useDashboardState() {
     }
   };
   
-  // Summary toggle functions
+  // Functions for summary toggle
   const toggleThreeMonthSummaries = () => {
     setShowThreeMonthSummaries(prev => !prev);
   };

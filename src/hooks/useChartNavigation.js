@@ -1,4 +1,4 @@
-// Hook for managing chart navigation with week or month navigation
+// Hook that manages chart navigation with week or month navigation
 import { useState } from 'react';
 
 const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
@@ -14,7 +14,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     if (navigationType === 'month') {
       newDate.setMonth(newDate.getMonth() - 1);
     } else {
-      // Subtract 7 days for week navigation
+      // Subtract 7 days for week navigation to go to previous week
       newDate.setDate(newDate.getDate() - 7);
     }
     setCurrentDate(newDate);
@@ -26,7 +26,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     if (navigationType === 'month') {
       newDate.setMonth(newDate.getMonth() + 1);
     } else {
-      // Add 7 days for week navigation
+      // Add 7 days for week navigation to go to next week
       newDate.setDate(newDate.getDate() + 7);
     }
     setCurrentDate(newDate);
@@ -37,7 +37,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const startOfMonth = new Date(year, month, 1);
-    const endOfMonth = new Date(year, month + 1, 0); // Last day of month (day 0 of next month)
+    const endOfMonth = new Date(year, month + 1, 0); // Last day of month which is day 0 of next month
     return { start: startOfMonth, end: endOfMonth };
   };
 
@@ -45,13 +45,13 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
   const getWeekDateRange = () => {
     const startOfWeek = new Date(currentDate);
     const currentDayOfWeek = startOfWeek.getDay(); // 0 = Sunday, 6 = Saturday
-    const daysToSubtract = currentDayOfWeek; // Go back to Sunday
+    const daysToSubtract = currentDayOfWeek; // Go back to Sunday to start the week
     
     startOfWeek.setDate(startOfWeek.getDate() - daysToSubtract);
     startOfWeek.setHours(0, 0, 0, 0); // Start of day
     
     const endOfWeek = new Date(startOfWeek);
-    const daysInWeek = 6; // Sunday to Saturday = 7 days, but we start on Sunday so add 6
+    const daysInWeek = 6; // Sunday to Saturday equals 7 days but we start on Sunday so add 6
     endOfWeek.setDate(endOfWeek.getDate() + daysInWeek);
     endOfWeek.setHours(23, 59, 59, 999); // End of day
     
@@ -67,7 +67,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     }
   };
 
-  // Get formatted date range with year (e.g., "May 1 - 7, 2025" for weeks or "May 1 - 31, 2025" for months)
+  // Get formatted date range with year for example May 1 to 7, 2025 for weeks or May 1 to 31, 2025 for months
   const getFormattedDateRange = () => {
     const range = getDateRange();
     const startMonth = range.start.toLocaleDateString('en-US', { month: 'long' });
@@ -79,25 +79,25 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     if (range.start.getMonth() === range.end.getMonth()) {
       return `${startMonth} ${startDay} - ${endDay}, ${year}`;
     } else {
-      // Different months (edge case for weeks spanning month boundaries)
+      // Different months for edge case when weeks span month boundaries
       const endMonth = range.end.toLocaleDateString('en-US', { month: 'long' });
       return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
     }
   };
 
-  // Get 3-month date range (3 months before current date)
+  // Get three month date range which is three months before current date
   const getThreeMonthRange = () => {
     const endOfThreeMonths = new Date(currentDate);
     const startOfThreeMonths = new Date(currentDate);
     startOfThreeMonths.setMonth(startOfThreeMonths.getMonth() - 3);
     
-    // Make sure we don't go before the earliest data date
+    // Make sure we do not go before the earliest data date
     const dataStartDate = new Date(2024, 6, 1);
     if (startOfThreeMonths < dataStartDate) {
       startOfThreeMonths.setTime(dataStartDate.getTime());
     }
     
-    // Make sure we don't go after the latest data date
+    // Make sure we do not go after the latest data date
     const dataEndDate = new Date(2025, 6, 31);
     if (endOfThreeMonths > dataEndDate) {
       endOfThreeMonths.setTime(dataEndDate.getTime());
@@ -106,7 +106,7 @@ const useChartNavigation = (chartType, initialDate = new Date(2025, 4, 1)) => {
     return { start: startOfThreeMonths, end: endOfThreeMonths };
   };
 
-  // Get 3-month display string
+  // Get three month display string
   const getThreeMonthDisplay = () => {
     const range = getThreeMonthRange();
     const startStr = range.start.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });

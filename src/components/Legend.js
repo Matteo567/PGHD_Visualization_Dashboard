@@ -1,7 +1,7 @@
 /*
  Legend.js - Dynamic Chart Legend Component
  
- This component provides interactive legends for chart visualizations. It auto-sizes to fit chart container dimensions and supports horizontal and vertical orientations. It dynamically positions based on chart type and container and handles sizing for different chart contexts. It provides consistent legend formatting across all chart types. This component is used for interpreting chart data and color coding in health visualizations.
+ This component provides interactive legends for chart visualizations. It auto sizes to fit chart container dimensions and supports horizontal and vertical orientations. It dynamically positions based on chart type and container and handles sizing for different chart contexts. It provides consistent legend formatting across all chart types. This component is used for interpreting chart data and color coding in health visualizations.
  */
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -10,8 +10,8 @@ import './ChartStyles.css';
 const Legend = ({ 
   title, 
   items, 
-  orientation = 'horizontal', // horizontal | vertical
-  size = 'medium', // small | medium | large
+  orientation = 'horizontal', // horizontal or vertical
+  size = 'medium', // small or medium or large
   hide = false // Hide legend in screenshot mode
 }) => {
   const legendRef = useRef(null);
@@ -21,7 +21,7 @@ const Legend = ({
     const updateWidth = () => {
       if (!legendRef.current) return;
 
-      // Simplified container finding - try multiple selector strategies in order
+      // Simplified container finding that tries multiple selector strategies in order
       const containerSelectors = [
         // Direct chart wrappers (most specific)
         '.glucose-chart-wrapper, .chart-section, .bp-svg-container, .exercise-chart-content, .sleep-chart, .pain-chart-wrapper, .meal-chart-wrapper, .mood-calendar-wrapper, .pain-line-chart-container',
@@ -45,7 +45,7 @@ const Legend = ({
         }
       }
 
-      // Special case for pain chart - check for inner wrapper
+      // Special case for pain chart that checks for inner wrapper
       if (!containerWidth && legendRef.current.closest('.pain-chart-container')) {
         const painWrapper = legendRef.current.closest('.pain-chart-container')?.querySelector('.pain-chart-wrapper');
         if (painWrapper) {
@@ -102,7 +102,7 @@ const Legend = ({
             style={item.style}
             title={item.description || item.label}
           >
-            {/* Color indicator */}
+            {/* Color indicator for the legend item */}
             {item.color && (
               <span 
                 className="legend-color-indicator" 
@@ -111,7 +111,7 @@ const Legend = ({
               />
             )}
             
-            {/* Icon/emoji indicator */}
+            {/* Icon or emoji indicator for the legend item */}
             {item.icon && (
               <span 
                 className="legend-icon"
@@ -121,7 +121,7 @@ const Legend = ({
               </span>
             )}
             
-            {/* Shape indicator for special cases */}
+            {/* Shape indicator for special cases like outlined shapes */}
             {item.shape && (
               <span 
                 className={`legend-shape legend-shape-${item.shape}`}
@@ -130,7 +130,7 @@ const Legend = ({
               />
             )}
             
-            {/* Label */}
+            {/* Text label for the legend item */}
             <span className="legend-label">{item.label}</span>
           </div>
         ))}

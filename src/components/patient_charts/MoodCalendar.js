@@ -1,17 +1,16 @@
 /**
  MoodCalendar.js - Mood Tracking Calendar Visualization
  
- This component provides mood monitoring with daily mood tracking in calendar format. It uses color-coded mood states including happy, sad, and angry. It includes monthly navigation and trend analysis with an interactive calendar layout. It integrates with patient data and navigation. This component is used for mental health monitoring and emotional well-being tracking.
+ This component monitors mood with daily mood tracking in calendar format. It uses color coded mood states including happy, sad, and angry. It includes monthly navigation and trend analysis with an interactive calendar layout. It integrates with patient data and navigation. This component is used for mental health monitoring and emotional well being tracking.
  */
 
 import React, { useState } from 'react';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
 
 import './MoodCalendar.css';
 
-// --- Constants & Config ---
+// Constants and configuration
 const MOODS = { happy: '😊', sad: '😢', angry: '😠' };
 const MOOD_COLORS = { 
   happy: 'var(--chart-color-mood-happy)', 
@@ -25,13 +24,15 @@ const MOOD_BACKGROUNDS = {
 };
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Separate configurations for clarity
+// Separate configurations for different view sizes
 const CHART_CONFIGS = {
   normal: {
     svgWidth: 350,
     svgHeight: 300,
     cellWidth: 50,
     cellHeight: 44,
+    rowSpacing: 4,
+    colSpacing: 0,
     dayLabelY: 30,
     dayLabelFontSize: 9,
     dateLabelX: 5,
@@ -46,6 +47,8 @@ const CHART_CONFIGS = {
     svgHeight: 600,
     cellWidth: 100,
     cellHeight: 85,
+    rowSpacing: 8,
+    colSpacing: 0,
     dayLabelY: 55,
     dayLabelFontSize: 16,
     dateLabelX: 12,
@@ -61,7 +64,7 @@ const getCalendarConfig = (isExpanded) => {
   return isExpanded ? CHART_CONFIGS.expanded : CHART_CONFIGS.normal;
 };
 
-// --- Helper Functions ---
+// Helper functions
 const normalizeMood = (mood) => (mood && MOODS[mood.toLowerCase()]) ? mood.toLowerCase() : null;
 const getMoodEmoji = (mood) => MOODS[normalizeMood(mood)];
 const getMoodColor = (mood) => MOOD_COLORS[normalizeMood(mood)];
@@ -76,7 +79,7 @@ const moodLegendItems = Object.entries(MOODS).map(([mood, emoji]) => ({
   },
 }));
 
-// --- Sub-components ---
+// Sub components
 
 const CalendarHeader = ({ config }) => (
   <g className="calendar-header">
@@ -97,12 +100,15 @@ const CalendarHeader = ({ config }) => (
 const DayCell = ({ config, date, moods }) => {
   const dayOfMonth = date.getDate();
   const dayOfWeek = date.getDay();
-  const weekOfMonth = Math.floor((dayOfMonth - 1 + (() => {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    return !isNaN(firstDay.getTime()) ? firstDay.getDay() : 0;
-  })()) / 7);
+  
+  // Calculate which week of the month this day belongs to by finding the first day
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const firstDayOfWeek = !isNaN(firstDay.getTime()) ? firstDay.getDay() : 0;
+  const weekOfMonth = Math.floor((dayOfMonth - 1 + firstDayOfWeek) / 7);
+  
+  // Calculate position using consistent row spacing
   const x = config.startX + dayOfWeek * config.cellWidth;
-  const y = config.startY + weekOfMonth * (config.cellHeight + 2);
+  const y = config.startY + weekOfMonth * (config.cellHeight + config.rowSpacing);
   const primaryMood = moods.length > 0 ? moods[0] : null;
 
   return (
@@ -159,13 +165,11 @@ const Calendar = ({ isExpanded, moodByDate, currentMonth, monthDisplay }) => {
   );
 };
 
-// --- Main Component ---
+// Main component
 const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false, accessType = 'Admin' }) => {
-  const { moodData, loading, error } = usePatientData(patientId);
+  const { moodData } = usePatientData(patientId);
   
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('mood');
-  const nav = navigation || internalNavigation;
+  const nav = navigation;
   
   // For mood chart, determine the month to display based on the navigation
   // If using weekly navigation, show the month that contains the current week
@@ -193,11 +197,11 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
     ? currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : nav.getFormattedDateRange();
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = moodData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
-  // Calculate summary statistics for physician view
+  // Calculate summary statistics for the physician view
   const currentMonthData = moodData.filter(d => 
     d.date.getFullYear() === currentMonth.getFullYear() && 
     d.date.getMonth() === currentMonth.getMonth()
@@ -206,7 +210,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
   let monthSummary = null;
   if (currentMonthData.length > 0) {
 
-    // Count mood occurrences
+    // Count how many times each mood occurs
     const moodCounts = {};
     Object.keys(MOODS).forEach(mood => {
       moodCounts[mood] = 0;
@@ -219,19 +223,18 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
       }
     });
 
-    // Find most common mood
+    // Find the most common mood
     const mostCommonMood = Object.entries(moodCounts)
       .sort(([,a], [,b]) => b - a)[0];
 
-    // Calculate mood distribution percentages
+    // Calculate percentages for mood distribution
     const totalEntries = currentMonthData.length;
     const moodPercentages = {};
     Object.entries(moodCounts).forEach(([mood, count]) => {
       moodPercentages[mood] = totalEntries > 0 ? ((count / totalEntries) * 100).toFixed(0) : 0;
     });
 
-    // Days in current month
-    // Gets the number of days in a given month (year and month 0-11)
+    // Get the number of days in the current month where year and month are 0 to 11
     function getDaysInMonth(year, month) {
       const lastDay = new Date(year, month + 1, 0);
       return lastDay.getDate();
@@ -240,7 +243,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
     const daysInMonth = getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth());
     const daysWithMood = new Set(currentMonthData.map(d => d.date.getDate())).size;
 
-    // Calculate mood score (happy=3, sad=1, angry=1)
+    // Calculate mood score where happy equals 3, sad equals 1, and angry equals 1
     const moodScore = (moodCounts.happy * 3 + moodCounts.sad * 1 + moodCounts.angry * 1) / totalEntries;
     const moodTrend = moodScore >= 2.5 ? 'Positive' : moodScore >= 1.5 ? 'Mixed' : 'Needs Attention';
 
@@ -256,11 +259,11 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
     };
   }
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate three month summary statistics for physician view
   let threeMonthSummary = null;
   if (threeMonthData.length > 0) {
 
-    // Count mood occurrences
+    // Count how many times each mood occurs
     const moodCounts = {};
     Object.keys(MOODS).forEach(mood => {
       moodCounts[mood] = 0;
@@ -273,23 +276,23 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
       }
     });
 
-    // Find most common mood
+    // Find the most common mood
     const mostCommonMood = Object.entries(moodCounts)
       .sort(([,a], [,b]) => b - a)[0];
 
-    // Calculate mood distribution percentages
+    // Calculate percentages for mood distribution
     const totalEntries = threeMonthData.length;
     const moodPercentages = {};
     Object.entries(moodCounts).forEach(([mood, count]) => {
       moodPercentages[mood] = totalEntries > 0 ? ((count / totalEntries) * 100).toFixed(0) : 0;
     });
 
-    // Calculate actual days in the 3-month period
+    // Calculate actual days in the three month period
     const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
     const daysInThreeMonths = Math.ceil((endOfThreeMonths - startOfThreeMonths) / (1000 * 60 * 60 * 24)) + 1;
     const daysWithMood = new Set(threeMonthData.map(d => d.date.toDateString())).size;
 
-    // Calculate mood score (happy=3, sad=1, angry=1)
+    // Calculate mood score where happy equals 3, sad equals 1, and angry equals 1
     const moodScore = (moodCounts.happy * 3 + moodCounts.sad * 1 + moodCounts.angry * 1) / totalEntries;
     const moodTrend = moodScore >= 2.5 ? 'Positive' : moodScore >= 1.5 ? 'Mixed' : 'Needs Attention';
 
@@ -305,7 +308,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
     };
   }
 
-  // For physicians, hide the calendar and legend, show only summaries
+  // For physicians, hide the calendar and legend and show only summaries
   const isPhysician = accessType === 'Physician';
 
   return (
@@ -330,7 +333,7 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
         </div>
       )}
 
-      {/* Show summary for physician/unified view */}
+      {/* Show summary for physician or unified view */}
       {monthSummary && (
         <div className="summary-container">
           <div className="chart-summary">

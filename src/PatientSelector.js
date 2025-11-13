@@ -1,9 +1,7 @@
 /**
  PatientSelector.js - Patient Selection Dropdown Component
  
- A simple dropdown component that allows users to select from available patients.
- Displays patient IDs in a formatted list and handles selection changes.
- Used in the main app header for switching between different patient datasets.
+ A simple dropdown component that allows users to select from available patients. It displays patient IDs in a formatted list and handles selection changes. It is used in the main app header for switching between different patient datasets.
  */
 
 import React from 'react';

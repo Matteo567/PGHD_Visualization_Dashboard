@@ -1,10 +1,9 @@
 .custom-tooltip {
   position: fixed;
   background: white;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 4px;
   padding: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   font-size: 12px;
   font-family: Arial, sans-serif;
   z-index: 1000;

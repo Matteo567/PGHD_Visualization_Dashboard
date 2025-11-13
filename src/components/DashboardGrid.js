@@ -10,7 +10,7 @@ import Placeholder from './ui/Placeholder';
 import './DashboardGrid.css';
 
 /*
- Shared component for rendering dashboard grids with visualization wrappers. Shows all available visualizations instead of using dropdown selectors. The component handles view mode which currently only supports 'unified'. It manages available visualizations and all visualization configurations. It provides handlers for expand and collapse operations and tracks the currently expanded item ID. It includes a function to render visualizations and displays placeholder text when no data is available. It integrates navigation objects for each chart type and supports screenshot mode.
+ Shared component for rendering dashboard grids with visualization wrappers. Shows all available visualizations instead of using dropdown selectors. The component handles view mode which currently only supports unified. It manages available visualizations and all visualization configurations. It provides handlers for expand and collapse operations and tracks the currently expanded item ID. It includes a function to render visualizations and displays placeholder text when no data is available. It integrates navigation objects for each chart type and supports screenshot mode.
  */
 const DashboardGrid = ({
   viewMode = 'unified', // View mode (defaults to 'unified')
@@ -27,7 +27,7 @@ const DashboardGrid = ({
   // Condensed view mode
   condensedView = false
 }) => {
-  // Configuration for view mode (only 'unified' is currently used)
+  // Configuration for view mode where only unified is currently used
   const gridConfig = {
     unified: {
       className: 'dashboard-grid',
@@ -35,14 +35,14 @@ const DashboardGrid = ({
     }
   };
 
-  const config = gridConfig[viewMode] || gridConfig.unified; // Fallback to unified if unknown mode
+  const config = gridConfig[viewMode] || gridConfig.unified; // Fall back to unified if unknown mode
 
   // Get all available visualization types
   const availableVizTypes = Object.keys(availableVisualizations);
 
   // If there's an expanded item, show only that chart in expanded view
   if (expandedItem) {
-    // Extract the chart index from the chart ID (format: "viewMode-chart-index")
+    // Extract the chart index from the chart ID using format viewMode chart index
     const chartIdParts = expandedItem.split('-');
     const chartIndex = parseInt(chartIdParts[chartIdParts.length - 1]);
     const selectedViz = availableVizTypes[chartIndex];

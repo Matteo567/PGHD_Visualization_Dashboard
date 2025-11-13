@@ -1,7 +1,7 @@
 /*
  HealthDashboard.js - Unified Health Dashboard Component
  
- This component provides a unified health dashboard designed for use by both patients and healthcare providers. It displays patient information with QR code access and shows week summaries for health tracking. It includes a toggle for 3-month summaries for long-term trend analysis. Exercise visualization includes both activity breakdown and weekly goals. The component uses custom hooks for data management, visualization handling, and navigation. It implements expandable chart views and provides educational information for patients. It handles loading and error states and includes summary statistics for health monitoring. The component displays patient demographics and medication information through PatientInfoCard. The QR code section provides access to the patient dashboard. The summary toggle controls visibility of 3-month summaries. DashboardGrid renders the chart grid with navigation and expansion controls. Individual chart components handle each health metric. State management uses custom hooks for centralized state, handles chart expansion state, manages navigation state for each chart type independently, and controls summary visibility with toggle state.
+ This component provides a unified health dashboard designed for use by both patients and healthcare providers. It displays patient information with QR code access and shows week summaries for health tracking. It includes a toggle for three month summaries for long term trend analysis. Exercise visualization includes both activity breakdown and weekly goals. The component uses custom hooks for data management, visualization handling, and navigation. It implements expandable chart views and provides educational information for patients. It handles loading and error states and includes summary statistics for health monitoring. The component displays patient demographics and medication information through PatientInfoCard. The QR code section provides access to the patient dashboard. The summary toggle controls visibility of three month summaries. DashboardGrid renders the chart grid with navigation and expansion controls. Individual chart components handle each health metric. State management uses custom hooks for centralized state, handles chart expansion state, manages navigation state for each chart type independently, and controls summary visibility with toggle state.
  */
 
 import React, { useState } from 'react';
@@ -24,7 +24,7 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
   } = useVisualizations(data);
   
   // Filter visualizations based on access type
-  // Physicians do not see meal contents chart
+  // Physicians do not see meal contents chart so remove it from their view
   let availableVisualizations = { ...allAvailableVisualizations };
   if (accessType === 'Physician') {
     const { mealContents, ...rest } = availableVisualizations;
@@ -41,8 +41,8 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
 
   // Create navigation for each chart type
   // Most charts use week navigation while mood uses month navigation
-  const weekNavigation = useChartNavigation('glucose'); // Week-based
-  const monthNavigation = useChartNavigation('mood');   // Month-based
+  const weekNavigation = useChartNavigation('glucose'); // Week based navigation
+  const monthNavigation = useChartNavigation('mood');   // Month based navigation
   
   const chartNavigation = {
     glucose: weekNavigation,
@@ -50,7 +50,7 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
     exercise: weekNavigation,
     sleep: weekNavigation,
     pain: weekNavigation,
-    mood: monthNavigation,      // Mood uses month navigation
+    mood: monthNavigation,      // Mood uses month navigation instead of week
     mealContents: weekNavigation
   };
 
@@ -76,7 +76,7 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
       accessType={accessType}
       navigation={navigation}
       screenshotMode={screenshotMode}
-      showThreeMonthSummaries={showThreeMonthSummaries} // Pass summary toggle state
+      showThreeMonthSummaries={showThreeMonthSummaries} // Pass summary toggle state to chart components
     />;
   };
 
@@ -87,54 +87,56 @@ const HealthDashboard = ({ patientId, accessType = 'Admin', screenshotMode = fal
 
   return (
     <div className="health-dashboard">
-      {!screenshotMode && !condensedView && (
-        <div className="dashboard-header">
-          <PatientInfoCard 
-            patientInfo={patientInfo}
-            loading={loading}
-            error={error}
-            variant="unified"
-          />
-          
-          <div className="dashboard-controls">
-            <div className="qr-code-section">
-              <h3>Access PGHD Visualization System</h3>
-              <p>Scan QR code for quick access</p>
-              <img 
-                src={`${process.env.PUBLIC_URL}/Public_dashboard_QR_code.png`}
-                alt="QR Code for PGHD Dashboard"
-                className="qr-code-image"
-              />
-            </div>
-            
-            <div className="summary-toggle-section">
-              <h3>Summary Options</h3>
-              <Switch
-                checked={showThreeMonthSummaries}
-                onChange={toggleThreeMonthSummaries}
-                leftLabel="Week Only"
-                rightLabel="Include 3-Month"
-              />
-              <p className="toggle-description">
-                {showThreeMonthSummaries 
-                  ? "Showing both week and 3-month summaries for comprehensive health tracking"
-                  : "Showing week summaries only for focused current health monitoring"
-                }
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {!screenshotMode && (
-        <div className="condensed-view-control">
-          <button
-            onClick={() => setCondensedView(!condensedView)}
-            className="condensed-view-button"
-            aria-label={condensedView ? 'Show full view' : 'Enable condensed view'}
-          >
-            {condensedView ? 'Show Full View' : 'Condensed View'}
-          </button>
+        <div className="dashboard-top-section">
+          {!condensedView && (
+            <div className="dashboard-header">
+              <PatientInfoCard 
+                patientInfo={patientInfo}
+                loading={loading}
+                error={error}
+                variant="unified"
+              />
+              
+              <div className="dashboard-controls">
+                <div className="qr-code-section">
+                  <h3>Access PGHD Visualization System</h3>
+                  <p>Scan QR code for quick access</p>
+                  <img 
+                    src={`${process.env.PUBLIC_URL}/Public_dashboard_QR_code.png`}
+                    alt="QR Code for PGHD Dashboard"
+                    className="qr-code-image"
+                  />
+                </div>
+                
+                <div className="summary-toggle-section">
+                  <h3>Summary Options</h3>
+                  <Switch
+                    checked={showThreeMonthSummaries}
+                    onChange={toggleThreeMonthSummaries}
+                    leftLabel="Week Only"
+                    rightLabel="Include 3-Month"
+                  />
+                  <p className="toggle-description">
+                    {showThreeMonthSummaries 
+                      ? "Showing both week and 3-month summaries"
+                      : "Showing week summaries only for focused current health monitoring"
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="condensed-view-control">
+            <button
+              onClick={() => setCondensedView(!condensedView)}
+              className="condensed-view-button"
+              aria-label={condensedView ? 'Show full view' : 'Enable condensed view'}
+            >
+              {condensedView ? 'Show Full View' : 'Condensed View'}
+            </button>
+          </div>
         </div>
       )}
 

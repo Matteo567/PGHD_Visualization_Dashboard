@@ -8,7 +8,7 @@ import React from 'react';
 import Placeholder from './ui/Placeholder';
 
 /*
- Shared component for visualization containers used in both Patient and Physician dashboards. Includes navigation, loading states, and error handling. The component accepts a unique identifier for the visualization, CSS class names, selected visualization type, available visualizations, and all visualization configurations. It provides handlers for expand and collapse operations and tracks whether the visualization is expanded. It includes a function to render the visualization and displays placeholder text when no data is available. It handles chart title display and provides previous and next navigation handlers. It supports navigation label customization and screenshot mode.
+ Shared component for visualization containers used in both Patient and Physician dashboards. Includes navigation, loading states, and error handling. The component accepts a unique identifier for the visualization, CSS class names, selected visualization type, available visualizations, and all visualization configurations. It provides handlers for expand and collapse operations and tracks whether the visualization is expanded. It includes a function to render the visualization and displays placeholder text when no data is available. It provides previous and next navigation handlers. It supports navigation label customization and screenshot mode.
  */
 const VisualizationWrapper = ({ 
   id, 
@@ -20,8 +20,6 @@ const VisualizationWrapper = ({
   isExpanded, 
   renderVisualization,
   placeholderText = "No data available for this patient.",
-  // ChartContainer props
-  title,
   onPrev,
   onNext,
   navigationLabel = 'Week',
@@ -30,8 +28,6 @@ const VisualizationWrapper = ({
   // Condensed view mode
   condensedView = false
 }) => {
-  const viz = allVisualizations[selectedViz];
-  
   return (
     <div className={`visualization-wrapper ${isExpanded ? 'expanded' : ''} ${className} ${screenshotMode ? 'screenshot-mode' : ''} ${condensedView ? 'condensed-view' : ''}`}>
       {!screenshotMode && !condensedView && (

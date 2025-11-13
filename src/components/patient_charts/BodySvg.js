@@ -1,36 +1,29 @@
 /**
  BodySvg.js - Human Body Anatomical Visualization Component
  
- This component provides an interactive human body diagram:
- - SVG-based anatomical body representation
- - Interactive body regions for pain location selection
- - Design that scales with container
- - Color-coded regions for different body parts
- - Integration with pain assessment functionality
- 
- Essential for pain location mapping and anatomical reference in health assessments.
+ This component provides an interactive human body diagram with SVG based anatomical body representation. It includes interactive body regions for pain location selection. The design scales with container size. It provides color coded regions for different body parts. It integrates with pain assessment functionality. This component is essential for pain location mapping and anatomical reference in health assessments.
  */
 
 import React from 'react';
 
 const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
   const defaultFill = '#F5F5F5';
-  const strokeColor = '#CCCCCC';
+  const strokeColor = '#000000';
   const strokeWidth = 1;
 
-  // More detailed body part mapping
+  // Detailed body part mapping
   const bodyPartFills = {
-    // Head and neck
+    // Head and neck regions
     head: defaultFill,
     neck: defaultFill,
     
-    // Torso - front
+    // Torso regions visible from front
     chest: defaultFill,
     stomach: defaultFill,
     leftShoulder: defaultFill,
     rightShoulder: defaultFill,
     
-    // Torso - back
+    // Torso regions visible from back
     upperBack: defaultFill,
     lowerBack: defaultFill,
     leftShoulderBlade: defaultFill,
@@ -61,13 +54,13 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
     rightFoot: defaultFill,
   };
 
-  // Enhanced location mapping
+  // Location mapping for body parts
   const locationMapping = {
-    // Head and neck (visible from both sides)
+    // Head and neck visible from both sides
     head: 'head',
     neck: 'neck',
     
-    // Torso - front view only
+    // Torso regions visible only in front view
     chest: view === 'front' ? 'chest' : null,
     stomach: view === 'front' ? 'stomach' : null,
     abdomen: view === 'front' ? 'stomach' : null,
@@ -77,7 +70,7 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
     shoulder: view === 'front' ? 'leftShoulder' : null,
     shoulders: view === 'front' ? 'leftShoulder' : null,
     
-    // Torso - back view only
+    // Torso regions visible only in back view
     back: view === 'back' ? 'upperBack' : null,
     upperBack: view === 'back' ? 'upperBack' : null,
     lowerBack: view === 'back' ? 'lowerBack' : null,
@@ -87,13 +80,13 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
     shoulderBlade: view === 'back' ? 'leftShoulderBlade' : null,
     shoulderBlades: view === 'back' ? 'leftShoulderBlade' : null,
     
-    // Hips (visible from both sides)
+    // Hips visible from both sides
     hip: 'leftHip',
     hips: 'leftHip',
     leftHip: 'leftHip',
     rightHip: 'rightHip',
     
-    // Arms (visible from both sides)
+    // Arms visible from both sides
     arm: 'leftArm',
     arms: 'leftArm',
     leftArm: 'leftArm',
@@ -111,7 +104,7 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
     leftHand: 'leftHand',
     rightHand: 'rightHand',
     
-    // Legs (visible from both sides)
+    // Legs visible from both sides
     leg: 'leftThigh',
     legs: 'leftThigh',
     leftThigh: 'leftThigh',
@@ -138,7 +131,7 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
   if (targetPart && targetPart !== null) {
     bodyPartFills[targetPart] = painColor;
     
-    // Handle symmetrical body parts - shade both sides for general terms
+    // Handle symmetrical body parts by shading both sides for general terms
     if (painLocation === 'elbow' || painLocation === 'elbows') {
       bodyPartFills.leftElbow = painColor;
       bodyPartFills.rightElbow = painColor;
@@ -582,7 +575,7 @@ const BodySvg = ({ painLocation, painColor, className, view = 'front' }) => {
       className={className}
       preserveAspectRatio="xMidYMid meet"
       style={{
-        transition: 'all 0.2s ease' // Smooth transitions for scaling
+        transition: 'all 0.2s ease' // Smooth transitions for scaling when size changes
       }}
     >
       {view === 'front' ? renderFrontView() : renderBackView()}

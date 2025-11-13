@@ -1,23 +1,20 @@
 /*
  MealContentsChart.js - Nutritional Tracking Visualization
  
- This component provides meal and nutrition monitoring with meal timing and content breakdown. It tracks nutritional components and provides daily and weekly dietary pattern analysis. It includes interactive tooltips with meal details and navigation controls for time periods. It integrates with patient data and chart navigation. This component is used for dietary monitoring and nutritional assessment.
+ This component monitors meals and nutrition with meal timing and content breakdown. It tracks nutritional components and provides daily and weekly dietary pattern analysis. It includes interactive tooltips with meal details and navigation controls for time periods. It integrates with patient data and chart navigation. This component is used for dietary monitoring and nutritional assessment.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Legend from '../Legend';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
-
 import './MealContentsChart.css';
 
-
-// --- Constants ---
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Constants
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Late Night Snack'];
 const FOOD_CATEGORIES = ['Protein', 'Carbohydrates', 'Vegetables', 'Fruit', 'Alcohol'];
 const SUGAR_CATEGORIES = ['', '1-20g', '20-40g', '40-60g', '60g+'];
-// Emoji mappings for food categories
+// Emoji mappings for each food category
 const CATEGORY_EMOJIS = {
   'Protein': '🥩',
   'Carbohydrates': '🍞',
@@ -34,16 +31,13 @@ const SUGAR_EMOJIS = {
   '60g+': '🎂'         // Cake
 };
 
-
-
-// --- Helper Functions ---
+// Helper functions
 const formatDayLabel = (date) => {
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[date.getDay()];
 };
 
 const getMealTime = (data, mealType) => {
-  // Convert meal type to the correct column name format (with underscores)
+  // Convert meal type to the correct column name format using underscores
   const columnPrefix = mealType.replace(/\s+/g, '_');
   const timeKey = `${columnPrefix}_Time`;
   return data[timeKey] || '';
@@ -52,12 +46,12 @@ const getMealTime = (data, mealType) => {
 const getMealData = (data, mealType) => {
   const mealData = {};
   
-  // Convert meal type to the correct column name format (with underscores)
+  // Convert meal type to the correct column name format using underscores
   const columnPrefix = mealType.replace(/\s+/g, '_');
   
   FOOD_CATEGORIES.forEach(category => {
     const key = `${columnPrefix}_${category}`;
-    // Handle both numeric (1, 0) and string ('1', '0') values
+    // Handle both numeric values like 1 and 0 and string values like '1' and '0'
     mealData[category] = data[key] === 1 || data[key] === '1';
   });
   
@@ -67,7 +61,7 @@ const getMealData = (data, mealType) => {
   return mealData;
 };
 
-// --- Chart Sub-components ---
+// Chart sub components
 
 const XAxis = ({ config, weekDays }) => (
   <g className="x-axis">
@@ -114,12 +108,12 @@ const XAxis = ({ config, weekDays }) => (
 );
 
 const YAxis = ({ config }) => {
-  // Calculate dynamic text positioning based on available space
+  // Calculate text positioning dynamically based on available space
   const getTextX = (textLength) => {
-    // Base offset from the chart area
+    // Base offset from the chart area for text positioning
     const baseOffset = 10;
-    // Calculate position to ensure text doesn't get cut off
-    // For longer text like "Late Night Snack", position it closer to the chart
+    // Calculate position to ensure text does not get cut off
+    // For longer text like Late Night Snack, position it closer to the chart
     const dynamicOffset = textLength > 10 ? 5 : 25;
     return Math.max(baseOffset, config.padding.left - dynamicOffset);
   };
@@ -168,21 +162,21 @@ const MealCell = ({ config, dayIndex, mealIndex, mealData, mealTime, isExpanded 
   const cellWidth = config.dayWidth - 10;
   const cellHeight = config.mealHeight - 10;
   
-  // Calculate grid layout for 6 circles (2x3 grid)
+  // Calculate grid layout for 6 circles in a 2 by 3 grid
   const circlesPerRow = 3;
   const circleWidth = cellWidth / circlesPerRow;
-  const circleHeight = (cellHeight - 20) / 2; // Reserve space for time
+  const circleHeight = (cellHeight - 20) / 2; // Reserve space for time display
   
-  // Calculate circle radius and emoji size based on cell dimensions
+  // Calculate circle radius and emoji size based on cell dimensions for proper scaling
   const minDimension = Math.min(circleWidth, circleHeight);
-  const circleRadius = Math.max(8, Math.min(16, minDimension * 0.35)); // Min 8px, max 16px, 35% of min dimension
-  const emojiFontSize = Math.max(8, Math.min(16, minDimension * 0.4)); // Min 8px, max 16px, 40% of min dimension for better visibility
+  const circleRadius = Math.max(8, Math.min(16, minDimension * 0.35)); // Minimum 8px, maximum 16px, 35 percent of min dimension
+  const emojiFontSize = Math.max(8, Math.min(16, minDimension * 0.4)); // Minimum 8px, maximum 16px, 40 percent of min dimension for better visibility
   
-  // Apply expanded view scaling
+  // Apply scaling for expanded view
   const expandedCircleRadius = isExpanded ? circleRadius * 1.3 : circleRadius;
   const expandedEmojiFontSize = isExpanded ? emojiFontSize * 1.4 : emojiFontSize;
   
-  // Define the 6 food categories in order (5 main + 1 sugar)
+  // Define the 6 food categories in order with 5 main categories plus 1 sugar category
   const allCategories = [...FOOD_CATEGORIES, 'Added Sugar'];
   
   return (
@@ -198,7 +192,7 @@ const MealCell = ({ config, dayIndex, mealIndex, mealData, mealTime, isExpanded 
         strokeWidth="1"
       />
       
-      {/* Meal time at the top */}
+      {/* Display meal time at the top of the cell */}
       <text
         x={x + cellWidth / 2}
         y={y + 12}
@@ -209,7 +203,7 @@ const MealCell = ({ config, dayIndex, mealIndex, mealData, mealTime, isExpanded 
         {mealTime}
       </text>
       
-      {/* 6 placeholder circles with food category emojis */}
+      {/* Six placeholder circles with food category emojis */}
       {allCategories.map((category, index) => {
         const row = Math.floor(index / circlesPerRow);
         const col = index % circlesPerRow;
@@ -299,24 +293,20 @@ const MealGrid = ({ config, weekDays, patientData, isExpanded }) => {
 };
 
 
-// --- Main Component ---
+// Main component
 const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { mealData: patientData, loading, error } = usePatientData(patientId);
+  const { mealData: patientData } = usePatientData(patientId);
   
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('mealContents');
-  const nav = navigation || internalNavigation;
-  const containerRef = useRef(null);
-  const [containerWidth, setContainerWidth] = useState(500);
+  const nav = navigation;
 
-  // Inline configuration for chart dimensions and styling
+  // Configuration for chart dimensions and styling
   const mealHeight = isExpanded ? 90 : 70;
   const dayWidth = isExpanded ? 100 : 70;
   const leftPadding = 140;
   
   const config = {
     width: leftPadding + (dayWidth * 7),
-    height: (4 * mealHeight) + 50 + 100, // 4 meals + top + bottom padding
+    height: (4 * mealHeight) + 50 + 100, // Four meals plus top and bottom padding
     padding: { top: 50, right: 40, bottom: 100, left: leftPadding },
     dayWidth: dayWidth,
     mealHeight: mealHeight,
@@ -327,20 +317,6 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
       timeLabel: isExpanded ? 8 : 8,
     },
   };
-  
-  // Measure container width for sizing
-  useEffect(() => {
-    const updateContainerWidth = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
-        setContainerWidth(width);
-      }
-    };
-
-    updateContainerWidth();
-    window.addEventListener('resize', updateContainerWidth);
-    return () => window.removeEventListener('resize', updateContainerWidth);
-  }, [isExpanded]);
 
   const { start: startOfWeek, end: endOfWeek } = nav.getDateRange();
   const weekDays = Array.from({ length: 7 }, (_, i) => {
@@ -349,14 +325,14 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
     return day;
   });
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = patientData.filter(d => {
     const dataDate = new Date(d.Date);
     return dataDate >= startOfThreeMonths && dataDate <= endOfThreeMonths;
   });
 
-  // Calculate summary statistics for physician view
+  // Calculate summary statistics for the physician view
   let weekSummary = null;
   if (patientData && patientData.length > 0) {
 
@@ -367,13 +343,13 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
 
     if (weekData.length === 0) return null;
 
-    // Count food categories across all meals
+    // Count food categories across all meals in the week
     const categoryStats = {};
     FOOD_CATEGORIES.forEach(category => {
       categoryStats[category] = 0;
     });
 
-    // Count sugar levels
+    // Count occurrences of each sugar level
     const sugarStats = {};
     SUGAR_CATEGORIES.filter(s => s !== '').forEach(sugar => {
       sugarStats[sugar] = 0;
@@ -399,7 +375,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
             }
           });
 
-          // Count sugar levels
+          // Count occurrences of each sugar level
           if (mealData['Added Sugar'] && mealData['Added Sugar'] !== '') {
             sugarStats[mealData['Added Sugar']]++;
           }
@@ -407,11 +383,11 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
       });
     });
 
-    // Find most common food category
+    // Find the most common food category
     const mostCommonFood = Object.entries(categoryStats)
       .sort(([,a], [,b]) => b - a)[0];
 
-    // Calculate sugar frequency
+    // Calculate how frequently sugar appears in meals
     const totalSugarMeals = Object.values(sugarStats).reduce((sum, count) => sum + count, 0);
     const sugarPercentage = totalMealsLogged > 0 ? 
       ((totalSugarMeals / totalMealsLogged) * 100).toFixed(0) : 0;
@@ -427,17 +403,17 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
     };
   }
 
-  // Calculate 3-month summary statistics for physician view
+  // Calculate three month summary statistics for physician view
   let threeMonthSummary = null;
   if (threeMonthData && threeMonthData.length > 0) {
 
-    // Count food categories across all meals
+    // Count food categories across all meals in the week
     const categoryStats = {};
     FOOD_CATEGORIES.forEach(category => {
       categoryStats[category] = 0;
     });
 
-    // Count sugar levels
+    // Count occurrences of each sugar level
     const sugarStats = {};
     SUGAR_CATEGORIES.filter(s => s !== '').forEach(sugar => {
       sugarStats[sugar] = 0;
@@ -463,7 +439,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
             }
           });
 
-          // Count sugar levels
+          // Count occurrences of each sugar level
           if (mealData['Added Sugar'] && mealData['Added Sugar'] !== '') {
             sugarStats[mealData['Added Sugar']]++;
           }
@@ -471,11 +447,11 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
       });
     });
 
-    // Find most common food category
+    // Find the most common food category
     const mostCommonFood = Object.entries(categoryStats)
       .sort(([,a], [,b]) => b - a)[0];
 
-    // Calculate sugar frequency
+    // Calculate how frequently sugar appears in meals
     const totalSugarMeals = Object.values(sugarStats).reduce((sum, count) => sum + count, 0);
     const sugarPercentage = totalMealsLogged > 0 ? 
       ((totalSugarMeals / totalMealsLogged) * 100).toFixed(0) : 0;
@@ -497,7 +473,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
       <div className="meal-contents-chart-container">
         <h3 className="chart-title">Meal Contents</h3>
         <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
-        <div className={`meal-chart-wrapper ${isExpanded ? 'expanded' : ''}`} ref={containerRef}>
+        <div className={`meal-chart-wrapper ${isExpanded ? 'expanded' : ''}`}>
           <svg 
             width={config.width} 
             height={config.height} 
@@ -535,7 +511,7 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
             />
         </div>
 
-        {/* Show summary for physician/unified view */}
+        {/* Show summary for physician or unified view */}
         {weekSummary && (
           <div className="summary-container">
             <div className="chart-summary">

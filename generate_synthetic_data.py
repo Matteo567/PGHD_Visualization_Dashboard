@@ -1,22 +1,6 @@
 ''' generate_synthetic_data.py - Synthetic Health Data Generator
 
-This script generates comprehensive synthetic health tracking data for 100 patients
-covering the period July 2024 - July 2025. The generated data includes:
-
-- Patient demographics (age, gender, names)
-- Medical conditions and diagnoses
-- Current medications with dosages and schedules
-- Blood glucose readings (pre/post meal)
-- Blood pressure measurements (systolic/diastolic)
-- Exercise activity tracking (type, duration, frequency)
-- Mood tracking (daily emotional states)
-- Pain assessment (location, intensity, frequency)
-- Sleep tracking (duration, quality ratings)
-- Meal contents and nutritional data
-
-- Data is saved as individual CSV files per patient and a combined master CSV.
-- This synthetic dataset enables testing and demonstration of the health dashboard.
-- without requiring real patient data.'''
+This script generates comprehensive synthetic health tracking data for 100 patients covering the period July 2024 to July 2025. The generated data includes patient demographics with age, gender, and names. It includes medical conditions and diagnoses. It includes current medications with dosages and schedules. It includes blood glucose readings for pre and post meal. It includes blood pressure measurements for systolic and diastolic. It includes exercise activity tracking with type, duration, and frequency. It includes mood tracking with daily emotional states. It includes pain assessment with location, intensity, and frequency. It includes sleep tracking with duration and quality ratings. It includes meal contents and nutritional data. Data is saved as individual CSV files per patient and a combined master CSV. This synthetic dataset enables testing and demonstration of the health dashboard without requiring real patient data.'''
 
 import os
 import random
@@ -24,14 +8,14 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-'''Age and Medication Helpers'''
+'''Age and medication helper functions'''
 
 def generate_patient_age():
-    '''Generate patient age (mean 69, SD 3.1, min 65)'''
+    '''Generate patient age with mean 69, standard deviation 3.1, minimum 65'''
     return int(np.clip(np.random.normal(69, 3.1), 65, None))
 
 def generate_patient_gender():
-    '''Generate patient gender with slight female bias (common in older populations)'''
+    '''Generate patient gender with slight female bias which is common in older populations'''
     return random.choice(["Male", "Female"])
 
 def load_names_by_gender():
@@ -69,7 +53,7 @@ def generate_patient_name(gender, male_names, female_names):
         return random.choice(female_names)
 
 def parse_medications_with_dosages(filename):
-    '''Parse medications from the Sample_medications.txt format.'''
+    '''Parse medications from the Sample_medications.txt format'''
     all_medications = []
     
     current_medication = None
@@ -134,11 +118,9 @@ def parse_medications_with_dosages(filename):
 random.seed(999)
 np.random.seed(999)
 
-# ---------------------------------------------
 # Universally collected data
-# ---------------------------------------------
 MOOD_VALUES = ["happy", "sad", "angry", "contempt"]
-# Add probability for empty mood (neutral)
+# Add probability for empty mood which represents neutral
 MOOD_PROBABILITIES = [0.25, 0.15, 0.10, 0.10, 0.40]  # happy, sad, angry, contempt, empty (neutral)
 MOOD_VALUES_WITH_EMPTY = ["happy", "sad", "angry", "contempt", ""]
 
@@ -147,9 +129,7 @@ WEATHER_VALUES = ["Good", "Bad"]
 SLEEP_QUALITIES = ["Very good", "Fairly good", "Fairly bad", "Very bad"]
 SLEEP_QUALITY_MAP = {v: i for i, v in enumerate(SLEEP_QUALITIES)}
 
-# ---------------------------------------------
 # Meal contents
-# ---------------------------------------------
 MEAL_COMPONENTS = ["Protein", "Vegetables", "Fruit", "Alcohol", "Carbohydrates"]
 ADDED_SUGAR_CATEGORIES = ["0-20g", "20-40g", "40-60g", "60g+"]
 
@@ -163,14 +143,14 @@ MEDICATION_CATEGORIES = [
     "Other"
 ]
 
-# Helper for meal components: returns dict of binary meal components and added sugar category
-# Each meal gets random binary assignment for each component, and a random added sugar category
+# Helper for meal components that returns dict of binary meal components and added sugar category
+# Each meal gets random binary assignment for each component and a random added sugar category
 
 SUGAR_CATEGORIES = ["", "1-20g", "20-40g", "40-60g", "60g+"]
-# Exponential decay: no sugar most common, high sugar least common
+# Exponential decay where no sugar is most common and high sugar is least common
 SUGAR_WEIGHTS = [0.516, 0.258, 0.129, 0.065, 0.032]
 
-# Meal-specific probabilities of having any food content
+# Meal specific probabilities of having any food content
 MEAL_FOOD_PROBABILITIES = {
     "Breakfast": 1.0,    # 100% chance
     "Lunch": 0.9,        # 90% chance
@@ -179,46 +159,44 @@ MEAL_FOOD_PROBABILITIES = {
 }
 
 def generate_meal_contents(meal_type=None):
-    # Check if this meal should have any food content at all
+    # Check if this meal should have any food content at all based on meal type
     if meal_type and meal_type in MEAL_FOOD_PROBABILITIES:
         has_food_probability = MEAL_FOOD_PROBABILITIES[meal_type]
         if random.random() > has_food_probability:
-            # No food content for this meal
+            # No food content for this meal so return empty components
             components = {comp: 0 for comp in MEAL_COMPONENTS}
             added_sugar = ""
             return components, added_sugar
     
-    # Generate food components as before
+    # Generate food components using random binary assignment
     components = {comp: random.choice([1, 0]) for comp in MEAL_COMPONENTS}
     added_sugar = np.random.choice(SUGAR_CATEGORIES, p=SUGAR_WEIGHTS)
     return components, added_sugar
 
 def generate_exercise_data():
-    """Generate 1-5 exercise types per day with exponential decay probability
-    Total exercise time averages 17 minutes per day"""
-    # Use exponential decay for number of exercises (1 most common, 5 least common)
-    # Probabilities: [0.516, 0.258, 0.129, 0.065, 0.032] for 1-5 exercises
+    """Generate 1 to 5 exercise types per day with exponential decay probability. Total exercise time averages 17 minutes per day."""
+    # Use exponential decay for number of exercises where 1 is most common and 5 is least common
+    # Probabilities are 0.516, 0.258, 0.129, 0.065, 0.032 for 1 to 5 exercises
     exercise_probs = [0.516, 0.258, 0.129, 0.065, 0.032]
     num_exercises = np.random.choice([1, 2, 3, 4, 5], p=exercise_probs)
     
-    # Generate total exercise time for the day (uniform distribution around 17 minutes average)
-    # Range: 5-29 minutes to achieve average of 17 minutes per day
+    # Generate total exercise time for the day using uniform distribution around 17 minutes average
+    # Range is 5 to 29 minutes to achieve average of 17 minutes per day
     total_minutes = random.randint(5, 29)
     
-    # Randomly select exercise types without replacement
+    # Randomly select exercise types without replacement to avoid duplicates
     selected_exercises = random.sample(EXERCISE_TYPES, num_exercises)
     
-    # Distribute total minutes across exercises
-    # Use random proportions that sum to total_minutes
+    # Distribute total minutes across exercises using random proportions that sum to total_minutes
     if num_exercises == 1:
         exercise_minutes = [total_minutes]
     else:
-        # Generate random splits that sum to total_minutes
+        # Generate random splits that sum to total_minutes for proper distribution
         splits = sorted([random.randint(1, total_minutes-1) for _ in range(num_exercises-1)])
         splits = [0] + splits + [total_minutes]
         exercise_minutes = [splits[i+1] - splits[i] for i in range(num_exercises)]
     
-    # Generate exercise data for up to 5 slots
+    # Generate exercise data for up to 5 slots per day
     exercise_data = {
         "Exercise_Type_1": selected_exercises[0] if len(selected_exercises) > 0 else "",
         "Exercise_Minutes_1": exercise_minutes[0] if len(selected_exercises) > 0 else 0,
@@ -239,59 +217,32 @@ def generate_exercise_data():
     
     return exercise_data
 
-# ---------------------------------------------
-# Meal time ranges (in 24-hour format)
-# ---------------------------------------------
+# Meal time ranges in 24 hour format
 BREAKFAST_TIME_RANGE = (6, 11)  # 6:00 AM to 11:00 AM
 LUNCH_TIME_RANGE = (11, 15)     # 11:00 AM to 3:00 PM
 DINNER_TIME_RANGE = (16, 22)    # 4:00 PM to 10:00 PM
 LATE_NIGHT_SNACK_TIME_RANGE = (22, 24)  # 10:00 PM to 11:59 PM
 
-# ---------------------------------------------
 # Exercise related data
-# ---------------------------------------------
 EXERCISE_TYPES = ["walking", "swimming", "running", "biking", "muscle-strengthening", "balance", "other"]
 
-# ---------------------------------------------
 # Pain related data
-# ---------------------------------------------
 PAIN_LOCATIONS = ["head", "neck", "shoulders", "back", "chest", "stomach", "hips", "arms", "elbows", "hands", "legs", "knees", "feet"]
 
-# ---------------------------------------------
 # Binary variables
-# ---------------------------------------------
 BINARY_VALUES = ["Yes", "No"]
 
-# ---------------------------------------------
-# Date Range for July 2024 - July 2025
-# ---------------------------------------------
+# Date range for July 2024 to July 2025
 start_date = datetime(2024, 7, 1)
 end_date = datetime(2025, 7, 31)
 date_range = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range((end_date - start_date).days + 1)]
 
-# ---------------------------------------------
-# Helper Functions
-# ---------------------------------------------
+# Helper functions
 def assign_conditions():
-    """Randomly assign chronic conditions based on Canadian Community Health Survey prevalence rates.
-    
-    Key findings from 2017-2018 CCHS:
-    
-    Conditions with relevant data mappings:
-    - Hypertension (65.7%): BP readings, medications
-    - Periodontal disease (52.0%): no direct data mapping
-    - Osteoarthritis (38.0%): pain location/level, exercise type
-    - Ischemic heart disease (27.0%): BP readings, exercise data
-    - Diabetes (26.8%): glucose levels, medications, meal contents
-    - Osteoporosis (25.1%): pain location/level, exercise type
-    - Cancer (21.5%): no direct data mapping but included for realism
-    - COPD (20.2%): no direct data mapping but included for realism
-    - Asthma (10.7%): no direct data mapping but included for realism
-    - Mood and/or anxiety disorder (10.5%): mood tracking, medications, sleep quality
-    """
+    """Randomly assign chronic conditions based on Canadian Community Health Survey prevalence rates. Key findings from 2017 to 2018 CCHS include conditions with relevant data mappings. Hypertension at 65.7 percent maps to BP readings and medications. Periodontal disease at 52.0 percent has no direct data mapping. Osteoarthritis at 38.0 percent maps to pain location and level and exercise type. Ischemic heart disease at 27.0 percent maps to BP readings and exercise data. Diabetes at 26.8 percent maps to glucose levels, medications, and meal contents. Osteoporosis at 25.1 percent maps to pain location and level and exercise type. Cancer at 21.5 percent has no direct data mapping but is included for realism. COPD at 20.2 percent has no direct data mapping but is included for realism. Asthma at 10.7 percent has no direct data mapping but is included for realism. Mood and or anxiety disorder at 10.5 percent maps to mood tracking, medications, and sleep quality."""
     conditions = []
     
-    # Assign conditions based on individual prevalence rates
+    # Assign conditions based on individual prevalence rates from CCHS data
     if random.random() < 0.657:  # 65.7% prevalence
         conditions.append("Hypertension")
     if random.random() < 0.52:   # 52.0% prevalence
@@ -315,19 +266,19 @@ def assign_conditions():
     
     # All patients have at least two chronic conditions to reflect that many seniors have multiple conditions and to provide meaningful dashboard data
     
-    # If no conditions were assigned, assign two common ones
+    # If no conditions were assigned, assign two common ones from the list
     if len(conditions) == 0:
         conditions.extend(random.sample(["Hypertension", "Osteoarthritis", "Diabetes", "Osteoporosis"], 2))
     
-    # If only one condition was assigned, add a second one
+    # If only one condition was assigned, add a second one from available conditions
     elif len(conditions) == 1:
         additional_conditions = ["Hypertension", "Diabetes", "Osteoarthritis", "Osteoporosis", "Mood and/or anxiety disorder", "Ischemic heart disease"]
-        # Remove conditions already assigned
+        # Remove conditions already assigned to avoid duplicates
         available_conditions = [c for c in additional_conditions if c not in conditions]
         if available_conditions:
             conditions.append(random.choice(available_conditions))
     
-    # If we still don't have at least 2 conditions, force add common ones
+    # If we still do not have at least 2 conditions, force add common ones
     if len(conditions) < 2:
         common_conditions = ["Hypertension", "Osteoarthritis", "Diabetes"]
         for condition in common_conditions:
@@ -344,7 +295,7 @@ def assign_medications_by_conditions(conditions, all_medications):
     category_counts = {}
     cond_set = set(conditions)
 
-    # Check which conditions the patient has (used later for default medication if needed)
+    # Check which conditions the patient has for use later in default medication assignment if needed
     has_hypertension = "Hypertension" in cond_set or "Ischemic heart disease" in cond_set
     has_diabetes = "Diabetes" in cond_set
     has_pain = "Osteoarthritis" in cond_set or "Osteoporosis" in cond_set
@@ -352,12 +303,12 @@ def assign_medications_by_conditions(conditions, all_medications):
     has_respiratory = "COPD" in cond_set or "Asthma" in cond_set
     has_cancer = "Cancer" in cond_set
 
-    # Shuffle medications to randomize selection
+    # Shuffle medications to randomize selection order
     random.shuffle(all_medications)
 
     # Assign medications based on conditions
     for med, med_type, category, dosage in all_medications:
-        # Only allow up to 2 medications per category
+        # Only allow up to 2 medications per category to limit medication count
         if category_counts.get(category, 0) >= 2:
             continue
 
@@ -379,12 +330,12 @@ def assign_medications_by_conditions(conditions, all_medications):
         elif "Vitamins and supplements" in category:
             should_assign = random.random() < 0.7
 
-        # Add medication if it should be assigned with 90% probability
+        # Add medication if it should be assigned with 90 percent probability
         if should_assign and random.random() < 0.9:
             assigned_meds.append((med, med_type, category, dosage))
             category_counts[category] = category_counts.get(category, 0) + 1
 
-    # If no medications were assigned, add at least one default medication
+    # If no medications were assigned, add at least one default medication based on conditions
     if not assigned_meds:
         if has_hypertension:
             assigned_meds.append(("Lisinopril", "Prescribed", "Heart health and hypertension", "10 mg once daily"))
@@ -400,7 +351,7 @@ def assign_medications_by_conditions(conditions, all_medications):
     return assigned_meds
 
 def get_bp_type(systolic, diastolic):
-    # Blood pressure risk categories based on Blood_pressure_range_description.txt
+    # Blood pressure risk categories based on Blood_pressure_range_description.txt file
     if systolic < 90:
         systolic_type = "Low blood pressure"
     elif 90 <= systolic <= 120:
@@ -422,30 +373,30 @@ def get_bp_type(systolic, diastolic):
     return systolic_type, diastolic_type
 
 def generate_measurement_timestamps_with_spacing(num_readings, min_hours_between=1):
-    """Generate random timestamps for health measurements with minimum spacing between readings."""
+    """Generate random timestamps for health measurements with minimum spacing between readings to avoid overlapping times."""
     if num_readings == 0:
         return ["", "", "", ""]
     
     timestamps = []
-    used_times = []  # Track used times to ensure spacing
+    used_times = []  # Track used times to ensure proper spacing between readings
     
     for i in range(num_readings):
-        max_attempts = 50  # Prevent infinite loops
+        max_attempts = 50  # Prevent infinite loops when finding valid timestamps
         attempts = 0
         
         while attempts < max_attempts:
-            # Generate completely random time (0-23 hours)
+            # Generate completely random time from 0 to 23 hours
             hour = random.randint(0, 23)
             minute = random.randint(0, 59)
             
-            # Convert to minutes since midnight for easier comparison
+            # Convert to minutes since midnight for easier comparison of time differences
             time_in_minutes = hour * 60 + minute
             
-            # Check if this time is at least min_hours_between away from all used times
+            # Check if this time is at least min_hours_between away from all used times to ensure spacing
             valid_time = True
             for used_time in used_times:
                 time_diff = abs(time_in_minutes - used_time)
-                # Handle day wraparound (e.g., 23:00 to 01:00)
+                # Handle day wraparound for example 23:00 to 01:00 across midnight
                 if time_diff > 12 * 60:  # More than 12 hours apart
                     time_diff = 24 * 60 - time_diff
                 if time_diff < min_hours_between * 60:
@@ -461,19 +412,19 @@ def generate_measurement_timestamps_with_spacing(num_readings, min_hours_between
             
             attempts += 1
         
-        # If we couldn't find a valid time after max attempts, just use the last generated time
+        # If we could not find a valid time after max attempts, just use the last generated time
         if attempts >= max_attempts:
             timestamp = f"{hour:02d}:{minute:02d}"
             timestamps.append(timestamp)
     
-    # Pad with empty strings for unused slots
+    # Pad with empty strings for unused slots to maintain consistent array length
     while len(timestamps) < 4:
         timestamps.append("")
     
     return timestamps
 
 def get_glucose_range(glucose, measurement_type):
-    # Glucose ranges from supporting file
+    # Glucose ranges from supporting file with different thresholds for pre and post meal
     if measurement_type == "Pre meal":
         if glucose < 4.0:
             return "below range"
@@ -481,7 +432,7 @@ def get_glucose_range(glucose, measurement_type):
             return "in range"
         else:
             return "above range"
-    else:  # 2-hour post meal
+    else:  # 2 hour post meal reading
         if glucose < 5.0:
             return "below range"
         elif 5.0 <= glucose <= 10.0:
@@ -490,11 +441,11 @@ def get_glucose_range(glucose, measurement_type):
             return "above range"
 
 def generate_blood_pressure_readings(has_condition):
-    """Generate 1-4 blood pressure readings per day for patients with hypertension or heart disease"""
+    """Generate 1 to 4 blood pressure readings per day for patients with hypertension or heart disease"""
     if not has_condition:
         return [0, 0, 0, 0], [0, 0, 0, 0], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]
     
-    # Determine number of readings (1-4) with exponential decay
+    # Determine number of readings from 1 to 4 with exponential decay probability
     num_readings = np.random.choice([1, 2, 3, 4], p=[0.516, 0.258, 0.129, 0.097])
     
     # Generate timestamps for the readings with minimum 1-hour spacing
@@ -508,15 +459,15 @@ def generate_blood_pressure_readings(has_condition):
     for i in range(4):
         if i < num_readings:
             # Generate blood pressure using normal distribution
-            # Systolic must always be higher than diastolic (medically required)
+            # Systolic must always be higher than diastolic which is medically required
             systolic = int(random.normalvariate(130, 15))
             
-            # Generate diastolic, ensuring it's at least 10 mmHg below systolic
+            # Generate diastolic ensuring it is at least 10 mmHg below systolic
             max_diastolic = systolic - 10
             diastolic = int(random.normalvariate(85, 10))
             diastolic = min(diastolic, max_diastolic)
             
-            # Final validation: ensure systolic > diastolic (should always be true, but safety check)
+            # Final validation to ensure systolic is greater than diastolic as safety check
             if diastolic >= systolic:
                 diastolic = max(40, systolic - 10)
             
@@ -535,11 +486,11 @@ def generate_blood_pressure_readings(has_condition):
     return systolic_readings, diastolic_readings, systolic_types, diastolic_types, timestamps
 
 def generate_glucose_readings(has_diabetes):
-    """Generate 1-4 glucose readings per day for diabetic patients"""
+    """Generate 1 to 4 glucose readings per day for diabetic patients"""
     if not has_diabetes:
         return [0, 0, 0, 0], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]
     
-    # Determine number of readings (1-4) with exponential decay
+    # Determine number of readings from 1 to 4 with exponential decay probability
     num_readings = np.random.choice([1, 2, 3, 4], p=[0.516, 0.258, 0.129, 0.097])
     
     # Generate timestamps for the readings with minimum 1-hour spacing
@@ -553,11 +504,11 @@ def generate_glucose_readings(has_diabetes):
         if i < num_readings:
             measurement_type = random.choice(["Pre meal", "2-hour post meal"])
             if measurement_type == "Pre meal":
-                # Normal distribution: mean=6.0, SD=1.5, clipped to 3.0-9.0
+                # Normal distribution with mean 6.0, standard deviation 1.5, clipped to 3.0 to 9.0
                 glucose = np.random.normal(6.0, 1.5)
                 glucose = round(np.clip(glucose, 3.0, 9.0), 1)
             else:
-                # Normal distribution: mean=7.5, SD=2.0, clipped to 4.0-12.0
+                # Normal distribution with mean 7.5, standard deviation 2.0, clipped to 4.0 to 12.0
                 glucose = np.random.normal(7.5, 2.0)
                 glucose = round(np.clip(glucose, 4.0, 12.0), 1)
             glucose_range = get_glucose_range(glucose, measurement_type)
@@ -575,17 +526,7 @@ def generate_glucose_readings(has_diabetes):
 def generate_patient_data(patient_id, conditions, age, gender, patient_name, patient_pain_location, assigned_medications):
     """Generate daily health data for a single patient based on their conditions.
     
-    Conditions are mapped to relevant data as specified in Conditions.txt:
-    - Hypertension: BP readings, medications
-    - Periodontal disease: no direct data mapping
-    - Osteoarthritis: pain location/level, exercise type
-    - Ischemic heart disease: BP readings, exercise data
-    - Diabetes: glucose levels, medications, meal contents
-    - Osteoporosis: pain location/level, exercise type
-    - Cancer: general health monitoring (no specific data mappings)
-    - COPD: general health monitoring (no specific data mappings)
-    - Asthma: general health monitoring (no specific data mappings)
-    - Mood and/or anxiety disorder: mood tracking, medications, sleep quality
+    Conditions are mapped to relevant data as specified in Conditions.txt. Hypertension maps to BP readings and medications. Periodontal disease has no direct data mapping. Osteoarthritis maps to pain location and level and exercise type. Ischemic heart disease maps to BP readings and exercise data. Diabetes maps to glucose levels, medications, and meal contents. Osteoporosis maps to pain location and level and exercise type. Cancer has general health monitoring with no specific data mappings. COPD has general health monitoring with no specific data mappings. Asthma has general health monitoring with no specific data mappings. Mood and or anxiety disorder maps to mood tracking, medications, and sleep quality.
     """
     data = []
     cond_set = set(conditions)
@@ -597,14 +538,14 @@ def generate_patient_data(patient_id, conditions, age, gender, patient_name, pat
     has_mood_disorder = "Mood and/or anxiety disorder" in cond_set
     
     for date in date_range:
-        # Basic data
+        # Basic daily data including mood, weather, and sleep
         mood = np.random.choice(MOOD_VALUES_WITH_EMPTY, p=MOOD_PROBABILITIES)
         weather = random.choice(WEATHER_VALUES)
         sleep_quality_code = random.choice([0, 1, 2, 3])
         sleep_quality = SLEEP_QUALITIES[sleep_quality_code]
         sleep_hours = round(random.uniform(1.0, 10.0), 1)
         
-        # Meal times and contents
+        # Meal times and contents for all meal types
         breakfast_hour = random.randint(*BREAKFAST_TIME_RANGE)
         breakfast_minute = random.randint(0, 59)
         breakfast_time = f"{breakfast_hour:02d}:{breakfast_minute:02d}"
@@ -620,31 +561,31 @@ def generate_patient_data(patient_id, conditions, age, gender, patient_name, pat
         dinner_time = f"{dinner_hour:02d}:{dinner_minute:02d}"
         dinner_components, dinner_added_sugar = generate_meal_contents("Dinner")
         
-        # Late night snack (10 PM to 11:59 PM)
+        # Late night snack from 10 PM to 11:59 PM
         late_snack_hour = random.randint(*LATE_NIGHT_SNACK_TIME_RANGE)
         late_snack_minute = random.randint(0, 59)
         late_snack_time = f"{late_snack_hour:02d}:{late_snack_minute:02d}"
         late_snack_components, late_snack_added_sugar = generate_meal_contents("Late night snack")
         
-        # Exercise data (1-3 types per day)
+        # Exercise data with 1 to 3 types per day
         exercise_data = generate_exercise_data()
         
-        # Pain data
+        # Pain data including location and intensity level
         pain_location = patient_pain_location
         pain_level = random.randint(0, 10)
         
-        # Continence & goal
+        # Continence and goal tracking data
         urinary_continence = random.choice(BINARY_VALUES)
         fecal_continence = random.choice(BINARY_VALUES)
         health_goal_met = random.choice(BINARY_VALUES)
         
-        # Blood pressure readings (1-4 per day) - for hypertension and heart disease patients
+        # Blood pressure readings from 1 to 4 per day for hypertension and heart disease patients
         systolic_readings, diastolic_readings, systolic_types, diastolic_types, bp_timestamps = generate_blood_pressure_readings(has_hypertension or has_heart_disease)
         
-        # Glucose readings (1-4 per day) - for diabetic patients
+        # Glucose readings from 1 to 4 per day for diabetic patients
         glucose_readings, measurement_types, glucose_ranges, glucose_timestamps = generate_glucose_readings(has_diabetes)
         
-        # Compile all data for the day
+        # Compile all data for the day into a single dictionary
         day_data = {
             "Date": date,
             "Mood": mood,
@@ -749,10 +690,8 @@ def generate_patient_data(patient_id, conditions, age, gender, patient_name, pat
         data.append(day_data)
     return pd.DataFrame(data)
 
-# ---------------------------------------------
-# Main Script: Generate Data for All Patients
-# ---------------------------------------------
-# Create the public directory for the application
+# Main script to generate data for all patients
+# Create the public directory for the application if it does not exist
 if not os.path.exists("public/synthetic_patients"):
     os.makedirs("public/synthetic_patients")
 print("Generating synthetic health data for 100 patients...")
@@ -789,7 +728,7 @@ for i in range(1, 101):
         assigned_medications
     )
     
-    # Add patient-level columns to every row
+    # Add patient level columns to every row in the dataframe
     df['Age'] = patient_age
     df['Gender'] = patient_gender
     df['Name'] = patient_name
@@ -808,9 +747,9 @@ for i in range(1, 101):
         df.insert(0, 'Patient_ID', patient_id)
         all_patients_df = pd.concat([all_patients_df, df], ignore_index=True)
 
-# Save all data to a single CSV with error handling
+# Save all data to a single CSV with error handling and retry logic
 def save_csv_with_retry(df, filepath, max_retries=3):
-    """Save CSV file with retry logic for permission errors"""
+    """Save CSV file with retry logic for permission errors that may occur when file is open"""
     for attempt in range(max_retries):
         try:
             df.to_csv(filepath, index=False)
@@ -818,7 +757,7 @@ def save_csv_with_retry(df, filepath, max_retries=3):
             return True
         except PermissionError as e:
             if attempt < max_retries - 1:
-                print(f"Permission error saving {filepath} (attempt {attempt + 1}/{max_retries}). Please close any applications that might have the file open.")
+                print(f"Permission error saving {filepath} on attempt {attempt + 1} of {max_retries}. Please close any applications that might have the file open.")
                 import time
                 time.sleep(2)  # Wait 2 seconds before retrying
             else:
@@ -828,7 +767,7 @@ def save_csv_with_retry(df, filepath, max_retries=3):
             print(f"Unexpected error saving {filepath}: {e}")
             return False
 
-# Save the combined file to public directory
+# Save the combined file to public directory with error handling
 print("Saving combined patient data...")
 success_public = save_csv_with_retry(all_patients_df, "public/synthetic_patients_all.csv")
 

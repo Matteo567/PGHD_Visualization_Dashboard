@@ -1,4 +1,4 @@
-// Hook for managing visualization components and determining which visualizations have available data
+// Hook that manages visualization components and determines which visualizations have available data
 import { VISUALIZATION_CONFIG } from '../constants';
 import GlucoseChart from '../components/patient_charts/GlucoseChart';
 import BloodPressureChart from '../components/patient_charts/BloodPressureChart';
@@ -8,7 +8,7 @@ import PainChart from '../components/patient_charts/PainChart';
 import MealContentsChart from '../components/patient_charts/MealContentsChart';
 import SleepChart from '../components/patient_charts/SleepChart';
 const useVisualizations = (data) => {
-  // All available visualization types with their components
+  // All available visualization types with their corresponding components
   const allVisualizations = {
     pain: { ...VISUALIZATION_CONFIG.pain, component: PainChart },
     glucose: { ...VISUALIZATION_CONFIG.glucose, component: GlucoseChart },
@@ -19,7 +19,7 @@ const useVisualizations = (data) => {
     mood: { ...VISUALIZATION_CONFIG.mood, component: MoodCalendar },
   };
 
-  // Find which visualizations have data available
+  // Find which visualizations have data available for display
   const availableVisualizations = {};
   if (data) {
     const vizKeys = Object.keys(allVisualizations);
@@ -27,13 +27,13 @@ const useVisualizations = (data) => {
       const key = vizKeys[i];
       const viz = allVisualizations[key];
       
-      // Special case for meal contents
+      // Special case for meal contents chart
       if (key === 'mealContents') {
         if (data['mealData'] && data['mealData'].length > 0) {
           availableVisualizations[key] = viz;
         }
       } else {
-        // For other charts, check for matching data key (e.g., glucoseData for glucose chart)
+        // For other charts, check for matching data key for example glucoseData for glucose chart
         const dataKey = `${key}Data`;
         if (data[dataKey] && data[dataKey].length > 0) {
           availableVisualizations[key] = viz;

@@ -1,22 +1,21 @@
 /*
  BloodPressureChart.js - Blood Pressure Monitoring Visualization
  
- This component provides blood pressure tracking with systolic and diastolic pressure visualization. It includes risk categorization with color coding and provides daily and weekly trend analysis. It supports display of multiple daily measurements and includes interactive tooltips with blood pressure details. It includes navigation controls for time periods. The component uses custom SVG for blood pressure visualization and implements a dual-axis system for systolic and diastolic values. It provides risk-based color coding for clinical interpretation and supports multiple daily readings with time-based positioning. The component implements configurable layouts. Visualization features include color-coded risk categories including normal, elevated, high, and crisis, time-based positioning for multiple daily readings, interactive tooltips with detailed blood pressure information, and a grid system with axis scaling. Clinical features include risk categorization based on medical guidelines, summary statistics for physician view, trend analysis over time periods, and educational information for patient view. The component structure includes a dual-axis system for systolic and diastolic values on the Y-axis, a time-based axis with day and time labels on the X-axis, interactive blood pressure readings as data points, risk category explanations in the legend, and detailed reading information in tooltips. This component is used for cardiovascular health monitoring and hypertension management.
+ This component tracks blood pressure with systolic and diastolic pressure visualization. It includes risk categorization with color coding and provides daily and weekly trend analysis. It supports display of multiple daily measurements and includes interactive tooltips with blood pressure details. It includes navigation controls for time periods. The component uses custom SVG for blood pressure visualization and implements a dual axis system for systolic and diastolic values. It provides risk based color coding for clinical interpretation and supports multiple daily readings with time based positioning. The component implements configurable layouts. Visualization features include color coded risk categories including normal, elevated, high, and crisis, time based positioning for multiple daily readings, interactive tooltips with detailed blood pressure information, and a grid system with axis scaling. Clinical features include risk categorization based on medical guidelines, summary statistics for physician view, trend analysis over time periods, and educational information for patient view. The component structure includes a dual axis system for systolic and diastolic values on the Y axis, a time based axis with day and time labels on the X axis, interactive blood pressure readings as data points, risk category explanations in the legend, and detailed reading information in tooltips. This component is used for cardiovascular health monitoring and hypertension management.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
 import InfoBox from '../InfoBox';
 import Tooltip from '../ui/Tooltip';
 import './BloodPressureChart.css';
 
 // Constants
-// Helper Functions
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+// Helper Functions
 const formatDayLabel = (date) => {
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[date.getDay()];
 };
 
@@ -27,7 +26,7 @@ const getTimePosition = (date, dayIndex, config) => {
   return config.padding.left + (dayIndex * config.dayWidth) + config.dayPadding + (timeRatio * dayContentWidth);
 };
 
-// Chart Sub-components
+// Chart sub components
 
 const YAxis = ({ config, type }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
@@ -65,12 +64,12 @@ const BPRangeBackground = ({ config, isCombined = false }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
   
   if (isCombined) {
-    // For combined chart with single axis (0-200), show only ideal ranges as green bars
+    // For combined chart with single axis from 0 to 200, show only ideal ranges as green bars
     // This avoids conflicts with dot colors which use combined risk assessment
     const valueRange = config.yAxisRange;
     const yOffset = config.yAxisOffset;
     
-    // Ideal ranges: Systolic 90-120, Diastolic 60-80
+    // Ideal ranges are Systolic 90 to 120 and Diastolic 60 to 80
     const idealRanges = [
       { 
         name: 'Systolic Ideal', 
@@ -112,7 +111,7 @@ const BPRangeBackground = ({ config, isCombined = false }) => {
       </g>
     );
   } else {
-    // For separate charts, use dual-axis ranges
+    // For separate charts, use dual axis ranges
     const systolicRange = config.yAxisRange.systolic;
     const diastolicRange = config.yAxisRange.diastolic;
     const systolicOffset = config.yAxisOffset.systolic;
@@ -190,7 +189,7 @@ const BPRangeBackground = ({ config, isCombined = false }) => {
   }
 };
 
-// Dual Y-Axis Component for Combined Chart
+// Dual Y axis component for combined chart
 const DualYAxis = ({ config }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
   const systolicLabels = config.yAxisLabels.systolic;
@@ -202,7 +201,7 @@ const DualYAxis = ({ config }) => {
 
   return (
     <g className="dual-y-axis">
-      {/* Systolic Y-Axis (Left) */}
+      {/* Systolic Y axis on the left */}
       <g className="y-axis-left">
         <text
           x={config.padding.left / 3}
@@ -234,7 +233,7 @@ const DualYAxis = ({ config }) => {
         })}
       </g>
 
-      {/* Diastolic Y-Axis (Right) */}
+      {/* Diastolic Y axis on the right */}
       <g className="y-axis-right">
         <text
           x={config.width - config.padding.right / 3}
@@ -280,7 +279,7 @@ const XAxis = ({ config, weekDays, isExpanded }) => (
 
       return (
         <g key={dayIndex} className="x-axis-label-group">
-          {/* X-axis tick marks */}
+          {/* X axis tick marks */}
           <line 
             className="x-axis-tick" 
             x1={startTickX} 
@@ -458,18 +457,18 @@ const getDiastolicColor = (value) => {
   return 'var(--chart-color-bp-high)';
 };
 
-// Combined I-Bar Chart Component
+// Combined I bar chart component
 const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
-  // Use single range for both systolic and diastolic (0-200 covers both)
+  // Use single range for both systolic and diastolic where 0 to 200 covers both
   const valueRange = config.yAxisRange;
   const yOffset = config.yAxisOffset;
 
   // Determine overall risk color and category based on both values
   // Based on Blood_pressure_range_description.txt:
   // Low: systolic < 90 AND diastolic < 60
-  // Ideal: systolic 90-120 AND diastolic 60-80
-  // Pre-high: systolic 120-140 OR diastolic 80-90
+    // Ideal is systolic 90 to 120 AND diastolic 60 to 80
+    // Pre high is systolic 120 to 140 OR diastolic 80 to 90
   // High: systolic >= 140 OR diastolic >= 90
   // This simplified function combines both color and category into one return value
   function getCombinedRisk(systolic, diastolic) {
@@ -481,7 +480,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
       };
     }
     
-    // Pre-high: systolic 120-140 OR diastolic 80-90 (but not already high)
+    // Pre high is systolic 120 to 140 OR diastolic 80 to 90 but not already high
     if ((systolic >= 120 && systolic < 140) || (diastolic >= 80 && diastolic < 90)) {
       return {
         name: 'Pre-High',
@@ -497,7 +496,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
       };
     }
     
-    // Ideal: systolic 90-120 AND diastolic 60-80 (default for remaining cases)
+    // Ideal is systolic 90 to 120 AND diastolic 60 to 80 as default for remaining cases
     return {
       name: 'Ideal',
       color: 'var(--chart-color-bp-ideal)'
@@ -511,7 +510,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
     return dateA - dateB;
   });
 
-  // Build path string for trend lines - simpler version using basic loops
+  // Build path string for trend lines using basic loops
   function buildPath(points) {
     if (points.length === 0) {
       return '';
@@ -563,12 +562,12 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
 
   return (
     <g className="combined-data-bars">
-      {/* Trend lines - draw before dots so dots appear on top */}
+      {/* Trend lines drawn before dots so dots appear on top */}
       {systolicPath && points.length > 1 && (
         <path
           d={systolicPath}
           fill="none"
-          stroke="#cccccc"
+          stroke="#000000"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -579,7 +578,7 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
         <path
           d={diastolicPath}
           fill="none"
-          stroke="#cccccc"
+          stroke="#000000"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -616,27 +615,25 @@ const CombinedDataBars = ({ readings, config, onBarHover, onBarLeave }) => {
 
         return (
           <g key={index} className="bp-reading-group">
-            {/* Systolic point - standardized styling */}
+            {/* Systolic point with standardized styling */}
             <circle
               cx={x}
               cy={systolicY}
               r="5"
               fill={combinedRiskColor}
-              stroke="#cccccc"
-              strokeWidth="2"
+              stroke="none"
               style={{ cursor: 'pointer' }}
               className="systolic-dot"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             />
-            {/* Diastolic point - standardized styling */}
+            {/* Diastolic point with standardized styling */}
             <circle
               cx={x}
               cy={diastolicY}
               r="5"
               fill={combinedRiskColor}
-              stroke="#cccccc"
-              strokeWidth="2"
+              stroke="none"
               style={{ cursor: 'pointer' }}
               className="diastolic-dot"
               onMouseEnter={handleMouseEnter}
@@ -717,7 +714,7 @@ const Chart = ({ type, weekData, isExpanded, weekDays, onBarHover, onBarLeave })
   );
 };
 
-// Combined Y-Axis Component for Combined Chart (single axis)
+// Combined Y axis component for combined chart with single axis
 const CombinedYAxis = ({ config }) => {
   const chartHeight = config.height - config.padding.top - config.padding.bottom;
   const yAxisLabels = config.yAxisLabels;
@@ -757,7 +754,7 @@ const CombinedYAxis = ({ config }) => {
   );
 };
 
-// Combined Chart Component
+// Combined chart component
 const CombinedChart = ({ weekData, isExpanded, weekDays, onBarHover, onBarLeave }) => {
   // Inline configuration for chart dimensions and styling
   const config = isExpanded 
@@ -818,7 +815,7 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, onBarHover, onBarLeave 
           {/* Blood pressure range background */}
           <BPRangeBackground config={config} isCombined={true} />
           <GridLines config={config} weekDays={weekDays} />
-          {/* Single Y-axis for combined chart */}
+          {/* Single Y axis for combined chart */}
           <CombinedYAxis config={config} />
           <XAxis config={config} weekDays={weekDays} isExpanded={isExpanded} />
           <CombinedDataBars readings={readings} config={config} onBarHover={onBarHover} onBarLeave={onBarLeave} />
@@ -837,30 +834,19 @@ const bloodPressureLegendItems = [
 
 
 
-// --- Main Component ---
+// Main component
 const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
-  const { bloodPressureData, loading, error } = usePatientData(patientId);
+  const { bloodPressureData } = usePatientData(patientId);
   const [tooltipData, setTooltipData] = useState(null);
-  // For Patient access, force Combined View (remove Separate Charts access).
-  // For Physician access, force Combined View (remove Separate Charts access).
-  // Admin can toggle between both.
+  // For Patient and Physician access, force Combined View and remove Separate Charts access
+  // Admin can toggle between both
   const shouldForceCombinedView = accessType === 'Patient' || accessType === 'Physician';
+  const [useCombinedView, setUseCombinedView] = useState(shouldForceCombinedView);
   
-  // Determine initial view state
-  let initialUseCombinedView = false;
-  if (shouldForceCombinedView) {
-    initialUseCombinedView = true;
-  }
-  
-  const [useCombinedView, setUseCombinedView] = useState(initialUseCombinedView); // State for view toggle
-  
-  // Enforce combined view for Patient and Physician - override state if needed
+  // Enforce combined view for Patient and Physician and override state if needed
   const effectiveUseCombinedView = shouldForceCombinedView ? true : useCombinedView;
-  const containerRef = useRef(null);
 
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('bloodPressure');
-  const nav = navigation || internalNavigation;
+  const nav = navigation;
 
   const { start: weekStart, end: weekEnd } = nav.getDateRange();
 
@@ -869,7 +855,7 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
     return readingDate >= weekStart && readingDate <= weekEnd;
   });
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = bloodPressureData.filter(d => {
     const readingDate = new Date(d.date);
@@ -881,9 +867,6 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
     d.setDate(weekStart.getDate() + i);
     return d;
   });
-
-
-
 
   const handleBarHover = (data) => {
     setTooltipData(data);
@@ -964,7 +947,7 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
     }
     const daysWithReadings = daysSet.size;
 
-    // Count readings in ideal category (systolic 90-120 AND diastolic 60-80)
+    // Count readings in ideal category where systolic is 90 to 120 AND diastolic is 60 to 80
     let idealReadingsCount = 0;
     for (let i = 0; i < data.length; i++) {
       const systolic = data[i].systolic;
@@ -990,17 +973,17 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
   // Calculate summary statistics for week period
   const weekSummary = calculateBPSummary(weekData);
 
-  // Calculate 3-month summary using the same helper function
+  // Calculate three month summary using the same helper function
   const threeMonthSummary = calculateBPSummary(threeMonthData);
 
   return (
     <>
-      <div className={`bp-chart-container ${isExpanded ? 'expanded' : ''}`} ref={containerRef}>
+      <div className={`bp-chart-container ${isExpanded ? 'expanded' : ''}`}>
         <div className="bp-header">
           <h3 className="bp-main-title">Blood Pressure</h3>
           <h4 className="chart-subtitle">{nav.getFormattedDateRange()}</h4>
           
-          {/* View Toggle - Hide for Patient and Physician, show both for Admin */}
+          {/* View toggle that hides for Patient and Physician and shows both for Admin */}
           {accessType === 'Admin' && (
             <div className="view-toggle">
               <button 
@@ -1052,7 +1035,7 @@ const BloodPressureChart = ({ patientId, isExpanded = false, onExpand, accessTyp
         
         <Legend title="Blood Pressure Category:" items={bloodPressureLegendItems} hide={screenshotMode} />
         
-        {/* Show InfoBox for patient view, summary for physician/unified view - Hide InfoBox for Physician but keep summaries */}
+        {/* Show InfoBox for patient view and summary for physician or unified view and hide InfoBox for Physician but keep summaries */}
         {weekSummary ? (
           <>
             {/* Hide InfoBox for Physician */}

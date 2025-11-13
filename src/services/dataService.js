@@ -88,7 +88,7 @@ export async function getPatientData(patientId) {
 }
 
 /**
- * Processes raw CSV data into structured patient information and health metrics. Returns structured patient data object. Throws error if data structure is invalid or processing fails.
+ Processes raw CSV data into structured patient information and health metrics. Returns structured patient data object. Throws error if data structure is invalid or processing fails.
  */
 function processPatientData(rows, patientId) {
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -118,7 +118,7 @@ function processPatientData(rows, patientId) {
     const medicationNames = medicationNamesStr.split('; ').filter(Boolean);
     const medicationDosages = medicationDosagesStr.split('; ').filter(Boolean);
     
-    // Validates if a medication name is valid for processing
+    // Validates if a medication name is valid for processing by checking length and content
     function isValidMedicationName(name) {
       if (name.length === 0 || name.length >= 100) return false;
       if (name.includes('Dose not specified')) return false;
@@ -259,7 +259,7 @@ function processSingleColumnGlucose(row, baseDate) {
 }
 
 /**
- * Processes blood glucose data from CSV rows.
+ Processes blood glucose data from CSV rows.
  */
 function processGlucoseData(rows) {
   const readings = [];
@@ -279,7 +279,7 @@ function processGlucoseData(rows) {
 }
 
 /**
- * Creates a date with time from a base date and time string.
+ Creates a date with time from a base date and time string.
  */
 function createDateWithTime(baseDate, timeStr) {
   const timeParts = timeStr.split(':');
@@ -296,7 +296,7 @@ function createDateWithTime(baseDate, timeStr) {
 }
 
 /**
- * Determines blood pressure type based on systolic and diastolic values.
+ Determines blood pressure type based on systolic and diastolic values.
  */
 function getBPType(systolic, diastolic) {
   if (systolic >= 180 || diastolic >= 120) return 'hypertensive crisis';
@@ -306,7 +306,7 @@ function getBPType(systolic, diastolic) {
 }
 
 /**
- * Processes a single blood pressure reading from multi-column format.
+ Processes a single blood pressure reading from multi column format.
  */
 function processMultiColumnBPReading(row, index, baseDate) {
   const systolic = parseInt(row[`Systolic_${index}`]);
@@ -332,7 +332,7 @@ function processMultiColumnBPReading(row, index, baseDate) {
 }
 
 /**
- * Processes a single blood pressure reading from single-column format.
+ Processes a single blood pressure reading from single column format.
  */
 function processSingleColumnBPReading(row, baseDate) {
   const systolic = parseInt(row['Systolic_BP']);
@@ -342,7 +342,7 @@ function processSingleColumnBPReading(row, baseDate) {
     return null;
   }
   
-  // Generate random time for single reading format when timestamp is not available
+  // Generate random time for single reading format when timestamp is not available in the data
   const randomHour = Math.floor(Math.random() * 24);
   const randomMinute = Math.floor(Math.random() * 60);
   const date = new Date(baseDate);
@@ -360,7 +360,7 @@ function processSingleColumnBPReading(row, baseDate) {
 }
 
 /**
- * Processes blood pressure data from CSV rows.
+ Processes blood pressure data from CSV rows.
  */
 function processBloodPressureData(rows) {
   const readings = [];
@@ -386,7 +386,7 @@ function processBloodPressureData(rows) {
 }
 
 /**
- * Creates initial exercise data structure for a date.
+ Creates initial exercise data structure for a date.
  */
 function createExerciseDayData(date) {
   return {
@@ -403,7 +403,7 @@ function createExerciseDayData(date) {
 }
 
 /**
- * Processes a single exercise entry.
+ Processes a single exercise entry.
  */
 function processExerciseEntry(row, index, dayData) {
   const typeKey = index ? `Exercise_Type_${index}` : 'Exercise_Type';
@@ -418,7 +418,7 @@ function processExerciseEntry(row, index, dayData) {
 }
 
 /**
- * Processes exercise data from CSV rows. Returns processed exercise data with activity types and durations.
+ Processes exercise data from CSV rows. Returns processed exercise data with activity types and durations.
  */
 function processExerciseData(rows) {
   const exerciseByDate = {};
@@ -449,7 +449,7 @@ function processExerciseData(rows) {
 }
 
 /**
- * Categorizes exercise activities into predefined types and adds them to the daily exercise data object.
+ Categorizes exercise activities into predefined types and adds them to the daily exercise data object.
  */
 function categorizeExercise(type, minutes, dayData) {
   if (type.includes('walking')) dayData.walking += minutes;
@@ -463,7 +463,7 @@ function categorizeExercise(type, minutes, dayData) {
 }
 
 /**
- * Processes mood data from CSV rows.
+ Processes mood data from CSV rows.
  */
 function processMoodData(rows) {
   const moodData = [];
@@ -482,7 +482,7 @@ function processMoodData(rows) {
 }
 
 /**
- * Processes pain data from CSV rows.
+ Processes pain data from CSV rows.
  */
 function processPainData(rows) {
   const painData = [];
@@ -504,7 +504,7 @@ function processPainData(rows) {
 }
 
 /**
- * Processes sleep data from CSV rows.
+ Processes sleep data from CSV rows.
  */
 function processSleepData(rows) {
   const sleepData = [];
@@ -528,7 +528,7 @@ function processSleepData(rows) {
 }
 
 /**
- * Checks if a meal has any food components.
+ Checks if a meal has any food components.
  */
 function hasMealComponents(row, mealType) {
   const components = [
@@ -546,7 +546,7 @@ function hasMealComponents(row, mealType) {
 }
 
 /**
- * Checks if a row has any meal data.
+ Checks if a row has any meal data.
  */
 function hasAnyMealData(row) {
   const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Late Night Snack'];
@@ -558,7 +558,7 @@ function hasAnyMealData(row) {
 }
 
 /**
- * Processes meal data from CSV rows and returns rows that have meal data.
+ Processes meal data from CSV rows and returns rows that have meal data.
  */
 function processMealData(rows) {
   return rows.filter(row => hasAnyMealData(row));

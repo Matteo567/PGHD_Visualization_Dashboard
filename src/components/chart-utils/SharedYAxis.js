@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Simple Y-Axis component for charts
+// Simple Y axis component for charts
 const SharedYAxis = ({ 
   config, 
   type = 'single', 
@@ -52,7 +52,7 @@ const SharedYAxis = ({
 
   return (
     <g className={className}>
-      {/* Y-Axis title */}
+      {/* Y axis title */}
       {title && (
         <text
           className="y-axis-title"
@@ -67,7 +67,7 @@ const SharedYAxis = ({
         </text>
       )}
 
-      {/* Render Y-axis labels based on type */}
+      {/* Render Y axis labels based on type */}
       {type === 'bloodPressure' ? (
         <>
           {renderYAxisLabels(yAxisLabels.systolic, yAxisRange.systolic, config.yAxisOffset?.systolic)}

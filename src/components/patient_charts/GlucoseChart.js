@@ -1,27 +1,26 @@
 /*
  GlucoseChart.js - Blood Glucose Monitoring Visualization
  
- This component provides blood glucose tracking with time-based glucose readings that include meal context for pre and post meal readings. It uses range-based color coding to indicate whether readings are below, in, or above target range. It provides daily and weekly trend visualization with interactive tooltips that show detailed glucose information. It includes navigation controls for time periods and integrates with patient data and chart navigation. This component is used for diabetes management and glucose trend analysis.
+ This component tracks blood glucose with time based glucose readings that include meal context for pre and post meal readings. It uses range based color coding to indicate whether readings are below, in, or above target range. It provides daily and weekly trend visualization with interactive tooltips that show detailed glucose information. It includes navigation controls for time periods and integrates with patient data and chart navigation. This component is used for diabetes management and glucose trend analysis.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import usePatientData from '../../hooks/usePatientData';
-import useChartNavigation from '../../hooks/useChartNavigation';
 import Legend from '../Legend';
 import InfoBox from '../InfoBox';
 import Tooltip from '../ui/Tooltip';
 import SharedYAxis from '../chart-utils/SharedYAxis';
 import './GlucoseChart.css';
 
-// --- Constants ---
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Constants
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const RANGE_COLORS = {
   'below range': 'var(--chart-color-secondary)', // Purple
   'in range': 'var(--chart-color-good)', // Green
   'above range': 'var(--chart-color-blue)', // Orange (despite the name, this is actually orange)
 };
 
-// --- Helper Functions ---
+// Helper functions
 const getPointColor = (range) => RANGE_COLORS[range.toLowerCase()] || RANGE_COLORS['in range'];
 const isPreMeal = (measurementType) => measurementType === 'Pre meal';
 const getTimePosition = (date, dayIndex, config) => {
@@ -31,10 +30,10 @@ const getTimePosition = (date, dayIndex, config) => {
   return dayStart + (timeRatio * (config.dayWidth - 10)) + 5;
 };
 
-// --- Chart Sub-components ---
+// Chart sub components
 const XAxisAndGrid = ({ config, startOfWeek, isExpanded }) => (
   <g className="x-axis-grid">
-    {DAYS_OF_WEEK.map((day, i) => {
+    {dayNames.map((day, i) => {
       const x = config.padding.left + i * config.dayWidth;
       const currentDay = new Date(startOfWeek);
       currentDay.setDate(startOfWeek.getDate() + i);
@@ -115,16 +114,16 @@ const XAxisAndGrid = ({ config, startOfWeek, isExpanded }) => (
     {/* Final tick mark at the end of the last day */}
     <line 
       className="x-axis-tick" 
-      x1={config.padding.left + DAYS_OF_WEEK.length * config.dayWidth} 
+      x1={config.padding.left + dayNames.length * config.dayWidth} 
       y1={config.height - config.padding.bottom} 
-      x2={config.padding.left + DAYS_OF_WEEK.length * config.dayWidth} 
+      x2={config.padding.left + dayNames.length * config.dayWidth} 
       y2={config.height - config.padding.bottom + 5}
-      stroke="#666"
+      stroke="#000000"
       strokeWidth="1"
     />
     <text 
       className="time-label" 
-      x={config.padding.left + DAYS_OF_WEEK.length * config.dayWidth} 
+      x={config.padding.left + dayNames.length * config.dayWidth} 
       y={config.height - config.padding.bottom + 15} 
       textAnchor="middle"
       fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
@@ -232,7 +231,7 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
   );
 };
 
-// --- Main Component ---
+// Main component
 const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admin', navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
   const healthRangeLegendItems = [
     { label: 'Above range', color: RANGE_COLORS['above range'] },
@@ -254,20 +253,15 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
       description: 'Blood glucose measurements taken after meals'
     },
   ];
-  const { glucoseData, loading, error } = usePatientData(patientId);
+  const { glucoseData } = usePatientData(patientId);
   const [tooltipData, setTooltipData] = useState(null);
-  const containerRef = useRef(null);
 
-  // Use navigation from parent or fallback to internal navigation
-  const internalNavigation = useChartNavigation('glucose');
-  const nav = navigation || internalNavigation;
-
-
+  const nav = navigation;
 
   const { start: startOfWeek, end: endOfWeek } = nav.getDateRange();
   const weekData = glucoseData.filter(d => d.date >= startOfWeek && d.date <= endOfWeek);
 
-  // Get 3-month data
+  // Get data for the three month period
   const { start: startOfThreeMonths, end: endOfThreeMonths } = nav.getThreeMonthRange();
   const threeMonthData = glucoseData.filter(d => d.date >= startOfThreeMonths && d.date <= endOfThreeMonths);
 
@@ -290,7 +284,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
       return null;
     }
 
-    // Separate readings by meal timing (pre-meal vs post-meal)
+    // Separate readings by meal timing for pre meal and post meal
     const preMealReadings = [];
     const postMealReadings = [];
     
@@ -318,14 +312,14 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
     }
     const peakGlucose = maxGlucose.toFixed(1);
     
-    // Calculate average for pre-meal readings only
+    // Calculate average for pre meal readings only
     let preMealSum = 0;
     for (let i = 0; i < preMealReadings.length; i++) {
       preMealSum = preMealSum + preMealReadings[i].value;
     }
     const avgPreMeal = preMealReadings.length > 0 ? (preMealSum / preMealReadings.length).toFixed(1) : 0;
     
-    // Calculate average for post-meal readings only
+    // Calculate average for post meal readings only
     let postMealSum = 0;
     for (let i = 0; i < postMealReadings.length; i++) {
       postMealSum = postMealSum + postMealReadings[i].value;
@@ -377,7 +371,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
   // Calculate summary statistics for week period
   const weekSummary = calculateGlucoseSummary(weekData);
 
-  // Calculate 3-month summary using the same helper function
+  // Calculate three month summary using the same helper function
   const threeMonthSummary = calculateGlucoseSummary(threeMonthData);
 
 
@@ -391,7 +385,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
 
   return (
     <>
-      <div className="glucose-chart-container" ref={containerRef}>
+      <div className="glucose-chart-container">
         <div className={`glucose-chart-wrapper ${isExpanded ? 'expanded' : ''}`}>
                   <Chart 
           weekData={weekData} 
@@ -407,7 +401,7 @@ const GlucoseChart = ({ patientId, isExpanded = false, onExpand, accessType = 'A
           <Legend title="Prandial State" items={mealTimeLegendItems} hide={screenshotMode} />
         </div>
         
-        {/* Show InfoBox and summary for unified view - Hide InfoBox for Physician but keep summaries */}
+        {/* Show InfoBox and summary for unified view and hide InfoBox for Physician but keep summaries */}
         {weekSummary ? (
           <>
             {/* Hide InfoBox for Physician */}

@@ -20,7 +20,7 @@
 .access-type-selector-select {
   font-size: 1rem;
   padding: 4px 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #000000;
   border-radius: 4px;
   background: white;
   color: #000000;
@@ -28,11 +28,11 @@
 }
 
 .access-type-selector-select:hover {
-  border-color: #999;
+  border-color: #000000;
 }
 
 .access-type-selector-select:focus {
   outline: none;
-  border-color: #666;
+  border-color: #000000;
 }
 

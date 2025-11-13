@@ -26,21 +26,24 @@ function App() {
         <div className="header-content">
           <h1>Patient-Generated Health Data (PGHD) Visualization System</h1>
           
-          {/* Access Type Selector */}
-          <div className="access-type-selector">
-            <AccessTypeSelector
-              value={accessType}
-              onChange={setAccessType}
-            />
-          </div>
+          {/* Selectors Container */}
+          <div className="selectors-container">
+            {/* Access Type Selector */}
+            <div className="access-type-selector">
+              <AccessTypeSelector
+                value={accessType}
+                onChange={setAccessType}
+              />
+            </div>
 
-          {/* Patient Selector */}
-          <div className="patient-selector">
-            <PatientSelector
-              patients={PATIENTS}
-              value={selectedPatient}
-              onChange={setSelectedPatient}
-            />
+            {/* Patient Selector */}
+            <div className="patient-selector">
+              <PatientSelector
+                patients={PATIENTS}
+                value={selectedPatient}
+                onChange={setSelectedPatient}
+              />
+            </div>
           </div>
 
         </div>

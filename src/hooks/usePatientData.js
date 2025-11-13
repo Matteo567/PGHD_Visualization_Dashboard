@@ -1,5 +1,5 @@
-// Hook for loading patient data from CSV files and managing loading and error states
-import React, { useState, useEffect } from 'react';
+// Hook that loads patient data from CSV files and manages loading and error states
+import { useState, useEffect } from 'react';
 import { getPatientData } from '../services/dataService';
 const usePatientData = (patientId) => {
   const [data, setData] = useState(null);

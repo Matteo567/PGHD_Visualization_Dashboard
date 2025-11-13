@@ -1,9 +1,7 @@
 /**
  AccessTypeSelector.js - Access Type Selection Dropdown Component
  
- A dropdown component that allows users to select the access type.
- Displays access types: Patient, Physician, and Admin.
- Used in the main app header for switching between different access levels.
+ A dropdown component that allows users to select the access type. It displays access types including Patient, Physician, and Admin. It is used in the main app header for switching between different access levels.
  */
 
 import React from 'react';

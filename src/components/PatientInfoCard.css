@@ -4,8 +4,7 @@
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  border: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #000000;
 }
 
 .patient-info-card h3 {
@@ -38,7 +37,7 @@
   color: #000000;
   font-size: 1rem;
   font-weight: 400;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #000000;
   padding-bottom: 8px;
 }
 
@@ -65,7 +64,7 @@
   color: #000000;
   font-size: 1rem;
   font-weight: 400;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #000000;
   padding-bottom: 8px;
 }
 
@@ -79,7 +78,7 @@
   color: #000000;
   font-size: 1rem;
   font-weight: 400;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #000000;
   padding-bottom: 8px;
 }
 
@@ -106,7 +105,7 @@
   color: #000000;
   font-size: 1rem;
   font-weight: 400;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid #000000;
   padding-bottom: 8px;
 }
 
@@ -161,7 +160,7 @@
 /* Physician variant - simplified view */
 .patient-info-card.physician {
   background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  border: 1px solid #000000;
 }
 
 .patient-info-card.physician .medication-item {

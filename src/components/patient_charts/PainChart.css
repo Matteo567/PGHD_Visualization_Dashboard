@@ -70,7 +70,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--chart-spacing-md);
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   border-radius: 8px;
   background: #fafafa;
 }
@@ -137,7 +137,7 @@
 .pain-legend-wrapper {
   margin-top: var(--chart-spacing-md);
   padding-top: var(--chart-spacing-md);
-  border-top: 1px solid #eee;
+  border-top: 1px solid #000000;
 }
 
 /* Body SVG Styles */

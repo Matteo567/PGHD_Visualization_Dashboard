@@ -257,8 +257,8 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
       height: isExpanded ? 220 : 150, // Reduced height since we removed week labels
       padding: { top: 20, right: 30, bottom: 50, left: 50 }, // Reduced bottom padding
       fontSize: {
-        yAxis: isExpanded ? 10 : 8,
-        xAxis: isExpanded ? 10 : 8,
+        yAxis: isExpanded ? 10 : 12,
+        xAxis: isExpanded ? 10 : 12,
       }
     };
 

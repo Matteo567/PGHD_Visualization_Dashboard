@@ -36,11 +36,6 @@ const VisualizationWrapper = ({
     <div className={`visualization-wrapper ${isExpanded ? 'expanded' : ''} ${className} ${screenshotMode ? 'screenshot-mode' : ''} ${condensedView ? 'condensed-view' : ''}`}>
       {!screenshotMode && !condensedView && (
         <div className="visualization-header">
-          <div className="visualization-title-group">
-            <h3 className="visualization-title">
-              {title || viz?.name || 'Unknown Visualization'}
-            </h3>
-          </div>
           <div className="visualization-controls">
             {onPrev && onNext && (
               <div className="chart-navigation">
@@ -49,19 +44,19 @@ const VisualizationWrapper = ({
                   onClick={onPrev}
                   aria-label={`Previous ${navigationLabel}`}
                 >
-                  ‹
+                  ⇦ prev week
                 </button>
                 <button 
                   className="nav-button next" 
                   onClick={onNext}
                   aria-label={`Next ${navigationLabel}`}
                 >
-                  ›
+                  next week ⇨
                 </button>
               </div>
             )}
             <button onClick={() => onExpand(id)} className="expand-button">
-              {isExpanded ? 'Collapse' : 'Expand'}
+              {isExpanded ? 'Minimize' : 'Expand'}
             </button>
           </div>
         </div>

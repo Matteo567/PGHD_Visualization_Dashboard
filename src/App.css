@@ -6,12 +6,19 @@
   font-style: normal;
 }
 
+/* Allow horizontal scrolling on body and html */
+html, body {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 .App {
   font-family: 'Arial', sans-serif;
   text-align: center;
   min-height: 100vh;
   background: #7165b8;
   color: #000000;
+  min-width: 100%;
 }
 
 .App-header {
@@ -93,8 +100,10 @@
 .App-main {
   padding: 30px 20px;
   width: 100%;
+  min-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  overflow-x: visible;
 }
 
 .loading {

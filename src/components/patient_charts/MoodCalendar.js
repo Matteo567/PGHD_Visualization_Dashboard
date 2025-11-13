@@ -160,7 +160,7 @@ const Calendar = ({ isExpanded, moodByDate, currentMonth, monthDisplay }) => {
 };
 
 // --- Main Component ---
-const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false }) => {
+const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, screenshotMode = false, showThreeMonthSummaries = false, accessType = 'Admin' }) => {
   const { moodData, loading, error } = usePatientData(patientId);
   
   // Use navigation from parent or fallback to internal navigation
@@ -305,14 +305,30 @@ const MoodCalendar = ({ patientId, isExpanded = false, onExpand, navigation, scr
     };
   }
 
+  // For physicians, hide the calendar and legend, show only summaries
+  const isPhysician = accessType === 'Physician';
+
   return (
     <div className="mood-calendar-container">
-      <div className={`mood-calendar-wrapper ${isExpanded ? 'expanded' : ''}`}>
-        <Calendar isExpanded={isExpanded} moodByDate={moodByDate} currentMonth={currentMonth} monthDisplay={monthDisplay} />
-      </div>
-      <div className="mood-calendar-legend-wrapper">
-          <Legend title="Mood" items={moodLegendItems} hide={screenshotMode} />
-      </div>
+      {/* Hide calendar and legend for physicians */}
+      {!isPhysician && (
+        <>
+          <div className={`mood-calendar-wrapper ${isExpanded ? 'expanded' : ''}`}>
+            <Calendar isExpanded={isExpanded} moodByDate={moodByDate} currentMonth={currentMonth} monthDisplay={monthDisplay} />
+          </div>
+          <div className="mood-calendar-legend-wrapper">
+            <Legend title="Mood" items={moodLegendItems} hide={screenshotMode} />
+          </div>
+        </>
+      )}
+
+      {/* Show title and subtitle for physician view */}
+      {isPhysician && (
+        <div className="mood-calendar-svg-container">
+          <h3 className="chart-title">Mood Calendar</h3>
+          <h4 className="chart-subtitle">{monthDisplay}</h4>
+        </div>
+      )}
 
       {/* Show summary for physician/unified view */}
       {monthSummary && (

@@ -70,6 +70,13 @@
   justify-content: center;
 }
 
+/* When showing combined chart in expanded view, use column layout and allow full expansion */
+.bp-chart-container.expanded .bp-charts-wrapper:has(.combined-chart) {
+  flex-direction: column;
+  max-width: 100%;
+  align-items: stretch;
+}
+
 /* Header with toggle */
 .bp-header {
   display: flex;
@@ -87,43 +94,19 @@
   margin: 0;
 }
 
-/* View Toggle */
-.view-toggle {
-  display: flex;
-  gap: 8px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 4px;
-}
-
-.toggle-btn {
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 400;
-  transition: all 0.2s ease;
-  color: #000000;
-}
-
-.toggle-btn:hover {
-  background: #e0e0e0;
-  color: #000000;
-}
-
-.toggle-btn.active {
-  background: #007bff;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
 
 /* Combined Chart Styles */
 .combined-chart {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+}
+
+/* Allow combined chart to expand fully when container is expanded, similar to glucose chart */
+.bp-chart-container.expanded .combined-chart {
+  max-width: 100%;
+  width: 100%;
+  flex-grow: 1;
 }
 
 .combined-chart .chart-subtitle {
@@ -182,6 +165,14 @@
 .combined-chart .bp-svg-container {
   padding-left: 20px;
   padding-right: 20px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* Allow SVG container to expand fully in expanded view, similar to glucose chart */
+.bp-chart-container.expanded .combined-chart .bp-svg-container {
+  width: 100%;
+  flex-grow: 1;
 }
 
 /* Grid lines for dual axis */

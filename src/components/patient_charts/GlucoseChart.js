@@ -32,7 +32,7 @@ const getTimePosition = (date, dayIndex, config) => {
 };
 
 // --- Chart Sub-components ---
-const XAxisAndGrid = ({ config, startOfWeek }) => (
+const XAxisAndGrid = ({ config, startOfWeek, isExpanded }) => (
   <g className="x-axis-grid">
     {DAYS_OF_WEEK.map((day, i) => {
       const x = config.padding.left + i * config.dayWidth;
@@ -74,20 +74,18 @@ const XAxisAndGrid = ({ config, startOfWeek }) => (
             x={startTickX} 
             y={config.height - config.padding.bottom + 15} 
             textAnchor="middle"
-            fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '8px'}}
+            fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
           >
-            12a
+            12am
           </text>
           <text 
             className="time-label" 
             x={middleTickX} 
             y={config.height - config.padding.bottom + 15} 
             textAnchor="middle"
-            fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '8px'}}
+            fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
           >
-            12p
+            12pm
           </text>
           
           {/* Day and date labels */}
@@ -97,17 +95,17 @@ const XAxisAndGrid = ({ config, startOfWeek }) => (
             y={config.height - config.padding.bottom + 40} 
             textAnchor="middle"
             fontSize={config.fontSize.dayLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             {day}
           </text>
           <text 
             className="x-axis-date-label" 
             x={x + config.dayWidth / 2} 
-            y={config.height - config.padding.bottom + 58} 
+            y={config.height - config.padding.bottom + 62} 
             textAnchor="middle"
             fontSize={config.fontSize.dateLabel}
-            style={{fontSize: '8px'}}
+            style={{fontSize: '13px'}}
           >
             {currentDay.getDate()}
           </text>
@@ -129,10 +127,9 @@ const XAxisAndGrid = ({ config, startOfWeek }) => (
       x={config.padding.left + DAYS_OF_WEEK.length * config.dayWidth} 
       y={config.height - config.padding.bottom + 15} 
       textAnchor="middle"
-      fontSize={config.fontSize.timeLabel}
-      style={{fontSize: '8px'}}
+      fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
     >
-      12a
+      12am
     </text>
   </g>
 );
@@ -196,9 +193,9 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
         fontSize: {
           yAxis: 16,
           yAxisTitle: 18,
-          timeLabel: 14,
-          dayLabel: 14,
-          dateLabel: 14,
+          timeLabel: 22,
+          dayLabel: 22,
+          dateLabel: 22,
         },
         barWidth: 12,
         yAxisLabels: [0, 4, 8, 12],
@@ -212,9 +209,9 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
         fontSize: {
           yAxis: 14,
           yAxisTitle: 16,
-          timeLabel: 12,
-          dayLabel: 12,
-          dateLabel: 12,
+          timeLabel: 19,
+          dayLabel: 19,
+          dateLabel: 19,
         },
         barWidth: 8,
         yAxisLabels: [0, 4, 8, 12],
@@ -227,7 +224,7 @@ const Chart = ({ weekData, isExpanded, startOfWeek, onBarHover, onBarLeave, mont
       {monthLabel && <h4 className="chart-subtitle">{monthLabel}</h4>}
       <svg width="100%" height="100%" viewBox={`0 0 ${config.width} ${config.height}`} className="glucose-svg">
         <rect width={config.width} height={config.height} fill="white" />
-        <XAxisAndGrid config={config} startOfWeek={startOfWeek} />
+        <XAxisAndGrid config={config} startOfWeek={startOfWeek} isExpanded={isExpanded} />
         <SharedYAxis config={config} title="mmol/L" />
         <DataPoints weekData={weekData} config={config} onBarHover={onBarHover} onBarLeave={onBarLeave} />
       </svg>

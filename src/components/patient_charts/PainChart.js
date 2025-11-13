@@ -273,8 +273,8 @@ const PainChart = ({ patientId, isExpanded = false, onExpand, accessType = 'Admi
       padding: { top: 20, right: 30, bottom: 50, left: 50 }, // Reduced bottom padding
       yAxisRange: 10,
       fontSize: {
-        yAxis: isExpanded ? 10 : 8,
-        xAxis: isExpanded ? 10 : 8,
+        yAxis: isExpanded ? 10 : 12,
+        xAxis: isExpanded ? 10 : 12,
       }
     };
 

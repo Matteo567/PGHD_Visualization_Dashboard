@@ -65,7 +65,7 @@
 }
 
 .meal-legend text {
-  font-family: 'Arial', sans-serif;
+  font-family: var(--chart-font-family);
 }
 
 /* Grid lines */
@@ -74,7 +74,7 @@
 /* Axis styling */
 .x-axis text,
 .y-axis text {
-  font-family: 'Arial', sans-serif;
+  font-family: var(--chart-font-family);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -150,15 +150,4 @@
   -ms-user-select: none;
 }
 
-/* Meal Contents Chart Summary Styles - Now using standard chart-summary class */
-.meal-contents-chart-container .chart-summary {
-  max-width: 500px; /* Reduced width for meal contents charts */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.meal-contents-chart-container.expanded .chart-summary,
-.visualization-wrapper.expanded .meal-contents-chart-container .chart-summary {
-  max-width: none; /* Remove max-width constraint in expanded view */
-  width: 100%;
-}
+/* Meal Contents Chart Summary Styles - Now using standard chart-summary class from ChartStyles.css */

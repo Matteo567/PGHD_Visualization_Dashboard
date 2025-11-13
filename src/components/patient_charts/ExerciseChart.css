@@ -7,38 +7,6 @@
   margin-bottom: var(--chart-spacing-md);
 }
 
-/* View Toggle */
-.view-toggle {
-  display: flex;
-  gap: 8px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 4px;
-}
-
-.toggle-btn {
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 400;
-  transition: all 0.2s ease;
-  color: #000000;
-}
-
-.toggle-btn:hover {
-  background: #e0e0e0;
-  color: #000000;
-}
-
-.toggle-btn.active {
-  background: #007bff;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
-
 /* Exercise Chart Specific Styles */
 .exercise-chart-container {
   display: flex;
@@ -69,7 +37,7 @@
 
 /* Duration labels inside stacked bar segments */
 .exercise-svg .duration-label {
-  font-family: 'Arial', sans-serif;
+  font-family: var(--chart-font-family);
   pointer-events: none;
   user-select: none;
 }

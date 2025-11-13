@@ -268,7 +268,7 @@ const DualYAxis = ({ config }) => {
   );
 };
 
-const XAxis = ({ config, weekDays }) => (
+const XAxis = ({ config, weekDays, isExpanded }) => (
   <g className="x-axis">
     {weekDays.map((day, dayIndex) => {
       const dayX = config.padding.left + dayIndex * config.dayWidth;
@@ -306,20 +306,18 @@ const XAxis = ({ config, weekDays }) => (
             x={startTickX}
             y={config.height - config.padding.bottom + 15}
             textAnchor="middle"
-            fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '13px'}}
+            fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
           >
-            12a
+            12am
           </text>
           <text
             className="time-label"
             x={middleTickX}
             y={config.height - config.padding.bottom + 15}
             textAnchor="middle"
-            fontSize={config.fontSize.timeLabel}
-            style={{fontSize: '13px'}}
+            fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
           >
-            12p
+            12pm
           </text>
 
           {/* Day and Date Labels */}
@@ -361,10 +359,9 @@ const XAxis = ({ config, weekDays }) => (
       x={config.padding.left + weekDays.length * config.dayWidth}
       y={config.height - config.padding.bottom + 15}
       textAnchor="middle"
-      fontSize={config.fontSize.timeLabel}
-      style={{fontSize: '13px'}}
+      fontSize={isExpanded ? config.fontSize.timeLabel - 11 : config.fontSize.timeLabel - 10}
     >
-      12a
+      12am
     </text>
   </g>
 );
@@ -712,7 +709,7 @@ const Chart = ({ type, weekData, isExpanded, weekDays, onBarHover, onBarLeave })
         >
           <GridLines config={config} weekDays={weekDays} />
           <YAxis config={config} type={type} />
-          <XAxis config={config} weekDays={weekDays} />
+          <XAxis config={config} weekDays={weekDays} isExpanded={isExpanded} />
           <DataBars readings={readings} type={type} config={config} onBarHover={onBarHover} onBarLeave={onBarLeave} />
         </svg>
       </div>
@@ -823,7 +820,7 @@ const CombinedChart = ({ weekData, isExpanded, weekDays, onBarHover, onBarLeave 
           <GridLines config={config} weekDays={weekDays} />
           {/* Single Y-axis for combined chart */}
           <CombinedYAxis config={config} />
-          <XAxis config={config} weekDays={weekDays} />
+          <XAxis config={config} weekDays={weekDays} isExpanded={isExpanded} />
           <CombinedDataBars readings={readings} config={config} onBarHover={onBarHover} onBarLeave={onBarLeave} />
         </svg>
       </div>

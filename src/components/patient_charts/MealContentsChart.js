@@ -321,10 +321,10 @@ const MealContentsChart = ({ patientId, isExpanded = false, onExpand, navigation
     dayWidth: dayWidth,
     mealHeight: mealHeight,
     fontSize: {
-      dayLabel: isExpanded ? 12 : 10,
-      dateLabel: isExpanded ? 10 : 8,
-      mealLabel: isExpanded ? 10 : 8,
-      timeLabel: isExpanded ? 8 : 6,
+      dayLabel: isExpanded ? 12 : 12,
+      dateLabel: isExpanded ? 10 : 10,
+      mealLabel: isExpanded ? 10 : 10,
+      timeLabel: isExpanded ? 8 : 8,
     },
   };
   

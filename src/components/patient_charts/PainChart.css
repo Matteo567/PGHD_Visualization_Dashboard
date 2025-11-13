@@ -19,38 +19,6 @@
   margin-bottom: var(--chart-spacing-md);
 }
 
-/* View Toggle */
-.view-toggle {
-  display: flex;
-  gap: 8px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 4px;
-}
-
-.toggle-btn {
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 400;
-  transition: all 0.2s ease;
-  color: #000000;
-}
-
-.toggle-btn:hover {
-  background: #e0e0e0;
-  color: #000000;
-}
-
-.toggle-btn.active {
-  background: #007bff;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
-}
-
 /* Main Pain Visualization */
 .main-pain-visualization {
   display: flex;
@@ -160,22 +128,12 @@
   padding: var(--chart-spacing-lg);
 }
 
-/* Pain Line Chart Styles */
-.pain-line-chart-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: var(--chart-spacing-md);
-}
-
+/* Pain Line Chart Styles - using universal styles from ChartStyles.css */
 .pain-line-chart {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
   padding: var(--chart-spacing-md);
 }
 
-/* Legend styles */
+/* Legend styles - using universal styles from ChartStyles.css */
 .pain-legend-wrapper {
   margin-top: var(--chart-spacing-md);
   padding-top: var(--chart-spacing-md);
@@ -220,13 +178,6 @@
 }
 
 /* Physician View Styles */
-.physician-pain-chart-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--chart-spacing-lg);
-  width: 100%;
-}
-
 .pain-location-info {
   text-align: center;
   padding: var(--chart-spacing-md);
@@ -238,49 +189,5 @@
   margin: 0;
   color: #000000;
   font-size: 1.1em;
-}
-
-/* Summary styles */
-.summary-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--chart-spacing-md);
-  margin-top: var(--chart-spacing-lg);
-}
-
-.chart-summary {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: var(--chart-spacing-md);
-}
-
-.chart-summary h4 {
-  margin: 0 0 var(--chart-spacing-sm) 0;
-  color: #000000;
-  font-size: 1em;
-}
-
-.summary-stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--chart-spacing-xs);
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 0;
-}
-
-.stat-label {
-  font-size: 0.9em;
-  color: #000000;
-}
-
-.stat-value {
-  font-size: 0.9em;
-  color: #000000;
-  font-weight: 400;
 }
 

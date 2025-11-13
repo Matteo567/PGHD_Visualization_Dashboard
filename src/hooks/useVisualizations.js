@@ -11,12 +11,12 @@ const useVisualizations = (data) => {
   // All available visualization types with their components
   const allVisualizations = {
     pain: { ...VISUALIZATION_CONFIG.pain, component: PainChart },
-    bloodPressure: { ...VISUALIZATION_CONFIG.bloodPressure, component: BloodPressureChart },
     glucose: { ...VISUALIZATION_CONFIG.glucose, component: GlucoseChart },
-    exercise: { ...VISUALIZATION_CONFIG.exercise, component: ExerciseChart },
+    bloodPressure: { ...VISUALIZATION_CONFIG.bloodPressure, component: BloodPressureChart },
     mealContents: { ...VISUALIZATION_CONFIG.mealContents, component: MealContentsChart },
-    mood: { ...VISUALIZATION_CONFIG.mood, component: MoodCalendar },
+    exercise: { ...VISUALIZATION_CONFIG.exercise, component: ExerciseChart },
     sleep: { ...VISUALIZATION_CONFIG.sleep, component: SleepChart },
+    mood: { ...VISUALIZATION_CONFIG.mood, component: MoodCalendar },
   };
 
   // Find which visualizations have data available

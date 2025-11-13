@@ -283,6 +283,10 @@
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
+  max-width: calc(100% - 48px); /* Account for container padding (24px on each side) */
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 
 /* Individual summary styling for side-by-side layout */
@@ -564,6 +568,17 @@
   width: 100%;
 }
 
+/* Universal width constraints for pain chart visualization containers */
+/* Only constrain pain-line-chart-container (physician view), not pain-content-wrapper (patient list view) */
+.physician-pain-chart-container .pain-line-chart-container,
+.physician-pain-chart-container .pain-legend-wrapper {
+  max-width: calc(100% - 48px); /* Account for container padding (24px on each side) */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Universal summary width constraints for all chart containers */
 .glucose-chart-container .chart-summary,
 .bp-chart-content .chart-summary,
@@ -639,21 +654,14 @@
 
 /* Expanded view - legends and summaries should expand to full width but respect container padding */
 .visualization-wrapper.expanded .legend-container,
-.visualization-wrapper.expanded .chart-summary {
+.visualization-wrapper.expanded .chart-summary,
+.visualization-wrapper.expanded .summary-container,
+.visualization-wrapper.expanded .pain-line-chart-container,
+.visualization-wrapper.expanded .pain-legend-wrapper {
   max-width: calc(100% - 64px); /* Account for expanded container padding (32px on each side) */
   width: 100%;
 }
 
-
-
-/* Physician pain chart container base styles */
-.physician-pain-chart-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 100%;
-  width: 100%;
-}
 
 /* Pain line chart container and chart styles - using universal width constraints */
 .pain-line-chart-container,
@@ -718,6 +726,38 @@
   transform: scale(0.98);
 }
 
+/* --- View Toggle Button Styles --- */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  color: #000000;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+  color: #000000;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
 /* --- Pain Chart Base Styles --- */
 .pain-chart-container {
   max-width: 100%; /* Allow container to expand to parent width */
@@ -766,28 +806,30 @@
 }
 
 .nav-button {
-  width: 32px;
+  min-width: 32px;
   height: 32px;
-  border: 1px solid var(--chart-color-border);
+  padding: 0 12px;
+  border: 1px solid #dee2e6;
   background: white;
-  border-radius: var(--chart-border-radius-sm);
+  border-radius: 6px;
   cursor: pointer;
-  font-size: var(--chart-font-size-lg);
-  font-weight: var(--chart-font-weight);
-  color: var(--chart-color-text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .nav-button:hover {
-  background: var(--chart-color-background);
-  border-color: var(--chart-color-neutral);
+  background: #f8f9fa;
+  border-color: #adb5bd;
 }
 
 .nav-button:active {
-  background: var(--chart-color-border);
+  background: #dee2e6;
   transform: scale(0.95);
 }
 

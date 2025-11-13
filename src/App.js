@@ -24,7 +24,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1>Health Dashboard</h1>
+          <h1>Patient-Generated Health Data (PGHD) Visualization System</h1>
           
           {/* Access Type Selector */}
           <div className="access-type-selector">

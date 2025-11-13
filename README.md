@@ -6,7 +6,7 @@ A React-based dashboard for visualizing patient-generated health data. The dashb
 
 [View Live Dashboard](https://matteo567.github.io/PGHD_Visualization_Dashboard/)
 
-The dashboard includes 100 synthetic patients with one year of health data.
+The dashboard includes 100 synthetic patients with one year of health data from July 2024 to July 2025.
 
 ## Project Overview
 
@@ -148,8 +148,8 @@ App (Root)
 
 The project includes synthetic data for testing and demonstration:
 - 100 patients with health profiles
-- One year of data per patient (July 2024 to July 2025)
-- 70+ data fields per patient per day
+- One year of data per patient from July 2024 to July 2025
+- Multiple data fields per patient per day covering all health metrics
 
 ### Data Types
 
@@ -164,13 +164,13 @@ Patient data includes the following structure:
     conditions: ["Hypertension"],
     medications: [...]
   },
-  glucoseData: [...],      // Multiple daily readings
-  bloodPressureData: [...], // Timestamped measurements
-  exerciseData: [...],     // Activity tracking
-  moodData: [...],         // Daily mood entries
-  painData: [...],         // Pain reports with location
-  sleepData: [...],        // Sleep quality and duration
-  mealData: [...]          // Meal composition data
+  glucoseData: [...],
+  bloodPressureData: [...],
+  exerciseData: [...],
+  moodData: [...],
+  painData: [...],
+  sleepData: [...],
+  mealData: [...]
 }
 ```
 
@@ -188,6 +188,7 @@ Chart features:
 - Time navigation for week or month browsing
 - Expandable views for full-screen chart analysis
 - Three-month summary toggle for long-term trend analysis
+- Condensed view option to hide patient information section
 
 ## Usage
 
@@ -198,7 +199,7 @@ Chart features:
 3. View Charts: Scroll through the dashboard to see available health metrics
 4. Navigate Time Periods: Use arrow buttons on charts to navigate weeks or months
 5. Expand Charts: Click the expand button to view charts in full screen
-6. Toggle Summaries: Use the summary toggle to show or hide 3-month summaries
+6. Toggle Summaries: Use the summary toggle to show or hide three-month summaries
 
 ### Dashboard Features
 
@@ -250,12 +251,12 @@ The script uses data from the `Data_details/` directory including:
 
 ### Development Tools & Technologies
 
-All our digital visualizations in the dashboard (our "visualization system") were created in the Cursor interactive development environment, using JavaScript with the React framework (React 18.2.0 / React DOM 18.2.0 for the frontend, built with Create React App (react-scripts 5.0.1) and employing PapaParse 5.4.1 for CSV parsing, alongside HTML and CSS for layout and styling.
+The dashboard visualizations were created using JavaScript with the React framework. The project uses React 18.2.0 and React DOM 18.2.0 for the frontend. It is built with Create React App (react-scripts 5.0.1) and uses PapaParse 5.4.1 for CSV parsing. HTML and CSS are used for layout and styling.
 
 ### Open Source Libraries
 
 This project uses the following open-source libraries:
-- **React** (^18.2.0) - UI framework
-- **React DOM** (^18.2.0) - React rendering for the web
-- **PapaParse** (^5.4.1) - Powerful CSV parsing library
-- **Create React App** (react-scripts ^5.0.1) - Build tooling and development environment
+- React (^18.2.0) - UI framework
+- React DOM (^18.2.0) - React rendering for the web
+- PapaParse (^5.4.1) - CSV parsing library
+- Create React App (react-scripts ^5.0.1) - Build tooling and development environment

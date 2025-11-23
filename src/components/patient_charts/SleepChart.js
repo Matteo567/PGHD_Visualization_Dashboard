@@ -398,7 +398,7 @@ const SleepChart = ({ patientId, isExpanded, onExpand, accessType = 'Admin', nav
             
             {showThreeMonthSummaries && threeMonthSummary && (
               <div className="chart-summary">
-                <h4>Three Month Summary</h4>
+                <h4>3-Month Summary</h4>
                 <div className="summary-stats">
                   <div className="stat-item">
                     <span className="stat-label">Average Sleep:</span>

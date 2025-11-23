@@ -147,7 +147,7 @@ MEDICATION_CATEGORIES = [
 # Each meal gets random binary assignment for each component and a random added sugar category
 
 SUGAR_CATEGORIES = ["", "1-20g", "20-40g", "40-60g", "60g+"]
-# Exponential decay where no sugar is most common and high sugar is least common
+# Geometric distribution where no sugar is most common and high sugar is least common
 SUGAR_WEIGHTS = [0.516, 0.258, 0.129, 0.065, 0.032]
 
 # Meal specific probabilities of having any food content
